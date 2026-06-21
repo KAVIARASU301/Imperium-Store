@@ -24,3 +24,20 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+:root {
+  --background: #05070D;
+  --panel: #0B1020;
+  --border: #1E2A3A;
+  --text: #F8FAFC;
+  --muted: #94A3B8;
+  --accent: #22D3EE;
+  --danger: #EF4444;
+  --profit: #22C55E;
+  --warning: #FACC15;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+}
