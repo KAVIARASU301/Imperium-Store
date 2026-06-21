@@ -1,15 +1,13 @@
-import { products } from "@/lib/products";
+import { getActiveProducts } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 
 export default function ProductsPage() {
   return (
-    <main className="px-6 py-16 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-semibold text-white mb-8">Products</h1>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.slug} product={product} />
-        ))}
-      </div>
+    <main className="mx-auto max-w-6xl px-6 py-16">
+      <p className="font-mono text-sm uppercase tracking-[0.24em] text-cyan-300">Imperium catalog</p>
+      <h1 className="mt-3 text-4xl font-semibold text-white">Products</h1>
+      <p className="mt-4 max-w-2xl text-slate-400">Focused trading apps, templates, and education for practice, execution, and review.</p>
+      <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">{getActiveProducts().map((product) => <ProductCard key={product.slug} product={product} />)}</div>
     </main>
   );
 }
