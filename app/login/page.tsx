@@ -1,7 +1,6 @@
 "use client";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase";
-<<<<<<< ours
 import type { Provider } from "@supabase/supabase-js";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -29,21 +28,17 @@ function getAuthMode(value: string | null): AuthMode {
   return "signin";
 }
 
+function getSafeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  return value;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialMode = getAuthMode(searchParams.get("mode"));
+  const next = getSafeNextPath(searchParams.get("next"));
   const [mode, setMode] = useState<AuthMode>(initialMode);
-=======
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-
-function LoginForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const next = searchParams.get("next") ?? "/dashboard";
-
->>>>>>> theirs
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -83,11 +78,10 @@ function LoginForm() {
 
     try {
       const supabase = getSupabaseBrowserClient();
-<<<<<<< ours
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: getRedirectUrl("/dashboard"),
+          redirectTo: getRedirectUrl(next),
           queryParams: provider === "google" ? { prompt: "select_account" } : undefined,
         },
       });
@@ -96,20 +90,6 @@ function LoginForm() {
     } catch (error) {
       setLoading(false);
       setStatus({ tone: "error", text: error instanceof Error ? error.message : "Social login is not configured yet." });
-=======
-      const result = mode === "signin" ? await supabase.auth.signInWithPassword({ email, password }) : await supabase.auth.signUp({ email, password });
-      if (result.error) {
-        setMessage(result.error.message);
-        return;
-      }
-      if (result.data.session) {
-        router.push(next);
-        return;
-      }
-      setMessage(mode === "signin" ? "Signed in. You can open My Purchases." : "Account created. Check your email if confirmation is enabled, then log in.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Auth is not configured.");
->>>>>>> theirs
     }
   }
 
@@ -138,7 +118,7 @@ function LoginForm() {
         const { error } = await supabase.auth.updateUser({ password });
         if (error) throw error;
         setStatus({ tone: "success", text: "Password updated. Redirecting to your purchases..." });
-        router.push("/dashboard");
+        router.push(next);
         return;
       }
 
@@ -150,7 +130,7 @@ function LoginForm() {
           password,
           options: {
             data: { full_name: fullName.trim() },
-            emailRedirectTo: getRedirectUrl("/dashboard"),
+            emailRedirectTo: getRedirectUrl(next),
           },
         });
         if (error) throw error;
@@ -161,7 +141,7 @@ function LoginForm() {
       const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
       if (error) throw error;
       setStatus({ tone: "success", text: "Signed in. Redirecting to your purchases..." });
-      router.push("/dashboard");
+      router.push(next);
     } catch (error) {
       setStatus({ tone: "error", text: error instanceof Error ? error.message : "Authentication is not configured yet." });
     } finally {
@@ -173,7 +153,6 @@ function LoginForm() {
   const showPasswordFields = mode !== "forgot";
 
   return (
-<<<<<<< ours
     <main className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
       <section className="flex flex-col justify-center">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Secure customer access</p>
@@ -182,11 +161,7 @@ function LoginForm() {
           Sign in with a trusted provider or use email and password. Password recovery, account confirmation, and reset flows are built on Supabase Auth.
         </p>
         <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-          {[
-            "Google and GitHub OAuth",
-            "Email/password fallback",
-            "Forgot and reset password",
-          ].map((item) => (
+          {["Google and GitHub OAuth", "Email/password fallback", "Forgot and reset password"].map((item) => (
             <div key={item} className="rounded-2xl border border-slate-800 bg-white/[0.03] p-4">
               <span className="text-cyan-300">✓</span>
               <p className="mt-2">{item}</p>
@@ -259,33 +234,13 @@ function LoginForm() {
           <span>Protected by <Link href="/privacy-policy" className="text-cyan-300 hover:text-cyan-200">privacy-first policies</Link>.</span>
         </div>
       </section>
-=======
-    <main className="mx-auto max-w-md px-6 py-24">
-      <h1 className="text-3xl font-semibold text-white">Login</h1>
-      <p className="mt-3 text-sm leading-6 text-slate-400">{message}</p>
-      <div className="mt-8 space-y-4">
-        <input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full border border-slate-800 bg-[#0B1020] px-4 py-3 text-white" placeholder="Email" type="email" />
-        <input value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-slate-800 bg-[#0B1020] px-4 py-3 text-white" placeholder="Password" type="password" />
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => submit("signin")} className="bg-cyan-300 px-4 py-3 font-semibold text-black">Login</button>
-          <button onClick={() => submit("signup")} className="border border-slate-700 px-4 py-3 font-semibold text-white">Sign up</button>
-        </div>
-      </div>
->>>>>>> theirs
     </main>
   );
 }
 
-<<<<<<< ours
-
 export default function LoginPage() {
   return (
     <Suspense fallback={<main className="mx-auto max-w-md px-6 py-24 text-slate-400">Loading secure login...</main>}>
-=======
-export default function LoginPage() {
-  return (
-    <Suspense fallback={null}>
->>>>>>> theirs
       <LoginForm />
     </Suspense>
   );
