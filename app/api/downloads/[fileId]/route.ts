@@ -1,13 +1,21 @@
+import { getCurrentUserFromRequest } from "@/lib/auth";
+import { createSignedDownloadUrl } from "@/lib/downloads";
+import { getProductFileById } from "@/lib/products";
+import { hasPaidAccess } from "@/lib/purchases";
+import { hasSupabaseEnv } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { fileId: string } }
-) {
-  // TODO:
-  // 1. Get the logged-in user from the Supabase session
-  // 2. Check the user has a "paid" purchase for the product owning this file
-  // 3. Create a short-lived signed URL via Supabase Storage
-  // 4. Return the signed URL — never a permanent public link (Section 11)
-  return NextResponse.json({ message: "not implemented" }, { status: 501 });
+export async function GET(request: Request, ctx: RouteContext<"/api/downloads/[fileId]">) {
+  try {
+    if (!hasSupabaseEnv()) return NextResponse.json({ message: "Supabase is not configured" }, { status: 503 });
+    const { fileId } = await ctx.params;
+    const file = getProductFileById(fileId);
+    if (!file) return NextResponse.json({ message: "File not found" }, { status: 404 });
+    const user = await getCurrentUserFromRequest(request);
+    if (!user) return NextResponse.json({ message: "Authentication required" }, { status: 401 });
+    if (!(await hasPaidAccess(user.id, file.product_slug))) return NextResponse.json({ message: "Paid access required" }, { status: 403 });
+    return NextResponse.json({ url: await createSignedDownloadUrl(file.file_path) });
+  } catch (error) {
+    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to create signed URL" }, { status: 500 });
+  }
 }
