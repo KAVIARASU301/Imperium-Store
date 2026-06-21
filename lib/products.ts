@@ -28,11 +28,17 @@ export const products: Product[] = [
     type: "app",
     short_description:
       "A high-speed desktop terminal for serious Indian options traders who need live execution, paper trading, market context, and risk controls in one focused workspace.",
+    image: {
+      src: "/product-resources/imperium-option-trading-terminal/terminal.png",
+      alt: "Imperium Option Trading Terminal desktop workspace with option chain, watchlists, P&L, and order panels",
+      width: 1701,
+      height: 925,
+    },
     description:
       "Imperium Option Trading Terminal is a Python and PySide6 desktop application for Indian-market options trading. It connects with Zerodha Kite Connect for live market data and order placement, while also offering paper trading for simulation and practice. The terminal brings strike-ladder navigation, quick order controls, real-time positions, P&L tracking, CVD views, CPR scanning, watchlists, trade logs, and session review into one desktop-first trading workflow.",
     promise:
       "Trade faster, monitor smarter, practice safer, and manage risk with a desktop terminal built for active Indian options workflows.",
-    price: 0,
+    price: 6999,
     currency: "INR",
     is_active: true,
     audience: [
@@ -96,11 +102,17 @@ export const products: Product[] = [
     type: "app",
     short_description:
       "A professional swing trading workstation for scanners, watchlists, advanced charting, broker-connected execution, stop-loss management, alerts, news, and performance review.",
+    image: {
+      src: "/product-resources/imperium-investor/investor.png",
+      alt: "Imperium Investor desktop swing trading workstation with scanner, charts, watchlists, and portfolio panels",
+      width: 1672,
+      height: 941,
+    },
     description:
       "Imperium Investor is a desktop swing trading app that helps active traders move from idea discovery to chart validation to disciplined execution. It combines scanner-driven discovery, tabbed watchlists, professional charting, broker-aware order workflows, live positions, stop-loss management, alerts, news, portfolio intelligence, and performance review into one command center for traders who hold positions from days to weeks.",
     promise:
       "Find the setup, read the chart, manage the trade, and review performance from one focused swing trading workstation.",
-    price: 0,
+    price: 19999,
     currency: "INR",
     is_active: true,
     audience: [
@@ -157,4 +169,4 @@ export const products: Product[] = [
 export function getActiveProducts() { return products.filter((product) => product.is_active); }
 export function getProductBySlug(slug: string) { return products.find((product) => product.slug === slug && product.is_active); }
 export function getProductFileById(fileId: string) { return productFiles.find((file) => file.id === fileId && file.is_active); }
-export function formatPrice(price: number, currency = "INR") { return price === 0 ? "Contact Sales" : new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(price); }
+export function formatPrice(price: number, currency = "INR") { return new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(price); }

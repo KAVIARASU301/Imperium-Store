@@ -16,3 +16,14 @@ export async function getPurchasesForUser(userId: string) {
   if (error) throw error;
   return data ?? [];
 }
+
+export async function getPurchaseByOrderId(userId: string, orderId: string) {
+  const { data, error } = await getSupabaseServerClient(true)
+    .from("purchases")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("razorpay_order_id", orderId)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}

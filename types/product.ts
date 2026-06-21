@@ -24,6 +24,7 @@ export interface Product {
   type: ProductType;
   short_description: string;
   description: string;
+  image: { src: string; alt: string; width: number; height: number };
   promise: string;
   price: number;
   currency: string;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Script from "next/script";
 import "./globals.css";
 
 
@@ -8,10 +9,53 @@ export const metadata: Metadata = {
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
 };
 
+const darkReaderHydrationCleanup = `
+(function () {
+  function cleanDarkReaderAttributes(root) {
+    var nodes = root.querySelectorAll ? root.querySelectorAll('[data-darkreader-inline-color], [data-darkreader-inline-bgcolor], [data-darkreader-inline-border], [style*="--darkreader-inline"]') : [];
+    for (var i = 0; i < nodes.length; i += 1) {
+      var node = nodes[i];
+      node.removeAttribute('data-darkreader-inline-color');
+      node.removeAttribute('data-darkreader-inline-bgcolor');
+      node.removeAttribute('data-darkreader-inline-border');
+      if (node.style) {
+        node.style.removeProperty('--darkreader-inline-color');
+        node.style.removeProperty('--darkreader-inline-bgcolor');
+        node.style.removeProperty('--darkreader-inline-border');
+      }
+    }
+  }
+
+  cleanDarkReaderAttributes(document);
+
+  var observer = new MutationObserver(function () {
+    cleanDarkReaderAttributes(document);
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    childList: true,
+    subtree: true,
+  });
+
+  window.addEventListener('DOMContentLoaded', function () {
+    cleanDarkReaderAttributes(document);
+    window.setTimeout(function () {
+      observer.disconnect();
+    }, 1000);
+  });
+})();
+`;
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full bg-[#05070D] text-slate-100">
+        <Script
+          id="darkreader-hydration-cleanup"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: darkReaderHydrationCleanup }}
+        />
         <header className="border-b border-slate-900/90 bg-[#05070D]/90">
           <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <Link href="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">Imperium</Link>
