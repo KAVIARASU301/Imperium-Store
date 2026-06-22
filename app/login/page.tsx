@@ -13,9 +13,8 @@ type AuthStatus = {
   text: string;
 };
 
-const oauthProviders: Array<{ provider: Provider; label: string; icon: string }> = [
+const oauthProviders: Array<{ provider: Extract<Provider, "google">; label: string; icon: string }> = [
   { provider: "google", label: "Continue with Google", icon: "G" },
-  { provider: "github", label: "Continue with GitHub", icon: "◆" },
 ];
 
 function getRedirectUrl(path: string) {
@@ -73,7 +72,7 @@ function LoginForm() {
     });
   }
 
-  async function signInWithProvider(provider: Provider) {
+  async function signInWithProvider(provider: Extract<Provider, "google">) {
     setLoading(true);
     setStatus({ tone: "info", text: "Redirecting to your secure sign-in provider..." });
 
@@ -165,10 +164,10 @@ function LoginForm() {
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Secure customer access</p>
           <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Production-grade login for your trading tools.</h1>
           <p className="mt-5 text-base leading-7 text-slate-400">
-            Sign in with a trusted provider or use email and password. Password recovery, account confirmation, and reset flows are built on Supabase Auth.
+            Sign in with Google or use email and password. Password recovery, account confirmation, and reset flows are built on Supabase Auth.
           </p>
           <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-            {["Google and GitHub OAuth", "Email/password fallback", "Forgot and reset password"].map((item) => (
+            {["Google OAuth", "Email/password login", "Forgot and reset password"].map((item) => (
                 <div key={item} className="rounded-2xl border border-slate-800 bg-white/[0.03] p-4">
                   <span className="text-cyan-300">✓</span>
                   <p className="mt-2">{item}</p>
@@ -203,7 +202,7 @@ function LoginForm() {
           </div>
 
           {showOAuth ? (
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <div className="mt-6 grid gap-3">
                 {oauthProviders.map(({ provider, label, icon }) => (
                     <button
                         key={provider}
