@@ -166,14 +166,14 @@ function LoginForm() {
           Secure customer access
         </p>
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-          Production-grade login for your trading tools.
+          Sign in to your Imperium account.
         </h1>
         <p className="mt-5 text-base leading-7 text-slate-400">
-          Use email and password to sign in. Password recovery, account
-          confirmation, and reset flows are built on Supabase Auth.
+          Access your purchases, downloads, invoices, and product updates from one
+          secure account.
         </p>
         <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
-          {["Email/password login", "Forgot and reset password"].map((item) => (
+          {["Account access", "Download management", "Password recovery"].map((item) => (
             <div
               key={item}
               className="rounded-2xl border border-slate-800 bg-white/[0.03] p-4"
@@ -298,7 +298,7 @@ function LoginForm() {
                   ? "Send reset link"
                   : mode === "reset"
                     ? "Save new password"
-                    : "Login securely"}
+                    : "Login"}
           </button>
         </form>
 
@@ -341,7 +341,7 @@ export default function LoginPage() {
     <Suspense
       fallback={
         <main className="mx-auto max-w-md px-6 py-24 text-slate-400">
-          Loading secure login...
+          Loading login...
         </main>
       }
     >
