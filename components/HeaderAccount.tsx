@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 
 type AccountUser = {
@@ -27,6 +27,9 @@ function getAccountLabel(user: AccountUser | null) {
 export default function HeaderAccount() {
   const [user, setUser] = useState<AccountUser | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -44,6 +47,7 @@ export default function HeaderAccount() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoaded(true);
+      setIsMenuOpen(false);
     });
 
     window.addEventListener("imperium-auth-change", syncUser);
@@ -55,7 +59,36 @@ export default function HeaderAccount() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) setIsMenuOpen(false);
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMenuOpen]);
+
   const accountLabel = useMemo(() => getAccountLabel(user), [user]);
+
+  async function handleLogout() {
+    setIsSigningOut(true);
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    setUser(null);
+    setIsMenuOpen(false);
+    setIsSigningOut(false);
+  }
 
   if (!loaded) {
     return <span className="text-slate-600">Account</span>;
@@ -66,12 +99,42 @@ export default function HeaderAccount() {
   }
 
   return (
-    <Link
-      href="/dashboard"
-      className="rounded-full border border-cyan-300/30 px-3 py-1.5 font-medium text-cyan-200 transition hover:border-cyan-200 hover:text-white"
-      title="View account and purchases"
-    >
-      {accountLabel}
-    </Link>
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        className="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 px-3 py-1.5 font-medium text-cyan-200 transition hover:border-cyan-200 hover:text-white"
+        aria-expanded={isMenuOpen}
+        aria-haspopup="menu"
+        onClick={() => setIsMenuOpen((open) => !open)}
+      >
+        <span className="max-w-32 truncate sm:max-w-44">{accountLabel}</span>
+        <span className={`text-[10px] transition ${isMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
+      </button>
+
+      {isMenuOpen ? (
+        <div className="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-2xl border border-slate-800 bg-[#080B12] py-2 text-sm text-slate-300 shadow-2xl shadow-black/40" role="menu">
+          <div className="border-b border-slate-800 px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Signed in as</p>
+            <p className="mt-1 truncate font-medium text-white">{accountLabel}</p>
+            {user?.email ? <p className="mt-0.5 truncate text-xs text-slate-500">{user.email}</p> : null}
+          </div>
+          <Link href="/dashboard" className="block px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+            My purchases
+          </Link>
+          <Link href="/support" className="block px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+            Support
+          </Link>
+          <button
+            type="button"
+            className="block w-full px-4 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
+            role="menuitem"
+            disabled={isSigningOut}
+            onClick={handleLogout}
+          >
+            {isSigningOut ? "Signing out..." : "Logout"}
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
