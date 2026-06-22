@@ -2,12 +2,10 @@ import { getCurrentUserFromRequest } from "@/lib/auth";
 import { createSignedDownloadUrl } from "@/lib/downloads";
 import { getProductFileById } from "@/lib/products";
 import { hasPaidAccess } from "@/lib/purchases";
-import { hasSupabaseEnv } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request, ctx: RouteContext<"/api/downloads/[fileId]">) {
   try {
-    if (!hasSupabaseEnv()) return NextResponse.json({ message: "Supabase is not configured" }, { status: 503 });
     const { fileId } = await ctx.params;
     const file = getProductFileById(fileId);
     if (!file) return NextResponse.json({ message: "File not found" }, { status: 404 });

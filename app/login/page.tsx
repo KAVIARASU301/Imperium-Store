@@ -28,11 +28,16 @@ function getAuthMode(value: string | null): AuthMode {
   return "signin";
 }
 
+function safeRedirectPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/dashboard";
+  return value;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialMode = getAuthMode(searchParams.get("mode"));
-  const next = searchParams.get("next") ?? "/dashboard";
+  const next = safeRedirectPath(searchParams.get("next"));
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
@@ -43,7 +48,7 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<AuthStatus>({
     tone: "info",
-    text: "Sign in securely with Google, GitHub, or your email and password.",
+    text: "Sign in to access purchases, downloads, invoices, and product updates.",
   });
 
   const title = useMemo(() => {
@@ -64,7 +69,7 @@ function LoginForm() {
               ? "Enter your email and we will send a secure password reset link."
               : nextMode === "reset"
                   ? "Use the password reset link from your email, then save a stronger password."
-                  : "Sign in securely with Google, GitHub, or your email and password.",
+                  : "Sign in to access purchases, downloads, invoices, and product updates.",
     });
   }
 
@@ -77,7 +82,7 @@ function LoginForm() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: getRedirectUrl(next),
+          redirectTo: getRedirectUrl(`/auth/callback?next=${encodeURIComponent(next)}`),
           queryParams: provider === "google" ? { prompt: "select_account" } : undefined,
         },
       });
@@ -86,7 +91,7 @@ function LoginForm() {
       // On success, Supabase redirects the browser away — no further state update needed here.
     } catch (error) {
       setLoading(false);
-      setStatus({ tone: "error", text: error instanceof Error ? error.message : "Social login is not configured yet." });
+      setStatus({ tone: "error", text: error instanceof Error ? error.message : "Unable to start social sign-in." });
     }
   }
 
@@ -145,7 +150,7 @@ function LoginForm() {
       setStatus({ tone: "success", text: "Signed in. Redirecting..." });
       router.push(next);
     } catch (error) {
-      setStatus({ tone: "error", text: error instanceof Error ? error.message : "Authentication is not configured yet." });
+      setStatus({ tone: "error", text: error instanceof Error ? error.message : "Unable to authenticate your account." });
     } finally {
       setLoading(false);
     }
