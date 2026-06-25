@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import Script from "next/script";
 import HeaderAccount from "@/components/HeaderAccount";
@@ -8,6 +8,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Imperium Store | Trading tools and education",
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
+};
+
+export const viewport: Viewport = {
+  width: 1280,
+  initialScale: 1,
 };
 
 const darkReaderHydrationCleanup = `
