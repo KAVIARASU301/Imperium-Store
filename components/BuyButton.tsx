@@ -14,6 +14,12 @@ interface CreateOrderResponse {
   message?: string;
 }
 
+type RazorpaySuccessResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
+
 export default function BuyButton({ slug, price, productName }: { slug: string; price: number; productName: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -55,8 +61,20 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
         description: productName,
         prefill: { email: sessionData.session?.user.email ?? undefined },
         theme: { color: "#22D3EE" },
-        handler: () => {
-          router.push(`/checkout/success?order_id=${order.orderId}`);
+        handler: async (response: RazorpaySuccessResponse) => {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify(response),
+            });
+            const verifyPayload = await verifyRes.json();
+            if (!verifyRes.ok) throw new Error(verifyPayload.message ?? "Payment verification failed");
+            router.push(`/checkout/success?order_id=${response.razorpay_order_id}`);
+          } catch (error) {
+            setError(error instanceof Error ? error.message : "Payment verification failed");
+            setLoading(false);
+          }
         },
         modal: {
           ondismiss: () => setLoading(false),

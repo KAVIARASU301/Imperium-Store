@@ -53,7 +53,7 @@ function CheckoutSuccessInner() {
           ? "Your access is unlocked. Head to your dashboard to download."
           : status === "failed"
             ? "Razorpay reported this payment did not go through. No access was unlocked."
-            : "Access unlocks once the Razorpay webhook confirms your purchase. This usually takes a few seconds."}
+            : "Access unlocks once the server verifies your Razorpay payment. This usually takes a few seconds."}
       </p>
       <Link href="/dashboard" className="mt-8 inline-block bg-cyan-300 px-6 py-3 font-semibold text-black hover:bg-cyan-200">
         Go to My Purchases

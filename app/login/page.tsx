@@ -42,6 +42,7 @@ function LoginForm() {
   const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [status, setStatus] = useState<AuthStatus>({
     tone: "info",
     text: "Sign in to access purchases, downloads, invoices, and product updates.",
@@ -113,7 +114,7 @@ function LoginForm() {
         throw new Error("Use at least 8 characters for your password.");
 
       if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
+        const { error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
           options: {
@@ -122,17 +123,16 @@ function LoginForm() {
           },
         });
         if (error) throw error;
-        if (data.session) {
-          setStatus({
-            tone: "success",
-            text: "Account created. Redirecting...",
-          });
-          router.push(next);
-          return;
-        }
+        await supabase.auth.signOut();
+        setEmail(cleanEmail);
+        setPassword("");
+        setConfirmPassword("");
+        setFullName("");
+        setMode("signin");
+        setConfirmationEmail(cleanEmail);
         setStatus({
           tone: "success",
-          text: "Account created. Confirm your email if required, then sign in to continue.",
+          text: `Account created for ${cleanEmail}. You must confirm the email before logging in. For now, the confirmation email may appear from "Supabase Auth".`,
         });
         return;
       }
@@ -161,6 +161,38 @@ function LoginForm() {
 
   return (
     <main className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
+      {confirmationEmail ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
+          <section
+            aria-modal="true"
+            role="dialog"
+            className="w-full max-w-lg rounded-2xl border border-cyan-300/30 bg-[#0B1020] p-6 shadow-2xl shadow-cyan-950/40 sm:p-8"
+          >
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
+              Email confirmation required
+            </p>
+            <h2 className="mt-4 text-2xl font-semibold text-white">
+              Check your inbox before logging in.
+            </h2>
+            <p className="mt-4 leading-7 text-slate-300">
+              We created the account for <span className="font-semibold text-white">{confirmationEmail}</span>. Open the confirmation email and verify your address. Login will work only after the email is confirmed.
+            </p>
+            <p className="mt-4 rounded-2xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm leading-6 text-cyan-100">
+              For now, the email sender may show as <span className="font-semibold text-white">Supabase Auth</span>. Search your inbox for that sender if you do not see an Imperium Store email.
+            </p>
+            <div className="mt-6 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-100">
+              If you do not see the email, check spam, promotions, or updates folders before trying to create another account.
+            </div>
+            <button
+              type="button"
+              onClick={() => setConfirmationEmail("")}
+              className="mt-6 w-full rounded-2xl bg-cyan-300 px-4 py-3 font-semibold text-black hover:bg-cyan-200"
+            >
+              I understand, go to login
+            </button>
+          </section>
+        </div>
+      ) : null}
       <section className="flex flex-col justify-center">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
           Secure customer access

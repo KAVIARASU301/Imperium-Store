@@ -1,5 +1,5 @@
 import { verifyWebhookSignature } from "@/lib/razorpay";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { updatePurchaseStatus } from "@/lib/purchases";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,10 +10,10 @@ export async function POST(request: Request) {
   const orderId = payment?.order_id;
   if (!orderId) return NextResponse.json({ ok: true });
   if (event.event === "payment.captured") {
-    await getSupabaseServerClient(true).from("purchases").update({ status: "paid", razorpay_payment_id: payment.id, paid_at: new Date().toISOString() }).eq("razorpay_order_id", orderId);
+    await updatePurchaseStatus({ orderId, status: "paid", paymentId: payment.id });
   }
   if (event.event === "payment.failed") {
-    await getSupabaseServerClient(true).from("purchases").update({ status: "failed", razorpay_payment_id: payment.id }).eq("razorpay_order_id", orderId);
+    await updatePurchaseStatus({ orderId, status: "failed", paymentId: payment.id });
   }
   return NextResponse.json({ ok: true });
 }

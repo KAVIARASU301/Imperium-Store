@@ -16,10 +16,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ orderId: null, amount: 0, keyId: process.env.RAZORPAY_KEY_ID, productId: product.slug });
     }
     const amount = product.price * 100;
+    if (process.env.TEST_CHECKOUT_ENABLED === "true") {
+      const orderId = `test_order_${Date.now()}`;
+      await createPaidPurchase({ userId: user.id, productSlug: product.slug, orderId, amount: product.price, currency: product.currency, paymentId: `test_pay_${Date.now()}` });
+      return NextResponse.json({ orderId: null, amount, currency: product.currency, productId: product.slug, message: "Test checkout completed" });
+    }
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      const orderId = `local_order_${Date.now()}`;
-      await createPaidPurchase({ userId: user.id, productSlug: product.slug, orderId, amount: product.price, currency: product.currency });
-      return NextResponse.json({ orderId: null, amount, currency: product.currency, productId: product.slug, message: "Demo checkout completed" });
+      return NextResponse.json({ message: "Razorpay checkout is not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to continue." }, { status: 503 });
     }
     const order = await getRazorpayClient().orders.create({ amount, currency: product.currency, receipt: `${product.slug}-${Date.now()}`.slice(0, 40), notes: { productId: product.slug, userId: user.id } });
     await createPendingPurchase({ userId: user.id, productSlug: product.slug, razorpayOrderId: order.id, amount: product.price, currency: product.currency });

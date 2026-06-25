@@ -20,6 +20,30 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Payment Checkout
+
+Set these values in `.env.local` before accepting real payments:
+
+```bash
+RAZORPAY_KEY_ID=rzp_live_or_test_key
+RAZORPAY_KEY_SECRET=your_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
+```
+
+For local download testing without Razorpay, temporarily enable:
+
+```bash
+TEST_CHECKOUT_ENABLED=true
+```
+
+Turn this off or remove it before production deployment. When enabled, paid products unlock immediately after clicking buy.
+
+Razorpay checkout now verifies the browser payment signature on the server and unlocks the matching purchase immediately after payment. The webhook remains the backup confirmation path. In Razorpay Dashboard, point the webhook to:
+
+```text
+https://your-domain.com/api/razorpay/webhook
+```
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

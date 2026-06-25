@@ -1,5 +1,5 @@
 import { getProductBySlug } from "@/lib/products";
-import { createLocalPurchase, getLocalPurchaseByOrderId, getLocalPurchasesForUser, hasLocalPaidAccess } from "@/lib/local-store";
+import { createLocalPurchase, getLocalPurchaseByOrderId, getLocalPurchasesForUser, hasLocalPaidAccess, updateLocalPurchaseStatus } from "@/lib/local-store";
 import { getSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase";
 
 export async function createPendingPurchase(input: { userId: string; productSlug: string; razorpayOrderId: string; amount: number; currency: string }) {
@@ -39,6 +39,32 @@ export async function getPurchaseByOrderId(userId: string, orderId: string) {
     .eq("user_id", userId)
     .eq("razorpay_order_id", orderId)
     .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+export async function updatePurchaseStatus(input: {
+  orderId: string;
+  status: "paid" | "failed";
+  paymentId?: string | null;
+  userId?: string;
+}) {
+  if (!hasSupabaseEnv()) {
+    return updateLocalPurchaseStatus(input);
+  }
+
+  let query = getSupabaseServerClient(true)
+    .from("purchases")
+    .update({
+      status: input.status,
+      razorpay_payment_id: input.paymentId ?? null,
+      paid_at: input.status === "paid" ? new Date().toISOString() : null,
+    })
+    .eq("razorpay_order_id", input.orderId);
+
+  if (input.userId) query = query.eq("user_id", input.userId);
+
+  const { data, error } = await query.select("*").maybeSingle();
   if (error) throw error;
   return data;
 }

@@ -64,3 +64,24 @@ export async function getLocalPurchaseByOrderId(userId: string, orderId: string)
   const purchases = await getLocalPurchasesForUser(userId);
   return purchases.find((purchase) => purchase.razorpay_order_id === orderId) ?? null;
 }
+
+export async function updateLocalPurchaseStatus(input: {
+  orderId: string;
+  status: Purchase["status"];
+  paymentId?: string | null;
+  userId?: string;
+}) {
+  const purchases = await readPurchases();
+  const purchase = purchases.find(
+    (item) =>
+      item.razorpay_order_id === input.orderId &&
+      (!input.userId || item.user_id === input.userId),
+  );
+  if (!purchase) return null;
+
+  purchase.status = input.status;
+  if (input.paymentId !== undefined) purchase.razorpay_payment_id = input.paymentId;
+  if (input.status === "paid") purchase.paid_at = purchase.paid_at ?? new Date().toISOString();
+  await writePurchases(purchases);
+  return purchase;
+}

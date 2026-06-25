@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import ProductCard from "@/components/ProductCard";
+import TickerBoard from "@/components/TickerBoard";
 import { getActiveProducts } from "@/lib/products";
 import Link from "next/link";
 
@@ -14,6 +15,7 @@ export default function HomePage() {
   return (
     <main>
       <Hero />
+      <TickerBoard />
       <section className="mx-auto max-w-6xl px-6 py-16" id="products">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
