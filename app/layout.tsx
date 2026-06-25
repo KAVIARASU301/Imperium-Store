@@ -1,18 +1,13 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import Script from "next/script";
-import HeaderAccount from "@/components/HeaderAccount";
+import HeaderNav from "@/components/HeaderNav";
 import "./globals.css";
 
 
 export const metadata: Metadata = {
   title: "Imperium Store | Trading tools and education",
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
-};
-
-export const viewport: Viewport = {
-  width: 1280,
-  initialScale: 1,
 };
 
 const darkReaderHydrationCleanup = `
@@ -65,7 +60,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <header className="border-b border-slate-900/90 bg-[#05070D]/90">
           <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <Link href="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">Imperium</Link>
-            <div className="flex items-center gap-5 text-sm text-slate-400"><Link href="/products" className="hover:text-cyan-300">Products</Link><Link href="/dashboard" className="hover:text-cyan-300">My Purchases</Link><HeaderAccount /></div>
+            <HeaderNav />
           </nav>
         </header>
         {children}
