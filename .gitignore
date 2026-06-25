@@ -48,3 +48,6 @@ Thumbs.db
 *.swo
 
 .local-store/
+.env.local
+
+.env.local
