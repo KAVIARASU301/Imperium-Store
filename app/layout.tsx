@@ -8,6 +8,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Imperium Store | Trading tools and education",
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+  },
 };
 
 const darkReaderHydrationCleanup = `
