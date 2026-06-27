@@ -1,40 +1,41 @@
-# Imperium Investor — Swing Trading App Product Details
+# Imperium Investor — Investment Terminal Product Details
 
 ## Executive Sales Positioning
 
-**Imperium Investor** is a professional swing trading workstation built for traders who need a focused, broker-connected command center for finding opportunities, analyzing charts, managing risk, and executing trades. It combines market scanning, institutional-style charting, watchlists, live positions, order management, alerts, news, and portfolio intelligence into one desktop experience so traders can move from idea to execution without jumping between disconnected tools.
+**Imperium Investor** is a professional investment terminal for managing Indian and American stock portfolios in one broker-connected desktop workspace. It is built around Zerodha workflows for Indian markets and IBKR workflows for U.S. markets, combining portfolio monitoring, watchlists, market discovery, institutional-style charting, live positions, order management, alerts, news, P&L history, and performance review into one focused experience.
 
 The core message for customers is simple:
 
-> **Imperium Investor helps active swing traders identify quality setups faster, validate them with cleaner charting and market context, and manage trades with disciplined execution tools.**
+> **Imperium Investor helps investors and swing traders manage Indian and American stock portfolios from one terminal, with Zerodha and IBKR workflows connected to charts, watchlists, alerts, positions, and review.**
 
 ## Ideal Customer Profile
 
 Imperium Investor is designed for:
 
-- **Swing traders** who hold positions from days to weeks and need strong chart workflow, watchlists, alerts, and position monitoring.
-- **Active stock traders** who want real-time and historical market data in a dedicated trading terminal.
-- **Multi-market traders** who care about U.S. and Indian market access through broker-specific workflows.
-- **Process-driven traders** who want cleaner risk management through stop-loss tools, order history, P&L tracking, and portfolio review.
-- **Traders upgrading from spreadsheets or browser tabs** who want a consolidated desktop platform.
+- **Investors** managing Indian and American stock exposure from one workstation.
+- **Indian investors using Zerodha** who also want a serious U.S. investing workflow through IBKR.
+- **Portfolio-focused users** who want holdings, watchlists, alerts, P&L, and review context in one place.
+- **Swing traders** who hold positions from days to weeks and need strong chart workflow, watchlists, alerts, stops, and position monitoring.
+- **Users upgrading from spreadsheets, broker windows, charting sites, and browser tabs** who want a consolidated desktop platform.
 
 ## Product Promise
 
-Imperium Investor gives traders a single place to:
+Imperium Investor gives investors and traders a single place to:
 
-1. **Discover trade candidates** through scanners and watchlists.
-2. **Analyze market structure** with professional charts, drawing tools, multiple timeframes, and indicators.
-3. **Act quickly** with integrated order tickets and broker connectivity.
-4. **Manage open risk** with positions, stop-loss management, alerts, pending orders, and P&L tools.
-5. **Review performance** through order history, trade logs, portfolio intelligence, and account views.
+1. **Monitor portfolios** across Indian and American stock workflows.
+2. **Discover investment and trade candidates** through scanners and watchlists.
+3. **Analyze market structure** with professional charts, drawing tools, multiple timeframes, and indicators.
+4. **Act quickly** with integrated order tickets and broker connectivity.
+5. **Manage open risk** with positions, stop-loss management, alerts, pending orders, and P&L tools.
+6. **Review performance** through order history, trade logs, portfolio intelligence, and account views.
 
 ## Key Advantages
 
-### 1. Purpose-Built for Swing Traders
+### 1. Purpose-Built for Portfolio Investors and Swing Traders
 
-Imperium Investor is not a generic finance dashboard. The app is structured around the daily routine of a swing trader: scan, shortlist, analyze, enter, monitor, adjust, and review. Its workspace brings scanners, charts, watchlists, positions, order controls, alerts, and account context into one practical trading layout.
+Imperium Investor is not a generic finance dashboard. The app is structured around the routine of serious investors and swing traders: monitor portfolios, track watchlists, discover candidates, analyze charts, place or adjust orders, manage risk, and review performance. Its workspace brings scanners, charts, watchlists, positions, order controls, alerts, and account context into one practical investment layout.
 
-**Sales angle:** Traders save time because they do not need to switch between charting sites, broker windows, scanner pages, spreadsheet logs, and news tabs.
+**Sales angle:** Investors save time because they do not need to switch between Zerodha, IBKR, charting sites, scanner pages, spreadsheet logs, and news tabs.
 
 ### 2. Broker-Connected Trading Workstation
 
@@ -45,7 +46,7 @@ Supported capability examples include:
 - **India mode:** NSE, BSE, NFO, BFO, and MCX markets; stocks, options, futures, and commodities; market, limit, stop-loss, and stop-loss market order styles; INR currency support; paper trading support.
 - **America mode:** NYSE, NASDAQ, ARCA, BATS, and SMART routing; stocks, options, futures, forex, bonds, and crypto; market, limit, stop, stop-limit, and trailing order styles; USD currency support; persistent socket API connectivity and auto reconnect behavior.
 
-**Sales angle:** Imperium Investor can be positioned as a serious trading terminal that understands the different needs of Indian and U.S. traders instead of forcing every market into the same generic workflow.
+**Sales angle:** Imperium Investor can be positioned as a serious investment terminal that understands the different needs of Indian and U.S. stock investors instead of forcing every market into the same generic workflow.
 
 ### 3. Professional Charting Experience
 
@@ -60,7 +61,7 @@ Charting features include:
 - Persistent chart drawing storage for broker and trading-mode-specific workspaces.
 - A premium dark trading-terminal visual style intended to reduce clutter and improve focus.
 
-**Sales angle:** This is a chart-first product. It gives swing traders the technical analysis tools they expect without burying them in unnecessary long-term investor features.
+**Sales angle:** This is a portfolio-aware, chart-first product. It gives investors the context they need for monitoring holdings and gives swing traders the technical tools they expect for timing and risk.
 
 ### 4. Scanner and Watchlist Driven Workflow
 
@@ -196,34 +197,34 @@ Productivity features include:
 
 ## Suggested Product Taglines
 
-- **Imperium Investor: Command your swing trades with clarity, speed, and discipline.**
-- **Find the setup. Read the chart. Manage the trade.**
-- **A professional swing trading workstation for active market operators.**
-- **From scanner to execution, built for swing traders.**
-- **Your daily command center for swing trading opportunities.**
+- **Imperium Investor: Manage India and U.S. stock portfolios from one terminal.**
+- **Zerodha and IBKR workflows in one investment command center.**
+- **Track holdings. Read the chart. Manage the decision.**
+- **Built for investors, ready for swing traders.**
+- **One desktop workspace for portfolio monitoring, discovery, execution, and review.**
 
 ## Elevator Pitch
 
-Imperium Investor is a professional desktop swing trading app that brings scanners, watchlists, advanced charting, broker-connected order entry, stop-loss management, positions, alerts, news, and performance review into one focused workstation. It is built for traders who want to move faster from market discovery to chart validation to disciplined execution while keeping risk and portfolio performance visible at all times.
+Imperium Investor is a professional desktop investment terminal that brings Indian and American stock portfolio workflows into one focused workstation. It connects Zerodha-oriented Indian market workflows and IBKR-oriented U.S. market workflows with scanners, watchlists, advanced charting, broker-aware order tools, stop-loss management, positions, alerts, news, P&L history, and performance review. It is built for investors who want one place to monitor portfolios and for swing traders who want to move from discovery to chart validation to disciplined execution.
 
 ## Sales Demo Flow
 
 Use this order when presenting the app:
 
-1. **Open with the problem:** “Most swing traders use too many disconnected tools.”
-2. **Show the command center:** Highlight scanner, watchlist, chart, positions, and order areas.
+1. **Open with the problem:** “Most investors manage Indian and U.S. stocks across too many disconnected broker apps, charting sites, and spreadsheets.”
+2. **Show the command center:** Highlight portfolio, watchlist, chart, positions, scanner, and order areas.
 3. **Run the discovery story:** Explain how scanner results become watchlist candidates.
 4. **Analyze a setup:** Demonstrate timeframe switching, chart type changes, and drawing tools.
 5. **Explain execution:** Show the order dialog, pending orders, and order history.
 6. **Explain risk discipline:** Show stop-loss, positions, alerts, and P&L tracking.
 7. **Close with review:** Show portfolio intelligence, performance, and P&L history.
-8. **Summarize value:** “Imperium Investor helps traders trade with one repeatable process instead of scattered tools.”
+8. **Summarize value:** “Imperium Investor helps investors and swing traders manage decisions with one repeatable process instead of scattered tools.”
 
 ## Objection Handling
 
 ### “I already use a broker platform.”
 
-Broker platforms are often built for general execution, not a complete swing trading workflow. Imperium Investor layers scanner, charting, watchlists, alerts, risk tools, and performance review into a focused trader workstation.
+Broker platforms are often built for account access and execution, not a complete cross-market portfolio workflow. Imperium Investor layers portfolio context, scanner discovery, charting, watchlists, alerts, risk tools, and performance review into a focused investment workstation.
 
 ### “I already use a charting website.”
 
@@ -231,12 +232,12 @@ Charting websites are excellent for analysis, but many still require separate br
 
 ### “Is this only for advanced traders?”
 
-No. Beginners can use the watchlist, chart, alert, and order tools to build discipline, while advanced traders can benefit from the scanner workflow, broker-aware execution, floating windows, and performance review.
+No. Investors can use watchlists, charts, alerts, portfolio views, and review tools to stay organized, while advanced traders can benefit from scanner workflows, broker-aware execution, floating windows, and stop-loss management.
 
-### “Why is this good for swing trading specifically?”
+### “Is this only for swing trading?”
 
-Swing trading requires finding setups, validating them across timeframes, placing planned entries, managing stop-losses, monitoring positions, and reviewing results. Imperium Investor is organized around exactly that cycle.
+No. Imperium Investor is positioned as an investment terminal first: a place to manage Indian and American stock portfolios, watchlists, charts, alerts, broker workflows, and review. Swing trading is a strong workflow inside it because the same tools help users find candidates, validate charts, plan entries, manage stops, monitor positions, and review outcomes.
 
 ## Closing Sales Script
 
-“Imperium Investor is not just another market viewer. It is a swing trading command center. You can discover ideas, analyze the chart, place trades, manage stop-losses, monitor positions, track P&L, and review performance from one professional desktop app. If your goal is to trade with more speed, structure, and discipline, Imperium Investor gives you the workflow to do it.”
+“Imperium Investor is not just another market viewer. It is an investment terminal for managing Indian and American stock portfolios from one professional desktop app. You can monitor holdings, discover ideas, analyze charts, place or manage trades, handle stop-losses, track P&L, and review performance without scattering your process across Zerodha, IBKR, charting sites, spreadsheets, and browser tabs. If your goal is to invest and trade with more structure, Imperium Investor gives you the workflow to do it.”

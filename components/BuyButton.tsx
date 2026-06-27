@@ -107,7 +107,7 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
           </>
         ) : (
           <>
-            <Image src={price === 0 ? "/tick.svg" : "/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
+            <Image src={price === 0 ? "/icons/tick.svg" : "/icons/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
             {price === 0 ? "Get Access" : "Buy Now"}
           </>
         )}

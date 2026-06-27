@@ -119,9 +119,9 @@ export default function DashboardProducts({ products }: { products: Product[] })
 }
 
 function getPlatformIcon(file: ProductFile) {
-  if (file.platform === "linux") return "/linux-mint.svg";
-  if (file.platform === "windows") return "/windows.svg";
-  return "/file.svg";
+  if (file.platform === "linux") return "/icons/linux-mint.svg";
+  if (file.platform === "windows") return "/icons/windows.svg";
+  return "/icons/file.svg";
 }
 
 function getPlatformLabel(file: ProductFile) {

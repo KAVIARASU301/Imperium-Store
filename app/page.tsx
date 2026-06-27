@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const reasons = [
-  "Built for active options and swing traders",
+  "Built for active options traders, investors, and swing traders",
   "Broker-connected workstation workflows",
   "Tools designed around execution, risk, and review",
   "No noisy claims or profit guarantees",
@@ -32,13 +32,13 @@ export default function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
           <div>
             <p className="font-mono text-sm uppercase tracking-[0.24em] text-cyan-300">Imperium Investor</p>
-            <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">Indian and American markets in one swing trading terminal.</h2>
+            <h2 className="mt-3 text-3xl font-semibold text-white md:text-4xl">Manage Indian and American stock portfolios in one investment terminal.</h2>
             <p className="mt-4 leading-7 text-slate-400">
-              The main Investor advantage is a single workstation for Indian-market workflows and American stock investing. Move between India and U.S. ideas without rebuilding your watchlists, chart process, alerts, and portfolio review in separate tools.
+              Imperium Investor brings Indian stocks through Zerodha workflows and American stocks through IBKR workflows into one workstation. Track holdings, watchlists, charts, alerts, portfolio context, and swing-trade plans without rebuilding your process across separate broker apps and browser tabs.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <MarketBadge icon="/india.svg" title="Indian mode" text="Local watchlists, charts, positions, and swing-trade review." />
-              <MarketBadge icon="/usa.svg" title="American mode" text="U.S. stock discovery, chart validation, alerts, and portfolio context." />
+              <MarketBadge icon="/icons/india.svg" title="Indian portfolio mode" text="Zerodha-focused watchlists, charts, positions, and portfolio review." />
+              <MarketBadge icon="/icons/usa.svg" title="American portfolio mode" text="IBKR-focused U.S. stock discovery, chart validation, alerts, and portfolio context." />
             </div>
             <Link href="/products/imperium-investor" className="mt-7 inline-flex border border-cyan-300/40 px-5 py-3 text-sm font-semibold text-cyan-200 hover:bg-cyan-300/10">
               Explore Imperium Investor
@@ -73,7 +73,7 @@ function MarketBadge({ icon, title, text }: { icon: string; title: string; text:
   return (
     <div className="border border-slate-800 bg-[#0B1020] p-4">
       <div className="flex items-center gap-3">
-        <Image src={icon} alt="" width={26} height={24} className="h-6 w-auto" />
+        <Image src={icon} alt="" width={24} height={24} />
         <h3 className="font-semibold text-white">{title}</h3>
       </div>
       <p className="mt-3 text-sm leading-6 text-slate-400">{text}</p>

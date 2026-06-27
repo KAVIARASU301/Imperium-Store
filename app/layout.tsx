@@ -11,11 +11,11 @@ export const metadata: Metadata = {
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
   icons: {
     icon: [
-      { url: "/imperium_store_icons/imperium_icon_32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/imperium_store_icons/imperium_icon_64x64.png", sizes: "64x64", type: "image/png" },
-      { url: "/imperium_store_icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/imperium_store_icons/imperium_icon_32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/imperium_store_icons/imperium_icon_64x64.png", sizes: "64x64", type: "image/png" },
+      { url: "/icons/imperium_store_icons/icon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/imperium_store_icons/imperium_icon_32x32.png",
+    shortcut: "/icons/imperium_store_icons/imperium_icon_32x32.png",
   },
 };
 
@@ -69,7 +69,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <header className="border-b border-slate-900/90 bg-[#05070D]/90">
           <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
             <Link href="/" className="inline-flex items-center gap-3 font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">
-              <Image src="/imperium_store_icons/imperium_icon_32x32.png" alt="" width={32} height={32} className="h-8 w-8" priority />
+              <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={32} height={32} className="h-8 w-8" priority />
               <span>Imperium</span>
             </Link>
             <HeaderNav />

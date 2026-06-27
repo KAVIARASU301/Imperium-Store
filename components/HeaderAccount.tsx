@@ -98,7 +98,7 @@ export default function HeaderAccount() {
   if (!accountLabel) {
     return (
       <Link href="/login" className="inline-flex items-center gap-2 hover:text-cyan-300">
-        <Image src="/login.svg" alt="" width={16} height={16} className="h-4 w-4" />
+        <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" />
         <span>Login</span>
       </Link>
     );
@@ -113,7 +113,7 @@ export default function HeaderAccount() {
         aria-haspopup="menu"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        <Image src="/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" />
+        <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" />
         <span className="max-w-32 truncate sm:max-w-44">{accountLabel}</span>
         <span className={`text-[10px] transition ${isMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
       </button>
@@ -126,20 +126,21 @@ export default function HeaderAccount() {
             {user?.email ? <p className="mt-0.5 truncate text-xs text-slate-500">{user.email}</p> : null}
           </div>
           <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/portfolio/portfolio-lineal-color-16.png" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/briefcase.svg" alt="" width={16} height={16} className="h-4 w-4" />
             My purchases
           </Link>
           <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/support/support-ios-27-filled-16.png" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" />
             Support
           </Link>
           <button
             type="button"
-            className="block w-full px-4 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
+            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
             role="menuitem"
             disabled={isSigningOut}
             onClick={handleLogout}
           >
+            <Image src="/icons/logout.svg" alt="" width={16} height={16} className="h-4 w-4" />
             {isSigningOut ? "Signing out..." : "Logout"}
           </button>
         </div>

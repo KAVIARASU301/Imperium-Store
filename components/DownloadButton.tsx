@@ -42,7 +42,7 @@ export default function DownloadButton({ fileId, label = "Download" }: { fileId:
           </>
         ) : (
           <>
-            <Image src="/download/download-16.png" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/download/download-16.png" alt="" width={16} height={16} className="h-4 w-4" />
             {label}
           </>
         )}
