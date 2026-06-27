@@ -29,6 +29,29 @@ function safeRedirectPath(value: string | null) {
   return value;
 }
 
+async function emailAlreadyExists(email: string) {
+  const response = await fetch("/api/auth/email-exists", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const payload = (await response.json()) as {
+    exists?: boolean;
+    message?: string;
+  };
+
+  if (!response.ok) {
+    throw new Error(
+      payload.message ?? "Unable to verify whether this email is available.",
+    );
+  }
+
+  return Boolean(payload.exists);
+}
+
+const existingAccountMessage =
+  "An account already exists with this email. Use Login or Forgot password to recover that account and keep access to previous purchases. To create a separate account, use a different email address.";
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,8 +119,10 @@ function LoginForm() {
       }
 
       if (mode === "reset") {
+        if (!password) throw new Error("Enter your new password.");
         if (password.length < 8)
           throw new Error("Use at least 8 characters for your new password.");
+        if (!confirmPassword) throw new Error("Confirm your new password.");
         if (password !== confirmPassword)
           throw new Error("Passwords do not match.");
         const { error } = await supabase.auth.updateUser({ password });
@@ -110,21 +135,37 @@ function LoginForm() {
         return;
       }
 
-      if (password.length < 8)
-        throw new Error("Use at least 8 characters for your password.");
-
       if (mode === "signup") {
+        const cleanName = fullName.trim();
+        if (!cleanName) throw new Error("Enter your full name.");
+        if (cleanName.length < 4)
+          throw new Error("Full name must be at least 4 characters.");
+        if (cleanName.length > 20)
+          throw new Error("Full name must be 20 characters or fewer.");
+        if (!password) throw new Error("Enter your password.");
+        if (password.length < 8)
+          throw new Error("Use at least 8 characters for your password.");
+        if (!confirmPassword) throw new Error("Confirm your password.");
         if (password !== confirmPassword)
           throw new Error("Passwords do not match.");
-        const { error } = await supabase.auth.signUp({
+        if (await emailAlreadyExists(cleanEmail)) {
+          throw new Error(existingAccountMessage);
+        }
+
+        const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
           options: {
-            data: { full_name: fullName.trim() },
+            data: { full_name: cleanName },
             emailRedirectTo: getRedirectUrl(next),
           },
         });
         if (error) throw error;
+        const identities =
+          data.user && "identities" in data.user ? data.user.identities : null;
+        if (Array.isArray(identities) && identities.length === 0) {
+          throw new Error(existingAccountMessage);
+        }
         await supabase.auth.signOut();
         setEmail(cleanEmail);
         setPassword("");
@@ -138,6 +179,10 @@ function LoginForm() {
         });
         return;
       }
+
+      if (!password) throw new Error("Enter your password.");
+      if (password.length < 8)
+        throw new Error("Use at least 8 characters for your password.");
 
       const { error } = await supabase.auth.signInWithPassword({
         email: cleanEmail,
@@ -239,17 +284,11 @@ function LoginForm() {
 
         <div className="mt-8">
           <h2 className="text-2xl font-bold text-[#c5d5ee]">{title}</h2>
-          <p
-            className={`mt-3 border px-4 py-3 text-sm leading-6 ${
-              status.tone === "error"
-                ? "border-red-500/30 bg-red-500/10 text-red-200"
-                : status.tone === "success"
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-                  : "border-[#1b3055] bg-[#070c17] text-[#6882a8]"
-            }`}
-          >
-            {status.text}
-          </p>
+          {status.tone !== "error" ? (
+            <p className={`mt-2 text-sm leading-6 ${status.tone === "success" ? "text-emerald-300" : "text-[#6882a8]"}`}>
+              {status.text}
+            </p>
+          ) : null}
         </div>
 
         <form onSubmit={submit} className="mt-6 space-y-4">
@@ -262,6 +301,9 @@ function LoginForm() {
                 className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
                 placeholder="Your name"
                 autoComplete="name"
+                minLength={4}
+                maxLength={20}
+                required
               />
             </label>
           ) : null}
@@ -289,6 +331,7 @@ function LoginForm() {
                   className="min-w-0 flex-1 bg-transparent px-4 py-3 text-white outline-none"
                   placeholder="At least 8 characters"
                   type={showPassword ? "text" : "password"}
+                  minLength={8}
                   autoComplete={
                     mode === "signin" ? "current-password" : "new-password"
                   }
@@ -314,14 +357,10 @@ function LoginForm() {
                 className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
                 placeholder="Repeat password"
                 type="password"
+                minLength={8}
                 autoComplete="new-password"
                 required
               />
-              {mode === "signup" ? (
-                <span className="mt-2 block text-xs leading-5 text-[#6882a8]">
-                  Fill in all required fields, then click Create account.
-                </span>
-              ) : null}
             </label>
           ) : null}
 
@@ -339,6 +378,12 @@ function LoginForm() {
                     ? "Save new password"
                     : "Login"}
           </button>
+
+          {status.tone === "error" ? (
+            <p className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-semibold leading-6 text-red-100">
+              {status.text}
+            </p>
+          ) : null}
         </form>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#6882a8]">

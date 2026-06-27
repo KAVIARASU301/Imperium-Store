@@ -29,7 +29,7 @@ type BrowserAuthClient = {
     password: string;
     options?: unknown;
   }): Promise<
-    | { data: { session: BrowserSession }; error: null }
+    | { data: { session: BrowserSession; user: User | DemoUser | null }; error: null }
     | { data: unknown; error: Error }
   >;
   resetPasswordForEmail(
@@ -90,7 +90,8 @@ function createDemoBrowserClient() {
           email.trim().toLowerCase(),
         );
         window.dispatchEvent(new Event(DEMO_AUTH_EVENT));
-        return { data: { session: getDemoSession() }, error: null };
+        const session = getDemoSession();
+        return { data: { session, user: session?.user ?? null }, error: null };
       },
       async resetPasswordForEmail() {
         return { data: {}, error: null };
