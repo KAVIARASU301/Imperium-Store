@@ -1,5 +1,5 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { getPurchaseByOrderId, updatePurchaseStatus } from "@/lib/purchases";
+import { getPurchasesByOrderId, updatePurchasesStatus } from "@/lib/purchases";
 import { verifyCheckoutSignature } from "@/lib/razorpay";
 import { NextResponse } from "next/server";
 
@@ -17,8 +17,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Payment verification details are required" }, { status: 400 });
     }
 
-    const purchase = await getPurchaseByOrderId(user.id, razorpay_order_id);
-    if (!purchase) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
+    const purchases = await getPurchasesByOrderId(user.id, razorpay_order_id);
+    if (purchases.length === 0) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
 
     const verified = verifyCheckoutSignature({
       orderId: razorpay_order_id,
@@ -27,14 +27,18 @@ export async function POST(request: Request) {
     });
     if (!verified) return NextResponse.json({ message: "Invalid payment signature" }, { status: 400 });
 
-    const updatedPurchase = await updatePurchaseStatus({
+    const updatedPurchases = await updatePurchasesStatus({
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
       status: "paid",
       userId: user.id,
     });
 
-    return NextResponse.json({ status: updatedPurchase?.status ?? "paid", productId: purchase.product_id });
+    return NextResponse.json({
+      status: updatedPurchases[0]?.status ?? "paid",
+      productId: purchases[0].product_id,
+      productIds: purchases.map((purchase) => purchase.product_id),
+    });
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to verify payment" }, { status: 500 });
   }

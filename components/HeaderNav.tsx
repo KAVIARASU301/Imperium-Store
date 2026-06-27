@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import CartCount from "@/components/CartCount";
 import HeaderAccount from "@/components/HeaderAccount";
 
 export default function HeaderNav() {
@@ -32,6 +33,9 @@ export default function HeaderNav() {
     <div ref={menuRef} className="relative">
       <div className="hidden items-center gap-1 text-sm font-medium text-[#c5d5ee] md:flex">
         <Link href="/products" className="border border-transparent px-3 py-2 hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white">Products</Link>
+        <Link href="/cart" className="border border-transparent px-3 py-2 hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white">
+          Cart<CartCount />
+        </Link>
         <Link href="/dashboard" className="border border-transparent px-3 py-2 hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white">My Purchases</Link>
         <HeaderAccount />
       </div>
@@ -51,6 +55,9 @@ export default function HeaderNav() {
         <div className="absolute right-0 z-50 mt-3 w-64 overflow-visible border border-[#1b3055] bg-[#0c1525]/95 p-3 text-sm text-[#c5d5ee] shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
           <Link href="/products" className="block border border-transparent px-4 py-3 transition hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white" role="menuitem" onClick={() => setIsOpen(false)}>
             Products
+          </Link>
+          <Link href="/cart" className="block border border-transparent px-4 py-3 transition hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white" role="menuitem" onClick={() => setIsOpen(false)}>
+            Cart<CartCount />
           </Link>
           <Link href="/dashboard" className="block border border-transparent px-4 py-3 transition hover:border-[#1b3055] hover:bg-[#111d35] hover:text-white" role="menuitem" onClick={() => setIsOpen(false)}>
             My Purchases

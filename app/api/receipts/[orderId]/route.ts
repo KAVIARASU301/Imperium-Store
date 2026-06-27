@@ -1,6 +1,6 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { formatPrice, getProductBySlug } from "@/lib/products";
-import { getPurchaseByOrderId } from "@/lib/purchases";
+import { getPurchasesByOrderId } from "@/lib/purchases";
 import { NextResponse } from "next/server";
 
 const defaultSeller = {
@@ -36,17 +36,29 @@ export async function GET(request: Request, context: { params: Promise<{ orderId
     if (!user) return NextResponse.json({ message: "Authentication required" }, { status: 401 });
 
     const { orderId } = await context.params;
-    const purchase = await getPurchaseByOrderId(user.id, orderId);
-    if (!purchase) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
-    if (purchase.status !== "paid") return NextResponse.json({ message: "Receipt is available only after payment is confirmed" }, { status: 409 });
+    const purchases = await getPurchasesByOrderId(user.id, orderId);
+    if (purchases.length === 0) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
+    if (!purchases.every((purchase) => purchase.status === "paid")) return NextResponse.json({ message: "Receipt is available only after payment is confirmed" }, { status: 409 });
 
-    const product = getProductBySlug(purchase.product_id);
-    if (!product) return NextResponse.json({ message: "Product not found" }, { status: 404 });
+    const items = purchases.map((purchase) => {
+      const product = getProductBySlug(purchase.product_id);
+      if (!product) return null;
+      return {
+        name: product.name,
+        description: product.short_description,
+        amount: purchase.amount,
+        formattedAmount: formatPrice(purchase.amount, purchase.currency),
+      };
+    });
+    if (items.some((item) => !item)) return NextResponse.json({ message: "Product not found" }, { status: 404 });
 
-    const paidAt = purchase.paid_at ?? purchase.created_at;
+    const firstPurchase = purchases[0];
+    const paidAt = firstPurchase.paid_at ?? firstPurchase.created_at;
+    const subtotal = purchases.reduce((sum, purchase) => sum + purchase.amount, 0);
+    const currency = firstPurchase.currency;
     return NextResponse.json({
       receipt: {
-        receiptNumber: createReceiptNumber(purchase.razorpay_order_id, paidAt),
+        receiptNumber: createReceiptNumber(firstPurchase.razorpay_order_id, paidAt),
         issuedAt: formatReceiptDate(paidAt),
         seller: {
           name: process.env.STORE_LEGAL_NAME ?? defaultSeller.name,
@@ -56,24 +68,22 @@ export async function GET(request: Request, context: { params: Promise<{ orderId
         customer: {
           email: user.email,
         },
-        item: {
-          name: product.name,
-          description: product.short_description,
-        },
+        item: items[0],
+        items,
         payment: {
-          orderId: purchase.razorpay_order_id,
-          paymentId: purchase.razorpay_payment_id,
+          orderId: firstPurchase.razorpay_order_id,
+          paymentId: firstPurchase.razorpay_payment_id,
           paidAt: formatReceiptDate(paidAt),
           method: "Razorpay",
         },
         totals: {
-          subtotal: purchase.amount,
+          subtotal,
           tax: 0,
-          total: purchase.amount,
-          currency: purchase.currency,
-          formattedSubtotal: formatPrice(purchase.amount, purchase.currency),
-          formattedTax: formatPrice(0, purchase.currency),
-          formattedTotal: formatPrice(purchase.amount, purchase.currency),
+          total: subtotal,
+          currency,
+          formattedSubtotal: formatPrice(subtotal, currency),
+          formattedTax: formatPrice(0, currency),
+          formattedTotal: formatPrice(subtotal, currency),
         },
         note: "This is a payment receipt for a non-GST registered business. It is not a GST tax invoice.",
       },

@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/types/product";
 import { formatCurrencySymbol, formatPriceAmount } from "@/lib/products";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default function ProductCard({ product }: { product: Product }) {
   const primaryBadge = product.badges?.[0];
@@ -51,10 +52,14 @@ export default function ProductCard({ product }: { product: Product }) {
             </p>
             <Link
                 href={`/products/${product.slug}`}
-                className="whitespace-nowrap bg-[#1e52e8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]"
+                className="whitespace-nowrap border border-[#1b3055] bg-[#111d35] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:border-[#1e52e8]"
             >
               View Details
             </Link>
+            <AddToCartButton
+                slug={product.slug}
+                className="whitespace-nowrap bg-[#1e52e8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]"
+            />
         </div>
       </article>
   );

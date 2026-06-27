@@ -10,7 +10,8 @@ type Receipt = {
   issuedAt: string;
   seller: { name: string; email: string; address: string };
   customer: { email?: string };
-  item: { name: string; description: string };
+  item: { name: string; description: string; formattedAmount?: string };
+  items?: { name: string; description: string; formattedAmount: string }[];
   payment: { orderId: string; paymentId: string | null; paidAt: string; method: string };
   totals: {
     formattedSubtotal: string;
@@ -108,12 +109,16 @@ export default function ReceiptPage() {
             </div>
 
             <div className="py-6">
-              <div className="grid gap-3 border border-[#1b3055] bg-[#070c17] p-4 print:border-slate-300 print:bg-white sm:grid-cols-[1fr_auto]">
-                <div>
-                  <p className="font-semibold">{receipt.item.name}</p>
-                  <p className="mt-2 text-sm leading-6 text-[#6882a8] print:text-slate-600">{receipt.item.description}</p>
-                </div>
-                <p className="font-semibold tabular-nums">{receipt.totals.formattedSubtotal}</p>
+              <div className="grid gap-px border border-[#1b3055] bg-[#1b3055] print:border-slate-300 print:bg-slate-300">
+                {(receipt.items?.length ? receipt.items : [{ ...receipt.item, formattedAmount: receipt.item.formattedAmount ?? receipt.totals.formattedSubtotal }]).map((item) => (
+                  <div key={item.name} className="grid gap-3 bg-[#070c17] p-4 print:bg-white sm:grid-cols-[1fr_auto]">
+                    <div>
+                      <p className="font-semibold">{item.name}</p>
+                      <p className="mt-2 text-sm leading-6 text-[#6882a8] print:text-slate-600">{item.description}</p>
+                    </div>
+                    <p className="font-semibold tabular-nums">{item.formattedAmount}</p>
+                  </div>
+                ))}
               </div>
 
               <div className="ml-auto mt-6 max-w-sm space-y-3">

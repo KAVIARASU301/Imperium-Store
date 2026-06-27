@@ -1,0 +1,227 @@
+"use client";
+
+import { CART_UPDATED_EVENT, clearCart, clearCartItems, readCart, removeFromCart } from "@/lib/cart";
+import { createRazorpayCheckout } from "@/lib/razorpay-client";
+import { formatCurrencySymbol, formatPriceAmount } from "@/lib/products";
+import { getSupabaseBrowserClient } from "@/lib/supabase";
+import type { Product } from "@/types/product";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+
+interface CreateOrderResponse {
+  orderId: string | null;
+  amount: number;
+  currency: string;
+  keyId?: string;
+  productIds?: string[];
+  message?: string;
+}
+
+type RazorpaySuccessResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
+
+export default function CartPageClient({ products }: { products: Product[] }) {
+  const router = useRouter();
+  const [cartSlugs, setCartSlugs] = useState<string[]>([]);
+  const [email, setEmail] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    function sync() {
+      setCartSlugs(readCart());
+    }
+
+    sync();
+    window.addEventListener(CART_UPDATED_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(CART_UPDATED_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  useEffect(() => {
+    async function loadSession() {
+      const supabase = getSupabaseBrowserClient();
+      const { data } = await supabase.auth.getSession();
+      setEmail(data.session?.user.email ?? null);
+      setAuthChecked(true);
+    }
+
+    loadSession();
+  }, []);
+
+  const cartProducts = useMemo(
+    () => cartSlugs.map((slug) => products.find((product) => product.slug === slug)).filter((product): product is Product => Boolean(product)),
+    [cartSlugs, products],
+  );
+  const total = cartProducts.reduce((sum, product) => sum + product.price, 0);
+  const currency = cartProducts[0]?.currency ?? "INR";
+
+  async function startPayment() {
+    setError("");
+    setLoading(true);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        router.push(`/login?next=${encodeURIComponent("/cart")}`);
+        return;
+      }
+
+      const productIds = cartProducts.map((product) => product.slug);
+      const res = await fetch("/api/razorpay/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ productIds }),
+      });
+      const order: CreateOrderResponse = await res.json();
+      if (!res.ok) throw new Error(order.message ?? "Unable to start checkout");
+
+      if (!order.orderId) {
+        clearCartItems(productIds);
+        router.push("/dashboard");
+        return;
+      }
+      if (!order.keyId) throw new Error("Checkout is not configured");
+
+      const checkout = await createRazorpayCheckout({
+        key: order.keyId,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Imperium Store",
+        description: productIds.length === 1 ? cartProducts[0]?.name : `${productIds.length} Imperium products`,
+        prefill: { email: sessionData.session?.user.email ?? undefined },
+        theme: { color: "#22D3EE" },
+        handler: async (response: RazorpaySuccessResponse) => {
+          try {
+            const verifyRes = await fetch("/api/razorpay/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify(response),
+            });
+            const verifyPayload = await verifyRes.json();
+            if (!verifyRes.ok) throw new Error(verifyPayload.message ?? "Payment verification failed");
+            clearCartItems(verifyPayload.productIds ?? productIds);
+            router.push(`/checkout/success?order_id=${response.razorpay_order_id}`);
+          } catch (error) {
+            setError(error instanceof Error ? error.message : "Payment verification failed");
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => setLoading(false),
+        },
+      });
+
+      checkout.on("payment.failed", () => {
+        router.push(`/checkout/failed?order_id=${order.orderId}`);
+      });
+
+      checkout.open();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Something went wrong");
+      setLoading(false);
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-[1200px] px-6 py-12">
+      <section className="border-b border-[#1b3055] pb-8">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Secure order review</p>
+        <h1 className="mt-2 max-w-4xl text-3xl font-extrabold tracking-normal text-[#c5d5ee] sm:text-4xl">
+          Review Cart and Complete Payment
+        </h1>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6882a8]">
+          Review your selected products, add more tools if needed, and complete payment securely through Razorpay from this page.
+        </p>
+      </section>
+
+      {cartProducts.length === 0 ? (
+        <section className="mt-8 rounded-lg border-2 border-[#294875] bg-[#0c1525] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.36)]">
+          <h2 className="text-xl font-bold text-[#c5d5ee]">Start your cart</h2>
+          <p className="mt-2 text-sm leading-6 text-[#6882a8]">Add a product to review your order and pay securely.</p>
+          <Link href="/products" className="mt-6 inline-block bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
+            Browse Products
+          </Link>
+        </section>
+      ) : (
+        <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_390px]">
+          <section className="overflow-hidden rounded-lg border-2 border-[#1b3055] bg-[#07101f] shadow-[0_22px_54px_rgba(0,0,0,0.32)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b3055] bg-[#0f1b31] px-5 py-4">
+              <div>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#67e8f9]">Selected products</p>
+                <p className="mt-1 text-sm text-[#8aa3c7]">{cartProducts.length} item{cartProducts.length === 1 ? "" : "s"} ready for payment</p>
+              </div>
+              <button type="button" className="border border-[#1b3055] bg-[#111d35] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:border-[#1e52e8]" onClick={clearCart}>
+                Clear Cart
+              </button>
+            </div>
+            {cartProducts.map((product) => (
+              <article key={product.slug} className="grid gap-4 border-b border-[#1b3055] bg-[#0c1525] p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md border border-[#1b3055] bg-[#070c17] p-2 shadow-inner shadow-black/30">
+                  <Image src={product.icon.src} alt="" width={product.icon.width} height={product.icon.height} className="h-12 w-12 object-contain" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-[#c5d5ee]">{product.name}</h2>
+                  <p className="mt-1 text-sm leading-6 text-[#6882a8]">Digital download access after payment confirmation.</p>
+                  <button
+                    type="button"
+                    className="mt-3 border border-[#1b3055] bg-[#111d35] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#8aa3c7] hover:border-red-400/50 hover:text-red-100"
+                    onClick={() => removeFromCart(product.slug)}
+                  >
+                    Remove
+                  </button>
+                </div>
+                <p className="font-semibold tabular-nums text-[#c5d5ee]">
+                  <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
+                  {formatPriceAmount(product.price)}
+                </p>
+              </article>
+            ))}
+          </section>
+
+          <aside className="h-fit overflow-hidden rounded-lg border-2 border-[#294875] bg-[#07101f] shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(197,213,238,0.08)_inset] lg:sticky lg:top-24">
+            <div className="border-b-2 border-[#1b3055] bg-[#0f1b31] px-5 py-4">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#67e8f9]">Payment summary</p>
+              <p className="mt-1 text-sm font-medium text-[#c5d5ee]">Payments processed securely via Razorpay</p>
+            </div>
+            <div className="p-5">
+              <div className="rounded-md border-2 border-[#1b3055] bg-[#0c1525] p-4 shadow-[0_0_0_1px_rgba(197,213,238,0.06)_inset]">
+                <div className="space-y-3 text-sm text-[#8aa3c7]">
+                  <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
+                  <div className="flex justify-between gap-4"><span>Items</span><span>{cartProducts.length}</span></div>
+                  <div className="flex justify-between gap-4"><span>Subtotal</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span></div>
+                  <div className="flex justify-between gap-4"><span>GST</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(0)}</span></div>
+                </div>
+                <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#1b3055] pt-4 text-[#c5d5ee]">
+                  <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#8aa3c7]">Total payable</span>
+                  <span className="text-3xl font-extrabold tabular-nums">{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span>
+                </div>
+              </div>
+              {email ? (
+                <button type="button" disabled={loading} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 hover:bg-[#2b63ff] disabled:cursor-wait disabled:bg-[#1b3055] disabled:text-[#6882a8]">
+                  {loading ? "Starting Payment..." : "Pay Securely Now"}
+                </button>
+              ) : (
+                <Link href={`/login?next=${encodeURIComponent("/cart")}`} className="mt-5 block bg-[#1e52e8] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 hover:bg-[#2b63ff]">
+                  Sign In to Pay
+                </Link>
+              )}
+              {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
+            </div>
+          </aside>
+        </div>
+      )}
+    </main>
+  );
+}

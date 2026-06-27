@@ -65,6 +65,11 @@ export async function getLocalPurchaseByOrderId(userId: string, orderId: string)
   return purchases.find((purchase) => purchase.razorpay_order_id === orderId) ?? null;
 }
 
+export async function getLocalPurchasesByOrderId(userId: string, orderId: string) {
+  const purchases = await getLocalPurchasesForUser(userId);
+  return purchases.filter((purchase) => purchase.razorpay_order_id === orderId);
+}
+
 export async function updateLocalPurchaseStatus(input: {
   orderId: string;
   status: Purchase["status"];
@@ -84,4 +89,28 @@ export async function updateLocalPurchaseStatus(input: {
   if (input.status === "paid") purchase.paid_at = purchase.paid_at ?? new Date().toISOString();
   await writePurchases(purchases);
   return purchase;
+}
+
+export async function updateLocalPurchasesStatus(input: {
+  orderId: string;
+  status: Purchase["status"];
+  paymentId?: string | null;
+  userId?: string;
+}) {
+  const purchases = await readPurchases();
+  const matchingPurchases = purchases.filter(
+    (item) =>
+      item.razorpay_order_id === input.orderId &&
+      (!input.userId || item.user_id === input.userId),
+  );
+  const paidAt = new Date().toISOString();
+
+  for (const purchase of matchingPurchases) {
+    purchase.status = input.status;
+    if (input.paymentId !== undefined) purchase.razorpay_payment_id = input.paymentId;
+    if (input.status === "paid") purchase.paid_at = purchase.paid_at ?? paidAt;
+  }
+
+  await writePurchases(purchases);
+  return matchingPurchases;
 }

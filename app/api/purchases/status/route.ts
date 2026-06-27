@@ -1,5 +1,5 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { getPurchaseByOrderId, updatePurchaseStatus } from "@/lib/purchases";
+import { getPurchasesByOrderId, updatePurchasesStatus } from "@/lib/purchases";
 import { getLatestPaymentForOrder } from "@/lib/razorpay";
 import { NextResponse } from "next/server";
 
@@ -9,20 +9,26 @@ export async function GET(request: Request) {
     if (!user) return NextResponse.json({ message: "Authentication required" }, { status: 401 });
     const orderId = new URL(request.url).searchParams.get("order_id");
     if (!orderId) return NextResponse.json({ message: "order_id is required" }, { status: 400 });
-    const purchase = await getPurchaseByOrderId(user.id, orderId);
-    if (!purchase) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
-    if (purchase.status === "pending") {
+    const purchases = await getPurchasesByOrderId(user.id, orderId);
+    if (purchases.length === 0) return NextResponse.json({ message: "Purchase not found" }, { status: 404 });
+    const productIds = purchases.map((purchase) => purchase.product_id);
+    const status = purchases.every((purchase) => purchase.status === "paid")
+      ? "paid"
+      : purchases.some((purchase) => purchase.status === "failed")
+        ? "failed"
+        : "pending";
+    if (status === "pending") {
       const payment = await getLatestPaymentForOrder(orderId);
       if (payment?.status === "captured") {
-        const updatedPurchase = await updatePurchaseStatus({ orderId, status: "paid", paymentId: payment.id, userId: user.id });
-        return NextResponse.json({ status: updatedPurchase?.status ?? "paid", productId: purchase.product_id });
+        const updatedPurchases = await updatePurchasesStatus({ orderId, status: "paid", paymentId: payment.id, userId: user.id });
+        return NextResponse.json({ status: updatedPurchases[0]?.status ?? "paid", productId: productIds[0], productIds });
       }
       if (payment?.status === "failed") {
-        const updatedPurchase = await updatePurchaseStatus({ orderId, status: "failed", paymentId: payment.id, userId: user.id });
-        return NextResponse.json({ status: updatedPurchase?.status ?? "failed", productId: purchase.product_id });
+        const updatedPurchases = await updatePurchasesStatus({ orderId, status: "failed", paymentId: payment.id, userId: user.id });
+        return NextResponse.json({ status: updatedPurchases[0]?.status ?? "failed", productId: productIds[0], productIds });
       }
     }
-    return NextResponse.json({ status: purchase.status, productId: purchase.product_id });
+    return NextResponse.json({ status, productId: productIds[0], productIds });
   } catch (error) {
     return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to load purchase status" }, { status: 500 });
   }
