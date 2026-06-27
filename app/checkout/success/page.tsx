@@ -45,23 +45,23 @@ function CheckoutSuccessInner() {
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-24 text-center">
-      <section className="border border-[#1b3055] bg-[#0c1525] p-8">
-      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Checkout status</p>
-      <h1 className="mt-3 text-2xl font-bold text-[#c5d5ee]">
+      <section className="border border-cyan-border bg-section p-8">
+      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Checkout status</p>
+      <h1 className="mt-3 text-2xl font-bold text-white">
         {status === "paid" ? "Payment Confirmed" : status === "failed" ? "Payment Needs Attention" : "Payment Successful"}
       </h1>
-      <p className="mt-2 text-[#6882a8]">
+      <p className="mt-2 text-muted">
         {status === "paid"
           ? "Your products are unlocked. Head to your dashboard to download."
           : status === "failed"
             ? "Please review the payment status and try again from your cart when you are ready."
             : "Access unlocks once the server verifies your Razorpay payment. This usually takes a few seconds."}
       </p>
-      <Link href="/dashboard" className="mt-8 inline-block bg-[#1e52e8] px-6 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
+      <Link href="/dashboard" className="mt-8 inline-block btn-primary px-6 py-3 font-semibold uppercase tracking-[0.08em] text-white ">
         Go to My Purchases
       </Link>
       {status === "paid" && orderId ? (
-        <Link href={`/receipts/${encodeURIComponent(orderId)}`} className="ml-3 mt-8 inline-block border border-[#1b3055] bg-[#111d35] px-6 py-3 font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:border-[#1e52e8]">
+        <Link href={`/receipts/${encodeURIComponent(orderId)}`} className="ml-3 mt-8 inline-block border border-cyan-border bg-card px-6 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
           View Receipt
         </Link>
       ) : null}

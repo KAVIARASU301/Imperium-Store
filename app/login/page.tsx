@@ -213,18 +213,18 @@ function LoginForm() {
           <section
             aria-modal="true"
             role="dialog"
-            className="w-full max-w-lg border border-[#1b3055] bg-[#0c1525] p-6 shadow-2xl shadow-black/40 sm:p-8"
+            className="w-full max-w-lg border border-cyan-border bg-section p-6 shadow-2xl shadow-black/40 sm:p-8"
           >
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-[#0891b2]">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-brand">
               Email confirmation required
             </p>
             <h2 className="mt-4 text-2xl font-semibold text-white">
               Check your inbox before logging in.
             </h2>
-            <p className="mt-4 leading-7 text-[#c5d5ee]">
+            <p className="mt-4 leading-7 text-white">
               We created the account for <span className="font-semibold text-white">{confirmationEmail}</span>. Open the confirmation email and verify your address. Login will work only after the email is confirmed.
             </p>
-            <p className="mt-4 border border-[#1b3055] bg-[#111d35] px-4 py-3 text-sm leading-6 text-[#c5d5ee]">
+            <p className="mt-4 border border-cyan-border bg-card px-4 py-3 text-sm leading-6 text-white">
               For now, the email sender may show as <span className="font-semibold text-white">Supabase Auth</span>. Search your inbox for that sender if you do not see an Imperium Store email.
             </p>
             <div className="mt-6 border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-100">
@@ -233,7 +233,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => setConfirmationEmail("")}
-              className="mt-6 w-full bg-[#1e52e8] px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]"
+              className="mt-6 w-full btn-primary px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white "
             >
               I understand, go to login
             </button>
@@ -241,51 +241,51 @@ function LoginForm() {
         </div>
       ) : null}
       <section className="flex flex-col justify-center">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-[#0891b2]">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-brand">
           Secure customer access
         </p>
-        <h1 className="mt-5 text-4xl font-extrabold tracking-normal text-[#c5d5ee] sm:text-5xl">
+        <h1 className="mt-5 text-4xl font-extrabold tracking-normal text-white sm:text-5xl">
           Sign in to your Imperium account.
         </h1>
-        <p className="mt-5 text-base leading-7 text-[#6882a8]">
+        <p className="mt-5 text-base leading-7 text-muted">
           Access your purchases, downloads, invoices, and product updates from one
           secure account.
         </p>
-        <div className="mt-8 grid gap-px border border-[#1b3055] bg-[#1b3055] text-sm text-[#c5d5ee] sm:grid-cols-3">
+        <div className="mt-8 grid gap-px border border-cyan-border bg-cyan-border text-sm text-white sm:grid-cols-3">
           {["Account access", "Download management", "Password recovery"].map((item) => (
             <div
               key={item}
-              className="bg-[#0c1525] p-4"
+              className="bg-section p-4"
             >
-              <span className="text-[#0891b2]">✓</span>
+              <span className="text-brand">✓</span>
               <p className="mt-2">{item}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="border border-[#1b3055] bg-[#0c1525]/95 p-6 shadow-2xl shadow-black/20 sm:p-8">
-        <div className="flex border border-[#1b3055] bg-[#070c17] p-1 text-sm font-semibold">
+      <section className="border border-cyan-border bg-section/95 p-6 shadow-2xl shadow-black/20 sm:p-8">
+        <div className="flex border border-cyan-border bg-main p-1 text-sm font-semibold">
           <button
             type="button"
             onClick={() => switchMode("signin")}
-            className={`flex-1 px-4 py-2 ${mode === "signin" ? "bg-[#1e52e8] text-white" : "text-[#6882a8] hover:text-white"}`}
+            className={`flex-1 px-4 py-2 ${mode === "signin" ? "btn-primary text-white" : "text-muted hover:text-white"}`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => switchMode("signup")}
-            className={`flex-1 px-4 py-2 ${mode === "signup" ? "bg-[#1e52e8] text-white" : "text-[#6882a8] hover:text-white"}`}
+            className={`flex-1 px-4 py-2 ${mode === "signup" ? "btn-primary text-white" : "text-muted hover:text-white"}`}
           >
             Sign up
           </button>
         </div>
 
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-[#c5d5ee]">{title}</h2>
+          <h2 className="text-2xl font-bold text-white">{title}</h2>
           {status.tone !== "error" ? (
-            <p className={`mt-2 text-sm leading-6 ${status.tone === "success" ? "text-emerald-300" : "text-[#6882a8]"}`}>
+            <p className={`mt-2 text-sm leading-6 ${status.tone === "success" ? "text-emerald-300" : "text-muted"}`}>
               {status.text}
             </p>
           ) : null}
@@ -293,12 +293,12 @@ function LoginForm() {
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           {mode === "signup" ? (
-            <label className="block text-sm font-medium text-[#c5d5ee]">
+            <label className="block text-sm font-medium text-white">
               Full name
               <input
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
-                className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
+                className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
                 placeholder="Your name"
                 autoComplete="name"
                 minLength={4}
@@ -308,12 +308,12 @@ function LoginForm() {
             </label>
           ) : null}
 
-          <label className="block text-sm font-medium text-[#c5d5ee]">
+          <label className="block text-sm font-medium text-white">
             Email address
             <input
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
+              className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
               placeholder="you@example.com"
               type="email"
               autoComplete="email"
@@ -322,9 +322,9 @@ function LoginForm() {
           </label>
 
           {showPasswordFields ? (
-            <label className="block text-sm font-medium text-[#c5d5ee]">
+            <label className="block text-sm font-medium text-white">
               {mode === "reset" ? "New password" : "Password"}
-              <div className="mt-2 flex border border-[#1b3055] bg-[#070c17] focus-within:border-[#1e52e8]">
+              <div className="mt-2 flex border border-cyan-border bg-main focus-within:border-brand">
                 <input
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
@@ -340,7 +340,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="px-4 text-sm font-semibold text-[#0891b2]"
+                  className="px-4 text-sm font-semibold text-brand"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -349,12 +349,12 @@ function LoginForm() {
           ) : null}
 
           {mode === "signup" || mode === "reset" ? (
-            <label className="block text-sm font-medium text-[#c5d5ee]">
+            <label className="block text-sm font-medium text-white">
               {mode === "reset" ? "Confirm new password" : "Confirm password"}
               <input
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
+                className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
                 placeholder="Repeat password"
                 type="password"
                 minLength={8}
@@ -366,7 +366,7 @@ function LoginForm() {
 
           <button
             disabled={loading}
-            className="w-full bg-[#1e52e8] px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff] disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full btn-primary px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white  disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading
               ? "Please wait..."
@@ -386,12 +386,12 @@ function LoginForm() {
           ) : null}
         </form>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#6882a8]">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
           {mode !== "forgot" && mode !== "reset" ? (
             <button
               type="button"
               onClick={() => switchMode("forgot")}
-              className="font-semibold text-[#0891b2] hover:text-[#c5d5ee]"
+              className="font-semibold text-brand hover:text-white"
             >
               Forgot password?
             </button>
@@ -399,7 +399,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => switchMode("signin")}
-              className="font-semibold text-[#0891b2] hover:text-[#c5d5ee]"
+              className="font-semibold text-brand hover:text-white"
             >
               Back to login
             </button>
@@ -408,7 +408,7 @@ function LoginForm() {
             Account security and data handling are covered in our{" "}
             <Link
               href="/privacy-policy"
-              className="text-[#0891b2] hover:text-[#c5d5ee]"
+              className="text-brand hover:text-white"
             >
               Privacy Policy
             </Link>
@@ -424,7 +424,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-md px-6 py-24 text-[#6882a8]">
+        <main className="mx-auto max-w-md px-6 py-24 text-muted">
           Loading login...
         </main>
       }

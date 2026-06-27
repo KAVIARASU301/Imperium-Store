@@ -92,12 +92,12 @@ export default function HeaderAccount() {
   }
 
   if (!loaded) {
-    return <span className="px-3 py-2 text-[#6882a8]">Account</span>;
+    return <span className="px-3 py-2 text-muted">Account</span>;
   }
 
   if (!accountLabel) {
     return (
-      <Link href="/login" className="inline-flex items-center gap-2 bg-[#1e52e8] px-4 py-2 font-semibold text-white shadow-lg shadow-black/20 hover:bg-[#2b63ff]">
+      <Link href="/login" className="inline-flex items-center gap-2 btn-primary px-4 py-2 font-semibold text-white shadow-lg shadow-black/20 ">
         <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" />
         <span>Login</span>
       </Link>
@@ -108,7 +108,7 @@ export default function HeaderAccount() {
     <div ref={menuRef} className="relative">
       <button
         type="button"
-        className="inline-flex items-center gap-2 border border-[#1b3055] bg-[#0c1525] px-3 py-2 font-medium text-[#c5d5ee] transition hover:border-[#1e52e8] hover:bg-[#111d35]"
+        className="inline-flex items-center gap-2 border border-cyan-border bg-section px-3 py-2 font-medium text-white transition hover:border-brand hover:bg-card"
         aria-expanded={isMenuOpen}
         aria-haspopup="menu"
         onClick={() => setIsMenuOpen((open) => !open)}
@@ -119,17 +119,17 @@ export default function HeaderAccount() {
       </button>
 
       {isMenuOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-56 overflow-hidden border border-[#1b3055] bg-[#0c1525]/95 py-2 text-sm text-[#c5d5ee] shadow-2xl shadow-black/40 backdrop-blur-xl" role="menu">
-          <div className="border-b border-[#1b3055] px-4 py-3">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#6882a8]">Signed in as</p>
+        <div className="absolute right-0 z-50 mt-3 w-56 overflow-hidden border border-cyan-border bg-section/95 py-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl" role="menu">
+          <div className="border-b border-cyan-border px-4 py-3">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">Signed in as</p>
             <p className="mt-1 truncate font-medium text-white">{accountLabel}</p>
-            {user?.email ? <p className="mt-0.5 truncate text-xs text-[#6882a8]">{user.email}</p> : null}
+            {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
           </div>
-          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-[#111d35] hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" />
             My purchases
           </Link>
-          <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-[#111d35] hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" />
             Support
           </Link>

@@ -18,9 +18,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     <main className="mx-auto max-w-[1200px] px-6 py-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <section>
-          <p className="inline-flex border border-[#1b3055] bg-[#0c1525] px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-[#0891b2]">{product.type}</p>
+          <p className="inline-flex border border-cyan-border bg-section px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-brand">{product.type}</p>
           <div className="mt-4 flex items-center gap-4">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center border border-[#1b3055] bg-[#0c1525] p-3">
+            <span className="flex h-16 w-16 shrink-0 items-center justify-center border border-cyan-border bg-section p-3">
               <Image
                 src={product.icon.src}
                 alt=""
@@ -30,16 +30,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                 priority
               />
             </span>
-            <h1 className={`${keepTitleOnOneLine ? "whitespace-nowrap text-4xl lg:text-[2.65rem]" : "text-4xl md:text-5xl"} font-extrabold tracking-normal text-[#c5d5ee]`}>
+            <h1 className={`${keepTitleOnOneLine ? "whitespace-nowrap text-4xl lg:text-[2.65rem]" : "text-4xl md:text-5xl"} font-extrabold tracking-normal text-white`}>
               {product.name}
             </h1>
           </div>
-          <p className="mt-5 max-w-2xl text-xl leading-8 text-[#c5d5ee]">{product.promise}</p>
-          <p className="mt-4 max-w-3xl leading-7 text-[#6882a8]">{product.description}</p>
+          <p className="mt-5 max-w-2xl text-xl leading-8 text-white">{product.promise}</p>
+          <p className="mt-4 max-w-3xl leading-7 text-muted">{product.description}</p>
           {product.badges?.length ? (
             <div className="mt-6 flex flex-wrap gap-2">
               {product.badges.map((badge) => (
-                <span key={badge} className="border border-[#1b3055] bg-[#0c1525] px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-[#c5d5ee]">
+                <span key={badge} className="border border-cyan-border bg-section px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white">
                   {badge}
                 </span>
               ))}
@@ -54,17 +54,17 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <Info title="How it helps" items={product.outcomes} />
           {product.lessons ? <Info title="Course lessons" items={product.lessons.sort((a, b) => a.sort_order - b.sort_order).map((lesson) => `${lesson.title}${lesson.is_preview ? " (preview)" : ""}`)} /> : null}
           <section className="mt-12">
-            <h2 className="border-b border-[#1b3055] pb-3 text-2xl font-bold text-[#c5d5ee]">FAQ</h2>
-            <div className="mt-5 grid gap-px border border-[#1b3055] bg-[#1b3055]">
+            <h2 className="border-b border-cyan-border pb-3 text-2xl font-bold text-white">FAQ</h2>
+            <div className="mt-5 grid gap-px border border-cyan-border bg-cyan-border">
               {product.faq.map((item) => (
-                <div key={item.question} className="bg-[#0c1525] p-5">
-                  <h3 className="font-semibold text-[#c5d5ee]">{item.question}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[#6882a8]">{item.answer}</p>
+                <div key={item.question} className="bg-section p-5">
+                  <h3 className="font-semibold text-white">{item.question}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted">{item.answer}</p>
                 </div>
               ))}
             </div>
           </section>
-          <section className="mt-12 border border-amber-300/30 bg-amber-300/5 p-5"><h2 className="font-semibold text-amber-200">Disclaimer</h2><p className="mt-2 text-sm leading-6 text-[#c5d5ee]">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p></section>
+          <section className="mt-12 border border-amber-300/30 bg-amber-300/5 p-5"><h2 className="font-semibold text-amber-200">Disclaimer</h2><p className="mt-2 text-sm leading-6 text-white">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p></section>
         </section>
         <div className="lg:sticky lg:top-8 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} /></div>
       </div>
@@ -73,19 +73,19 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 }
 
 function Info({ title, items }: { title: string; items: string[] }) {
-  return <section className="mt-12"><h2 className="border-b border-[#1b3055] pb-3 text-2xl font-bold text-[#c5d5ee]">{title}</h2><ul className="mt-5 grid gap-px border border-[#1b3055] bg-[#1b3055] md:grid-cols-2">{items.map((item) => <li key={item} className="bg-[#0c1525] p-4 text-[#c5d5ee]">{item}</li>)}</ul></section>;
+  return <section className="mt-12"><h2 className="border-b border-cyan-border pb-3 text-2xl font-bold text-white">{title}</h2><ul className="mt-5 grid gap-px border border-cyan-border bg-cyan-border md:grid-cols-2">{items.map((item) => <li key={item} className="bg-section p-4 text-white">{item}</li>)}</ul></section>;
 }
 
 function Highlights({ items }: { items: ProductHighlight[] }) {
   return (
-    <section className="mt-10 grid gap-px border border-[#1b3055] bg-[#1b3055] md:grid-cols-3">
+    <section className="mt-10 grid gap-px border border-cyan-border bg-cyan-border md:grid-cols-3">
       {items.map((item) => (
-        <div key={item.title} className="bg-[#0c1525] p-4">
-          <div className="flex h-10 w-10 items-center justify-center border border-[#1b3055] bg-[#111d35]">
+        <div key={item.title} className="bg-section p-4">
+          <div className="flex h-10 w-10 items-center justify-center border border-cyan-border bg-card">
             <Image src={item.icon} alt="" width={22} height={22} />
           </div>
-          <h2 className="mt-4 font-semibold text-[#c5d5ee]">{item.title}</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6882a8]">{item.text}</p>
+          <h2 className="mt-4 font-semibold text-white">{item.title}</h2>
+          <p className="mt-2 text-sm leading-6 text-muted">{item.text}</p>
         </div>
       ))}
     </section>
@@ -95,26 +95,26 @@ function Highlights({ items }: { items: ProductHighlight[] }) {
 function Gallery({ productName, items }: { productName: string; items: ProductGalleryImage[] }) {
   return (
     <section className="mt-12">
-      <h2 className="border-b border-[#1b3055] pb-3 text-2xl font-bold text-[#c5d5ee]">{productName} screenshots</h2>
+      <h2 className="border-b border-cyan-border pb-3 text-2xl font-bold text-white">{productName} screenshots</h2>
       <div className="mt-5 grid gap-5">
         {items.map((item) => (
-          <figure key={item.src} className="overflow-hidden border border-[#1b3055] bg-[#0c1525] shadow-xl shadow-black/20">
-            <div className="grid gap-px bg-[#1b3055] font-mono text-[10px] uppercase tracking-[0.16em] text-[#6882a8] sm:grid-cols-[1fr_auto]">
-              <div className="bg-[#111d35] px-3 py-2 text-[#c5d5ee]">{item.title}</div>
-              <div className="bg-[#111d35] px-3 py-2">Screenshot file</div>
+          <figure key={item.src} className="overflow-hidden border border-cyan-border bg-section shadow-xl shadow-black/20">
+            <div className="grid gap-px bg-cyan-border font-mono text-[10px] uppercase tracking-[0.16em] text-muted sm:grid-cols-[1fr_auto]">
+              <div className="bg-card px-3 py-2 text-white">{item.title}</div>
+              <div className="bg-card px-3 py-2">Screenshot file</div>
             </div>
-            <div className="bg-[#070c17] p-2">
+            <div className="bg-main p-2">
               <Image
                 src={item.src}
                 alt={item.alt}
                 width={item.width}
                 height={item.height}
-                className="h-auto w-full border border-[#1b3055] object-contain"
+                className="h-auto w-full border border-cyan-border object-contain"
                 sizes="(min-width: 1024px) 760px, 100vw"
               />
             </div>
             <figcaption className="p-4">
-              <p className="text-sm leading-6 text-[#6882a8]">{item.caption}</p>
+              <p className="text-sm leading-6 text-muted">{item.caption}</p>
             </figcaption>
           </figure>
         ))}

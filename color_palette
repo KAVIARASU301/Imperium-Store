@@ -1,0 +1,604 @@
+## Recommended Palette for Imperium Store
+
+Your store is not a normal shopping site. It sells **professional trading software for Indian market traders**, with products like **Imperium Option Trading Terminal** and **Imperium Investor**. So the palette should feel **dark, premium, technical, sharp, and execution-focused**, not colorful or playful. ([Imperium Store][1])
+
+---
+
+# Final Brand Palette
+
+| Role                   | Color Name          |       Hex | Use                                 |
+| ---------------------- | ------------------- | --------: | ----------------------------------- |
+| **Main Background**    | Imperium Black Navy | `#010711` | Full page background                |
+| **Section Background** | Deep Terminal Navy  | `#030B19` | Navbar, footer, large sections      |
+| **Card Background**    | Panel Navy          | `#061225` | Product cards, feature cards        |
+| **Card Hover**         | Cyan-Tinted Navy    | `#07172F` | Hover states, selected cards        |
+| **Primary Accent**     | Imperium Cyan       | `#00CFFF` | Buttons, active links, highlights   |
+| **Accent Hover**       | Bright Cyan         | `#22CFFF` | Button hover, glowing edge          |
+| **Secondary Accent**   | Trading Blue        | `#00A7F0` | Gradients, icons, subtle highlights |
+| **Main Text**          | Pure White          | `#FFFFFF` | Headings, product names             |
+| **Body Text**          | Soft White          | `#F3F5F7` | Descriptions                        |
+| **Muted Text**         | Steel Gray          | `#8A97A8` | Captions, labels, secondary info    |
+
+---
+
+# Best CSS Variables
+
+Use this as your website’s main color system:
+
+```css
+:root {
+  /* Core backgrounds */
+  --bg-main: #010711;
+  --bg-section: #030B19;
+  --bg-card: #061225;
+  --bg-card-hover: #07172F;
+  --bg-input: #081629;
+
+  /* Brand colors */
+  --brand-cyan: #00CFFF;
+  --brand-cyan-bright: #22CFFF;
+  --brand-cyan-deep: #00A7F0;
+
+  /* Text */
+  --text-main: #FFFFFF;
+  --text-body: #F3F5F7;
+  --text-muted: #8A97A8;
+  --text-disabled: #526070;
+
+  /* Borders */
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-cyan-soft: rgba(0, 207, 255, 0.18);
+  --border-cyan: rgba(0, 207, 255, 0.35);
+
+  /* Glow */
+  --glow-cyan-soft: 0 0 18px rgba(0, 207, 255, 0.22);
+  --glow-cyan-strong: 0 0 32px rgba(0, 207, 255, 0.38);
+
+  /* Store status colors */
+  --success: #00E676;
+  --warning: #FFB020;
+  --error: #FF4D5E;
+  --info: #00CFFF;
+}
+```
+
+---
+
+# Website Usage Guide
+
+## 1. Page Background
+
+Use this for the full site:
+
+```css
+background: #010711;
+color: #F3F5F7;
+```
+
+Avoid pure black `#000000`. Your icon already has a deep navy tone, so `#010711` will look more premium.
+
+---
+
+## 2. Navbar
+
+```css
+background: rgba(3, 11, 25, 0.92);
+border-bottom: 1px solid rgba(0, 207, 255, 0.18);
+backdrop-filter: blur(14px);
+```
+
+Navbar links:
+
+```css
+color: #8A97A8;
+```
+
+Navbar active / hover:
+
+```css
+color: #00CFFF;
+```
+
+---
+
+## 3. Hero Section
+
+Use a radial glow behind the hero text:
+
+```css
+background:
+  radial-gradient(circle at 50% 20%, rgba(0, 207, 255, 0.12), transparent 32%),
+  radial-gradient(circle at 50% 0%, #07172F 0%, #030B19 42%, #010711 100%);
+```
+
+This will match the icon’s dark-blue + cyan glow style.
+
+---
+
+## 4. Product Cards
+
+For products like **Imperium Option Trading Terminal** and **Imperium Investor**, use this:
+
+```css
+background:
+  linear-gradient(180deg, rgba(7, 23, 47, 0.95), rgba(3, 11, 25, 0.98));
+
+border: 1px solid rgba(0, 207, 255, 0.18);
+box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+```
+
+Hover:
+
+```css
+border-color: rgba(0, 207, 255, 0.45);
+box-shadow: 0 0 28px rgba(0, 207, 255, 0.18);
+transform: translateY(-2px);
+```
+
+---
+
+# Button Colors
+
+## Primary Button
+
+Use for:
+
+* **Add to Cart**
+* **Buy Now**
+* **Download**
+* **Login**
+* **Explore Products**
+
+```css
+background: linear-gradient(135deg, #22CFFF 0%, #00A7F0 100%);
+color: #010711;
+border: 1px solid #00CFFF;
+box-shadow: 0 0 18px rgba(0, 207, 255, 0.28);
+```
+
+Important: use **dark text** on cyan buttons.
+
+```css
+color: #010711;
+font-weight: 700;
+```
+
+White text on cyan will look weaker. Dark navy text gives stronger contrast.
+
+---
+
+## Secondary Button
+
+Use for:
+
+* **View Details**
+* **Learn More**
+* **View Terminal**
+
+```css
+background: transparent;
+color: #00CFFF;
+border: 1px solid rgba(0, 207, 255, 0.45);
+```
+
+Hover:
+
+```css
+background: rgba(0, 207, 255, 0.08);
+border-color: #00CFFF;
+box-shadow: 0 0 14px rgba(0, 207, 255, 0.18);
+```
+
+---
+
+# Text Hierarchy
+
+| Element        |                  Color |    Weight |
+| -------------- | ---------------------: | --------: |
+| Hero heading   |              `#FFFFFF` | 700 / 800 |
+| Product title  |              `#FFFFFF` |       700 |
+| Price          | `#FFFFFF` or `#00CFFF` |       700 |
+| Body text      |              `#F3F5F7` | 400 / 500 |
+| Labels         |              `#8A97A8` |       500 |
+| Small captions |              `#526070` |       400 |
+
+For price, I recommend:
+
+```css
+color: #FFFFFF;
+```
+
+Then add a cyan underline, badge, or glow near it. Do not make every price cyan, or the page will become visually noisy.
+
+---
+
+# Status Colors
+
+For account, purchase, payment, and license states:
+
+| State             |       Hex | Example            |
+| ----------------- | --------: | ------------------ |
+| Paid / Active     | `#00E676` | Purchase active    |
+| Pending / Warning | `#FFB020` | Payment pending    |
+| Failed / Error    | `#FF4D5E` | Payment failed     |
+| Info              | `#00CFFF` | Download available |
+
+```css
+--success: #00E676;
+--warning: #FFB020;
+--error: #FF4D5E;
+--info: #00CFFF;
+```
+
+Use these only for status, not for normal decoration.
+
+---
+
+# Best Visual Ratio
+
+Use the colors like this:
+
+| Color Type                        |   Usage |
+| --------------------------------- | ------: |
+| Dark navy backgrounds             | **70%** |
+| White / soft white text           | **20%** |
+| Cyan accents                      |  **8%** |
+| Green / amber / red status colors |  **2%** |
+
+This is important. If cyan is used everywhere, it loses power. Cyan should guide the user’s eye to important actions.
+
+---
+
+# Recommended Final Look
+
+Your Imperium Store should follow this style:
+
+```text
+Dark navy base
++ clean white typography
++ cyan CTA buttons
++ subtle cyan borders
++ soft glow only on important actions
++ green/amber/red only for purchase/account status
+```
+
+This will make the site feel more like a **serious trading software store** instead of a generic ecommerce page.
+
+
+
+Yes, **amber can be used**, but not as a main brand color.
+
+For Imperium Store, cyan should remain the **primary brand accent**. Amber should be a **secondary attention color** used only where you want urgency, premium highlights, or trading-related emphasis.
+
+---
+
+# Best Uses for Amber
+
+## 1. Limited-Time / Important Badges
+
+Amber works very well for offer-style labels:
+
+```text
+LIMITED ACCESS
+NEW
+POPULAR
+BEST VALUE
+EARLY USER PRICE
+```
+
+Recommended amber:
+
+```css
+--amber: #FFB020;
+--amber-soft: rgba(255, 176, 32, 0.14);
+--amber-border: rgba(255, 176, 32, 0.38);
+```
+
+Example:
+
+```css
+.badge-amber {
+  color: #FFB020;
+  background: rgba(255, 176, 32, 0.12);
+  border: 1px solid rgba(255, 176, 32, 0.35);
+}
+```
+
+---
+
+## 2. Price Highlights
+
+Amber can be used near the price, but not for the entire price everywhere.
+
+Good usage:
+
+```text
+₹6,999
+One-time access
+```
+
+Use amber for the small supporting label:
+
+```css
+.price-note {
+  color: #FFB020;
+}
+```
+
+Avoid making all prices amber. White or cyan is cleaner for the main price.
+
+---
+
+## 3. Warning / Pending States
+
+Amber is perfect for account and payment states:
+
+| State                 |     Color |
+| --------------------- | --------: |
+| Payment pending       | `#FFB020` |
+| License expiring soon | `#FFB020` |
+| Update available      | `#FFB020` |
+| Action required       | `#FFB020` |
+
+Example:
+
+```css
+.status-warning {
+  color: #FFB020;
+  background: rgba(255, 176, 32, 0.12);
+  border: 1px solid rgba(255, 176, 32, 0.35);
+}
+```
+
+---
+
+## 4. Premium Feature Markers
+
+Amber can signal “premium” without looking cheap.
+
+Use it for:
+
+```text
+PRO
+PREMIUM
+ADVANCED
+LIFETIME
+```
+
+Example:
+
+```css
+.premium-label {
+  color: #FFB020;
+  text-shadow: 0 0 14px rgba(255, 176, 32, 0.22);
+}
+```
+
+---
+
+# Where Not to Use Amber
+
+Avoid amber for:
+
+* Main background
+* Navbar
+* Normal buttons
+* Main product card border
+* Normal links
+* Large text blocks
+* Too many icons
+
+Too much amber will fight with cyan and make the site look less premium.
+
+---
+
+# Best Rule
+
+Use the colors like this:
+
+| Color         | Purpose                                  |
+| ------------- | ---------------------------------------- |
+| **Dark navy** | Base and background                      |
+| **White**     | Main text                                |
+| **Cyan**      | Brand, buttons, active states            |
+| **Amber**     | Warnings, premium labels, limited offers |
+| **Green**     | Success / paid                           |
+| **Red**       | Error / failed                           |
+
+---
+
+# Final Recommendation
+
+Add amber to your palette, but use it as an **attention color**, not a brand color.
+
+```css
+:root {
+  --warning-amber: #FFB020;
+  --warning-amber-soft: rgba(255, 176, 32, 0.12);
+  --warning-amber-border: rgba(255, 176, 32, 0.35);
+}
+```
+
+For Imperium Store, amber is best for:
+
+```text
+POPULAR
+BEST VALUE
+UPDATE AVAILABLE
+LICENSE EXPIRING
+PAYMENT PENDING
+PREMIUM FEATURE
+```
+
+Cyan should still own the main identity. Amber should appear only when something needs special attention.
+
+Yes, **gold can work better than amber** for Imperium Store — but only if you want a more **premium / luxury / high-value software** feel.
+
+For your brand:
+
+```text
+Dark navy + cyan = technology / trading / execution
+Dark navy + gold = premium / wealth / authority
+Dark navy + cyan + gold = premium fintech / trading software
+```
+
+But gold should be used **even more carefully** than amber.
+
+---
+
+# Gold vs Amber
+
+| Color                   | Feeling                   | Best Use                                     |
+| ----------------------- | ------------------------- | -------------------------------------------- |
+| **Amber** `#FFB020`     | Warning, attention, alert | Pending, notice, update, caution             |
+| **Gold** `#D4AF37`      | Premium, luxury, value    | Pro badge, lifetime access, featured product |
+| **Soft Gold** `#F5D76E` | Highlight, shine          | Small decorative highlights                  |
+| **Dark Gold** `#9F7A18` | Serious premium           | Borders, subtle icons                        |
+
+---
+
+# Recommended Gold Palette
+
+```css
+:root {
+  --gold: #D4AF37;
+  --gold-bright: #F5D76E;
+  --gold-dark: #9F7A18;
+  --gold-soft: rgba(212, 175, 55, 0.12);
+  --gold-border: rgba(212, 175, 55, 0.35);
+  --gold-glow: 0 0 18px rgba(212, 175, 55, 0.24);
+}
+```
+
+---
+
+# Best Places to Use Gold
+
+## 1. Premium Product Badge
+
+Use gold for labels like:
+
+```text
+PRO
+PREMIUM
+BEST VALUE
+LIFETIME ACCESS
+FEATURED
+```
+
+Example:
+
+```css
+.badge-gold {
+  color: #F5D76E;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.18);
+}
+```
+
+---
+
+## 2. Featured Product Card
+
+For your main product, you can use a **very subtle gold border**:
+
+```css
+.featured-card {
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  box-shadow:
+    0 0 22px rgba(212, 175, 55, 0.12),
+    0 18px 40px rgba(0, 0, 0, 0.35);
+}
+```
+
+Do not make the whole card gold. Only use gold on the edge, badge, or small highlight.
+
+---
+
+## 3. Price Accent
+
+Gold is good for **small price-support text**, not necessarily the main price.
+
+Good:
+
+```text
+₹6,999
+Lifetime Access
+```
+
+Use gold for **Lifetime Access**:
+
+```css
+.price-note {
+  color: #D4AF37;
+}
+```
+
+For the main price, I still prefer:
+
+```css
+.price {
+  color: #FFFFFF;
+}
+```
+
+or:
+
+```css
+.price {
+  color: #00CFFF;
+}
+```
+
+---
+
+# Where Not to Use Gold
+
+Avoid gold for:
+
+* Main buttons
+* Navbar links
+* Normal body text
+* Large backgrounds
+* Every product card border
+* Normal icons
+* Error / warning messages
+
+Gold everywhere will make the site look heavy. Use it as a **premium signal**.
+
+---
+
+# Final Recommendation for Imperium Store
+
+Use this hierarchy:
+
+| Role           |           Color |
+| -------------- | --------------: |
+| Brand accent   |  Cyan `#00CFFF` |
+| Premium accent |  Gold `#D4AF37` |
+| Warning color  | Amber `#FFB020` |
+| Success color  | Green `#00E676` |
+| Error color    |   Red `#FF4D5E` |
+
+Best balance:
+
+```text
+70% dark navy
+18% white / gray text
+8% cyan
+3% gold
+1% status colors
+```
+
+So yes — **use gold**, but use it only for **premium, featured, lifetime, pro, and high-value elements**.
+
+For Imperium Store, I would use:
+
+```text
+Cyan = action
+Gold = premium value
+Amber = warning
+```
+
+That separation will make the design cleaner and more professional.

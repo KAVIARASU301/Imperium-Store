@@ -101,7 +101,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         name: "Imperium Store",
         description: productIds.length === 1 ? cartProducts[0]?.name : `${productIds.length} Imperium products`,
         prefill: { email: sessionData.session?.user.email ?? undefined },
-        theme: { color: "#22D3EE" },
+        theme: { color: "#00CFFF" },
         handler: async (response: RazorpaySuccessResponse) => {
           try {
             const verifyRes = await fetch("/api/razorpay/verify-payment", {
@@ -136,53 +136,53 @@ export default function CartPageClient({ products }: { products: Product[] }) {
 
   return (
     <main className="mx-auto max-w-[1200px] px-6 py-12">
-      <section className="border-b border-[#1b3055] pb-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Secure order review</p>
-        <h1 className="mt-2 max-w-4xl text-3xl font-extrabold tracking-normal text-[#c5d5ee] sm:text-4xl">
+      <section className="border-b border-cyan-border pb-8">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Secure order review</p>
+        <h1 className="mt-2 max-w-4xl text-3xl font-extrabold tracking-normal text-white sm:text-4xl">
           Review Cart and Complete Payment
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6882a8]">
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
           Review your selected products, add more tools if needed, and complete payment securely through Razorpay from this page.
         </p>
       </section>
 
       {cartProducts.length === 0 ? (
-        <section className="mt-8 rounded-lg border-2 border-[#294875] bg-[#0c1525] p-8 shadow-[0_24px_60px_rgba(0,0,0,0.36)]">
-          <h2 className="text-xl font-bold text-[#c5d5ee]">Start your cart</h2>
-          <p className="mt-2 text-sm leading-6 text-[#6882a8]">Add a product to review your order and pay securely.</p>
-          <Link href="/products" className="mt-6 inline-block bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
+        <section className="mt-8 rounded-lg border-2 border-cyan-border bg-section p-8 shadow-[0_24px_60px_rgba(0,0,0,0.36)]">
+          <h2 className="text-xl font-bold text-white">Start your cart</h2>
+          <p className="mt-2 text-sm leading-6 text-muted">Add a product to review your order and pay securely.</p>
+          <Link href="/products" className="mt-6 inline-block btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white ">
             Browse Products
           </Link>
         </section>
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_390px]">
-          <section className="overflow-hidden rounded-lg border-2 border-[#1b3055] bg-[#07101f] shadow-[0_22px_54px_rgba(0,0,0,0.32)]">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1b3055] bg-[#0f1b31] px-5 py-4">
+          <section className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_22px_54px_rgba(0,0,0,0.32)]">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-border bg-card-hover px-5 py-4">
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#67e8f9]">Selected products</p>
-                <p className="mt-1 text-sm text-[#8aa3c7]">{cartProducts.length} item{cartProducts.length === 1 ? "" : "s"} ready for payment</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Selected products</p>
+                <p className="mt-1 text-sm text-muted">{cartProducts.length} item{cartProducts.length === 1 ? "" : "s"} ready for payment</p>
               </div>
-              <button type="button" className="border border-[#1b3055] bg-[#111d35] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:border-[#1e52e8]" onClick={clearCart}>
+              <button type="button" className="border border-cyan-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand" onClick={clearCart}>
                 Clear Cart
               </button>
             </div>
             {cartProducts.map((product) => (
-              <article key={product.slug} className="grid gap-4 border-b border-[#1b3055] bg-[#0c1525] p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md border border-[#1b3055] bg-[#070c17] p-2 shadow-inner shadow-black/30">
+              <article key={product.slug} className="grid gap-4 border-b border-cyan-border bg-section p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-md border border-cyan-border bg-main p-2 shadow-inner shadow-black/30">
                   <Image src={product.icon.src} alt="" width={product.icon.width} height={product.icon.height} className="h-12 w-12 object-contain" />
                 </div>
                 <div>
-                  <h2 className="font-bold text-[#c5d5ee]">{product.name}</h2>
-                  <p className="mt-1 text-sm leading-6 text-[#6882a8]">Digital download access after payment confirmation.</p>
+                  <h2 className="font-bold text-white">{product.name}</h2>
+                  <p className="mt-1 text-sm leading-6 text-muted">Digital download access after payment confirmation.</p>
                   <button
                     type="button"
-                    className="mt-3 border border-[#1b3055] bg-[#111d35] px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-[#8aa3c7] hover:border-red-400/50 hover:text-red-100"
+                    className="mt-3 border border-cyan-border bg-card px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted hover:border-red-400/50 hover:text-red-100"
                     onClick={() => removeFromCart(product.slug)}
                   >
                     Remove
                   </button>
                 </div>
-                <p className="font-semibold tabular-nums text-[#c5d5ee]">
+                <p className="font-semibold tabular-nums text-white">
                   <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
                   {formatPriceAmount(product.price)}
                 </p>
@@ -190,30 +190,30 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             ))}
           </section>
 
-          <aside className="h-fit overflow-hidden rounded-lg border-2 border-[#294875] bg-[#07101f] shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(197,213,238,0.08)_inset] lg:sticky lg:top-24">
-            <div className="border-b-2 border-[#1b3055] bg-[#0f1b31] px-5 py-4">
-              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-[#67e8f9]">Payment summary</p>
-              <p className="mt-1 text-sm font-medium text-[#c5d5ee]">Payments processed securely via Razorpay</p>
+          <aside className="h-fit overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(255,255,255,0.08)_inset] lg:sticky lg:top-24">
+            <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Payment summary</p>
+              <p className="mt-1 text-sm font-medium text-white">Payments processed securely via Razorpay</p>
             </div>
             <div className="p-5">
-              <div className="rounded-md border-2 border-[#1b3055] bg-[#0c1525] p-4 shadow-[0_0_0_1px_rgba(197,213,238,0.06)_inset]">
-                <div className="space-y-3 text-sm text-[#8aa3c7]">
+              <div className="rounded-md border-2 border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
+                <div className="space-y-3 text-sm text-muted">
                   <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
                   <div className="flex justify-between gap-4"><span>Items</span><span>{cartProducts.length}</span></div>
                   <div className="flex justify-between gap-4"><span>Subtotal</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span></div>
                   <div className="flex justify-between gap-4"><span>GST</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(0)}</span></div>
                 </div>
-                <div className="mt-4 flex items-end justify-between gap-4 border-t border-[#1b3055] pt-4 text-[#c5d5ee]">
-                  <span className="text-sm font-semibold uppercase tracking-[0.08em] text-[#8aa3c7]">Total payable</span>
+                <div className="mt-4 flex items-end justify-between gap-4 border-t border-cyan-border pt-4 text-white">
+                  <span className="text-sm font-semibold uppercase tracking-[0.08em] text-muted">Total payable</span>
                   <span className="text-3xl font-extrabold tabular-nums">{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span>
                 </div>
               </div>
               {email ? (
-                <button type="button" disabled={loading} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 hover:bg-[#2b63ff] disabled:cursor-wait disabled:bg-[#1b3055] disabled:text-[#6882a8]">
+                <button type="button" disabled={loading} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-wait disabled:bg-cyan-border disabled:text-muted">
                   {loading ? "Starting Payment..." : "Pay Securely Now"}
                 </button>
               ) : (
-                <Link href={`/login?next=${encodeURIComponent("/cart")}`} className="mt-5 block bg-[#1e52e8] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 hover:bg-[#2b63ff]">
+                <Link href={`/login?next=${encodeURIComponent("/cart")}`} className="mt-5 block btn-primary px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 ">
                   Sign In to Pay
                 </Link>
               )}

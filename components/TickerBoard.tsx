@@ -42,7 +42,6 @@ function formatNumber(value: number | null, digits = 2) {
 
 export default function TickerBoard() {
   const [tickers, setTickers] = useState<MarketTicker[]>(fallbackTickers);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
 
   useEffect(() => {
     let active = true;
@@ -54,9 +53,8 @@ export default function TickerBoard() {
         if (!active) return;
         if (!response.ok || !Array.isArray(payload.items)) throw new Error("Unable to load market data");
         setTickers(payload.items);
-        setState("ready");
       } catch {
-        if (active) setState("error");
+        if (active) setTickers(fallbackTickers);
       }
     }
 
@@ -70,7 +68,7 @@ export default function TickerBoard() {
 
   const marqueeItems = useMemo(() => tickers, [tickers]);
   return (
-    <section className="border-b border-[#1b3055] bg-[#050914]">
+    <section className="border-b border-cyan-border bg-section">
       <div className="flex h-11 items-center overflow-hidden">
         <div className="min-w-0 flex-1 overflow-hidden">
           <div className="ticker-track">
@@ -83,9 +81,9 @@ export default function TickerBoard() {
                       key={`${ticker.label}-${ticker.symbol}-${segment}`}
                       className="flex h-11 items-center gap-2 whitespace-nowrap font-mono text-xs"
                     >
-                      <span className="font-semibold uppercase tracking-[0.08em] text-[#c5d5ee]">{ticker.label}</span>
-                      <span className="text-[#6882a8]">{formatNumber(ticker.price)}</span>
-                      <span className={ticker.available ? isPositive ? "text-emerald-400" : "text-red-400" : "text-[#6882a8]"}>
+                      <span className="font-semibold uppercase tracking-[0.08em] text-white">{ticker.label}</span>
+                      <span className="text-muted">{formatNumber(ticker.price)}</span>
+                      <span className={ticker.available ? isPositive ? "text-emerald-400" : "text-red-400" : "text-muted"}>
                         {ticker.available ? `${isPositive ? "+" : ""}${formatNumber(ticker.change)} (${isPositive ? "+" : ""}${formatNumber(ticker.changePercent)}%)` : "Loading"}
                       </span>
                     </div>

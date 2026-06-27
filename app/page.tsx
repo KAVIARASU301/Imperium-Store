@@ -24,12 +24,12 @@ export default function HomePage() {
             <Hero />
 
             <section className="mx-auto max-w-[1200px] px-6 py-12" id="products">
-                <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-[#1b3055] pb-4">
+                <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-cyan-border pb-4">
                     <div>
-                        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Products</p>
-                        <h2 className="mt-2 text-xl font-bold text-[#c5d5ee] sm:text-2xl">Trading Workstations</h2>
+                        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Products</p>
+                        <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">Trading Workstations</h2>
                     </div>
-                    <Link href="/products" className="text-sm font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:text-white">
+                    <Link href="/products" className="text-sm font-semibold uppercase tracking-[0.08em] text-white hover:text-white">
                         View all products
                     </Link>
                 </div>
@@ -40,14 +40,14 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="border-y border-[#1b3055] bg-[#0c1525]/80">
+            <section className="border-y border-cyan-border bg-section/80">
                 <div className="mx-auto max-w-[1200px] px-6 py-10">
-                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Why Imperium</p>
-                    <dl className="mt-4 grid gap-px border border-[#1b3055] bg-[#1b3055] md:grid-cols-2">
+                    <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Why Imperium</p>
+                    <dl className="mt-4 grid gap-px border border-cyan-border bg-cyan-border md:grid-cols-2">
                         {principles.map((item) => (
-                            <div key={item.title} className="bg-[#0c1525] p-4">
-                                <dt className="text-sm font-semibold text-[#c5d5ee]">{item.title}</dt>
-                                <dd className="mt-1 text-sm leading-6 text-[#6882a8]">{item.text}</dd>
+                            <div key={item.title} className="bg-section p-4">
+                                <dt className="text-sm font-semibold text-white">{item.title}</dt>
+                                <dd className="mt-1 text-sm leading-6 text-muted">{item.text}</dd>
                             </div>
                         ))}
                     </dl>
@@ -55,10 +55,10 @@ export default function HomePage() {
             </section>
 
             <section className="mx-auto max-w-[1200px] px-6 py-12">
-                <div className="border border-[#1b3055] bg-[#0c1525] p-6 text-center">
-                <h2 className="text-xl font-bold text-[#c5d5ee] sm:text-2xl">Choose your Imperium workstation.</h2>
-                <p className="mt-2 text-sm text-[#6882a8]">One product, one clean checkout, lifetime access to current downloads.</p>
-                <Link href="/products" className="mt-5 inline-block bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
+                <div className="border border-cyan-border bg-section p-6 text-center">
+                <h2 className="text-xl font-bold text-white sm:text-2xl">Choose your Imperium workstation.</h2>
+                <p className="mt-2 text-sm text-muted">One product, one clean checkout, lifetime access to current downloads.</p>
+                <Link href="/products" className="mt-5 inline-block btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white ">
                     Explore Products
                 </Link>
                 </div>

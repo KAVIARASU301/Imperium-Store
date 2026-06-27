@@ -1,22 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070c17;
-  --surface: #0c1525;
-  --card: #111d35;
-  --border: #1b3055;
-  --text: #c5d5ee;
-  --muted: #6882a8;
-  --action: #1e52e8;
-  --data: #0891b2;
-  --danger: #EF4444;
-  --profit: #22C55E;
-  --warning: #FACC15;
+  --bg-main: #010711;
+  --bg-section: #030B19;
+  --bg-card: #061225;
+  --bg-card-hover: #07172F;
+  --bg-input: #081629;
+
+  --brand-cyan: #00CFFF;
+  --brand-cyan-bright: #22CFFF;
+  --brand-cyan-deep: #00A7F0;
+
+  --text-main: #FFFFFF;
+  --text-body: #F3F5F7;
+  --text-muted: #8A97A8;
+  --text-disabled: #526070;
+
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --border-cyan-soft: rgba(0, 207, 255, 0.18);
+  --border-cyan: rgba(0, 207, 255, 0.35);
+
+  --glow-cyan-soft: 0 0 18px rgba(0, 207, 255, 0.22);
+  --glow-cyan-strong: 0 0 32px rgba(0, 207, 255, 0.38);
+
+  --success: #00E676;
+  --warning: #FFB020;
+  --error: #FF4D5E;
+  --info: #00CFFF;
+
+  --background: var(--bg-main);
+  --surface: var(--bg-section);
+  --card: var(--bg-card);
+  --border: var(--border-cyan-soft);
+  --text: var(--text-body);
+  --muted: var(--text-muted);
+  --action: var(--brand-cyan);
+  --data: var(--brand-cyan-deep);
+  --danger: var(--error);
+  --profit: var(--success);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--text);
+  --color-main: var(--bg-main);
+  --color-section: var(--bg-section);
+  --color-card: var(--bg-card);
+  --color-card-hover: var(--bg-card-hover);
+  --color-input: var(--bg-input);
+  --color-brand: var(--brand-cyan);
+  --color-brand-bright: var(--brand-cyan-bright);
+  --color-brand-deep: var(--brand-cyan-deep);
+  --color-copy: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-disabled: var(--text-disabled);
+  --color-soft-border: var(--border-soft);
+  --color-cyan-border: var(--border-cyan-soft);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
 }
@@ -25,14 +67,72 @@
 html { scroll-behavior: smooth; }
 body {
   background:
-    linear-gradient(rgba(27, 48, 85, 0.18) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(27, 48, 85, 0.14) 1px, transparent 1px),
-    var(--background);
-  background-size: 64px 64px;
-  color: var(--text);
+    radial-gradient(circle at 50% 0%, rgba(0, 207, 255, 0.08), transparent 30rem),
+    linear-gradient(rgba(0, 207, 255, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 207, 255, 0.06) 1px, transparent 1px),
+    var(--bg-main);
+  background-size: 100% 100%, 64px 64px, 64px 64px;
+  color: var(--text-body);
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
-a, button { transition: color .15s ease, border-color .15s ease, background-color .15s ease; }
+a, button {
+  transition:
+    color .15s ease,
+    border-color .15s ease,
+    background-color .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease;
+}
+
+@layer components {
+  .surface-panel {
+    border: 1px solid var(--border-cyan-soft);
+    background:
+      linear-gradient(180deg, rgba(7, 23, 47, 0.95), rgba(3, 11, 25, 0.98));
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .interactive-panel {
+    border: 1px solid var(--border-cyan-soft);
+    background:
+      linear-gradient(180deg, rgba(7, 23, 47, 0.95), rgba(3, 11, 25, 0.98));
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .interactive-panel:hover {
+    border-color: rgba(0, 207, 255, 0.45);
+    box-shadow: 0 0 28px rgba(0, 207, 255, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    border: 1px solid var(--brand-cyan);
+    background: linear-gradient(135deg, var(--brand-cyan-bright) 0%, var(--brand-cyan-deep) 100%);
+    color: var(--bg-main) !important;
+    box-shadow: var(--glow-cyan-soft);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--brand-cyan-bright) 0%, var(--brand-cyan) 100%);
+    box-shadow: var(--glow-cyan-strong);
+  }
+
+  .btn-secondary {
+    border: 1px solid rgba(0, 207, 255, 0.45);
+    background: transparent;
+    color: var(--brand-cyan);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--brand-cyan);
+    background: rgba(0, 207, 255, 0.08);
+    box-shadow: 0 0 14px rgba(0, 207, 255, 0.18);
+  }
+
+  .eyebrow {
+    color: var(--brand-cyan);
+  }
+}
 
 .ticker-track {
   display: flex;

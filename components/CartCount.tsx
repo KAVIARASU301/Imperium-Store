@@ -23,7 +23,7 @@ export default function CartCount() {
   if (count === 0) return null;
 
   return (
-    <span className="ml-1 inline-flex min-w-5 items-center justify-center bg-[#1e52e8] px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+    <span className="ml-1 inline-flex min-w-5 items-center justify-center btn-primary px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
       {count}
     </span>
   );
