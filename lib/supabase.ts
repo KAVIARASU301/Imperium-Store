@@ -49,6 +49,11 @@ type BrowserAuthClient = {
 };
 type BrowserSupabaseClient = { auth: BrowserAuthClient };
 
+declare global {
+  var __imperiumBrowserSupabaseClient: BrowserSupabaseClient | undefined;
+  var __imperiumDemoBrowserClient: BrowserSupabaseClient | undefined;
+}
+
 function getDemoSession(): DemoSession | null {
   if (typeof window === "undefined") return null;
   const email = window.localStorage.getItem(DEMO_SESSION_KEY);
@@ -121,9 +126,16 @@ export function hasSupabaseEnv() {
   return Boolean(supabaseUrl && supabaseAnonKey);
 }
 export function getSupabaseBrowserClient(): BrowserSupabaseClient {
-  if (!supabaseUrl || !supabaseAnonKey)
-    return createDemoBrowserClient() as BrowserSupabaseClient;
-  return createClient(supabaseUrl, supabaseAnonKey) as BrowserSupabaseClient;
+  if (!supabaseUrl || !supabaseAnonKey) {
+    globalThis.__imperiumDemoBrowserClient ??=
+      createDemoBrowserClient() as BrowserSupabaseClient;
+    return globalThis.__imperiumDemoBrowserClient;
+  }
+  globalThis.__imperiumBrowserSupabaseClient ??= createClient(
+    supabaseUrl,
+    supabaseAnonKey,
+  ) as BrowserSupabaseClient;
+  return globalThis.__imperiumBrowserSupabaseClient;
 }
 export function getSupabaseServerClient(useServiceRole = false) {
   const key = useServiceRole ? supabaseServiceRoleKey : supabaseAnonKey;
@@ -133,5 +145,9 @@ export function getSupabaseServerClient(useServiceRole = false) {
 }
 export const supabase =
   supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
+    ? typeof window === "undefined"
+      ? createClient(supabaseUrl, supabaseAnonKey, {
+          auth: { persistSession: false },
+        })
+      : getSupabaseBrowserClient()
     : null;

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import DownloadButton from "@/components/DownloadButton";
-import type { Product } from "@/types/product";
+import type { Product, ProductFile } from "@/types/product";
 import type { Purchase } from "@/types/purchase";
 
 type AccessState = "checking" | "signed-out" | "ready";
@@ -67,21 +68,38 @@ export default function DashboardProducts({ products }: { products: Product[] })
         return (
           <article key={product.slug} className="border border-slate-800 bg-[#0B1020] p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="text-xl font-semibold text-white">{product.name}</h2>
-                <p className="mt-2 text-sm text-slate-400">{product.short_description}</p>
+              <div className="flex min-w-0 items-start gap-3">
+                <Image src={product.icon.src} alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
+                <div className="min-w-0">
+                  <h2 className="text-xl font-semibold text-white">{product.name}</h2>
+                  <p className="mt-2 text-sm text-slate-400">{product.short_description}</p>
+                </div>
               </div>
               <StatusBadge hasAccess={hasAccess} status={purchase?.status} />
             </div>
             {hasAccess ? (
               <div className="mt-4 space-y-3">
                 {product.files?.map((file) => (
-                  <div key={file.id} className="flex flex-col gap-3 border border-slate-800 bg-black/20 p-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-medium text-white">{file.file_name}</p>
-                      <p className="font-mono text-xs uppercase text-slate-500">Version {file.version} / {file.platform}</p>
+                  <div
+                    key={file.id}
+                    className="group flex flex-col gap-4 border border-slate-800 bg-black/20 p-4 transition duration-150 hover:border-cyan-400/60 hover:bg-cyan-950/20 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="flex min-w-0 items-start gap-4">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-slate-700 bg-slate-950/80 transition duration-150 group-hover:border-cyan-400/50">
+                        <Image src={getPlatformIcon(file)} alt="" width={28} height={28} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-medium text-white">{getPlatformTitle(file)}</p>
+                          <span className="border border-slate-700 px-2 py-1 font-mono text-[11px] uppercase text-slate-400">
+                            v{file.version}
+                          </span>
+                        </div>
+                        <p className="mt-1 font-mono text-xs uppercase text-slate-500">{file.file_name}</p>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{getPlatformNote(file)}</p>
+                      </div>
                     </div>
-                    <DownloadButton fileId={file.id} />
+                    <DownloadButton fileId={file.id} label={`Download ${getPlatformLabel(file)}`} />
                   </div>
                 ))}
                 {!product.files?.length ? <p className="text-sm text-slate-500">No downloadable files for this product yet.</p> : null}
@@ -98,6 +116,28 @@ export default function DashboardProducts({ products }: { products: Product[] })
       })}
     </div>
   );
+}
+
+function getPlatformIcon(file: ProductFile) {
+  if (file.platform === "linux") return "/linux-mint.svg";
+  if (file.platform === "windows") return "/windows.svg";
+  return "/file.svg";
+}
+
+function getPlatformLabel(file: ProductFile) {
+  if (file.platform === "linux") return "Linux Mint";
+  if (file.platform === "windows") return "Windows";
+  return file.platform;
+}
+
+function getPlatformTitle(file: ProductFile) {
+  return `${getPlatformLabel(file)} version`;
+}
+
+function getPlatformNote(file: ProductFile) {
+  if (file.platform === "linux") return "Developed and tested on Linux Mint. Recommended for Linux Mint users.";
+  if (file.platform === "windows") return "Windows build for users running Imperium on Windows.";
+  return "Download package for this platform.";
 }
 
 function StatusBadge({ hasAccess, status }: { hasAccess: boolean; status?: string }) {

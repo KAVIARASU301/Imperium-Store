@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
 import HeaderNav from "@/components/HeaderNav";
@@ -9,8 +10,12 @@ export const metadata: Metadata = {
   title: "Imperium Store | Trading tools and education",
   description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
   icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
+    icon: [
+      { url: "/imperium_store_icons/imperium_icon_32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/imperium_store_icons/imperium_icon_64x64.png", sizes: "64x64", type: "image/png" },
+      { url: "/imperium_store_icons/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/imperium_store_icons/imperium_icon_32x32.png",
   },
 };
 
@@ -54,7 +59,7 @@ const darkReaderHydrationCleanup = `
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-[#05070D] text-slate-100">
         <Script
           id="darkreader-hydration-cleanup"
@@ -63,7 +68,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
         <header className="border-b border-slate-900/90 bg-[#05070D]/90">
           <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <Link href="/" className="font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">Imperium</Link>
+            <Link href="/" className="inline-flex items-center gap-3 font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">
+              <Image src="/imperium_store_icons/imperium_icon_32x32.png" alt="" width={32} height={32} className="h-8 w-8" priority />
+              <span>Imperium</span>
+            </Link>
             <HeaderNav />
           </nav>
         </header>

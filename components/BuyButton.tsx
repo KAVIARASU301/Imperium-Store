@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { createRazorpayCheckout } from "@/lib/razorpay-client";
@@ -97,9 +98,19 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
       <button
         onClick={handleClick}
         disabled={loading}
-        className="mt-6 block w-full bg-cyan-300 px-5 py-3 text-center font-semibold text-black hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 bg-cyan-300 px-5 py-3 text-center font-semibold text-black hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Starting checkout..." : price === 0 ? "Get Access" : "Buy Now"}
+        {loading ? (
+          <>
+            <span className="h-4 w-4 animate-spin border-2 border-slate-600 border-t-black" aria-hidden="true" />
+            Starting checkout...
+          </>
+        ) : (
+          <>
+            <Image src={price === 0 ? "/tick.svg" : "/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
+            {price === 0 ? "Get Access" : "Buy Now"}
+          </>
+        )}
       </button>
       {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
     </div>
