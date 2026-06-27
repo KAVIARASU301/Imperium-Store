@@ -66,11 +66,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: darkReaderHydrationCleanup }}
         />
-        <header className="border-b border-slate-900/90 bg-[#05070D]/90">
-          <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <Link href="/" className="inline-flex items-center gap-3 font-mono text-sm font-semibold uppercase tracking-[0.24em] text-white">
-              <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={32} height={32} className="h-8 w-8" priority />
-              <span>Imperium</span>
+        <header className="sticky top-0 z-40 border-b border-white/10 bg-[#05070D]/80 backdrop-blur-xl">
+          <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3.5">
+            <Link href="/" className="inline-flex items-center gap-3 text-white">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white shadow-lg shadow-black/20">
+                <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={30} height={30} className="h-[30px] w-[30px]" priority />
+              </span>
+              <span className="text-lg font-semibold tracking-normal">Imperium Store</span>
             </Link>
             <HeaderNav />
           </nav>

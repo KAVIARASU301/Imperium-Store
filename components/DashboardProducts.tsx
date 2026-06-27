@@ -51,9 +51,9 @@ export default function DashboardProducts({ products }: { products: Product[] })
 
   if (state === "signed-out") {
     return (
-      <div className="mt-8 border border-slate-800 bg-[#0B1020] p-6">
+      <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.06] p-6 shadow-xl shadow-black/20">
         <p className="text-slate-300">Log in to see which products you have unlocked.</p>
-        <Link href="/login?next=/dashboard" className="mt-4 inline-block bg-cyan-300 px-5 py-3 text-sm font-semibold text-black hover:bg-cyan-200">
+        <Link href="/login?next=/dashboard" className="mt-4 inline-block rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 hover:bg-slate-100">
           Login
         </Link>
       </div>
@@ -66,7 +66,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
         const purchase = purchasesBySlug[product.slug];
         const hasAccess = product.price === 0 || purchase?.status === "paid";
         return (
-          <article key={product.slug} className="border border-slate-800 bg-[#0B1020] p-5">
+          <article key={product.slug} className="rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-xl shadow-black/20">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
                 <Image src={product.icon.src} alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
@@ -82,16 +82,16 @@ export default function DashboardProducts({ products }: { products: Product[] })
                 {product.files?.map((file) => (
                   <div
                     key={file.id}
-                    className="group flex flex-col gap-4 border border-slate-800 bg-black/20 p-4 transition duration-150 hover:border-cyan-400/60 hover:bg-cyan-950/20 sm:flex-row sm:items-center sm:justify-between"
+                    className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 transition duration-150 hover:border-white/20 hover:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex min-w-0 items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-slate-700 bg-slate-950/80 transition duration-150 group-hover:border-cyan-400/50">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white transition duration-150">
                         <Image src={getPlatformIcon(file)} alt="" width={28} height={28} />
                       </div>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="font-medium text-white">{getPlatformTitle(file)}</p>
-                          <span className="border border-slate-700 px-2 py-1 font-mono text-[11px] uppercase text-slate-400">
+                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold uppercase text-slate-400">
                             v{file.version}
                           </span>
                         </div>
@@ -106,7 +106,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
               </div>
             ) : (
               <div className="mt-4">
-                <Link href={`/products/${product.slug}`} className="inline-block border border-slate-700 px-4 py-2 text-sm font-semibold text-cyan-300 hover:border-cyan-300">
+                <Link href={`/products/${product.slug}`} className="inline-block rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10">
                   {purchase?.status === "pending" ? "Complete payment" : "View product"}
                 </Link>
               </div>

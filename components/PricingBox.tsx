@@ -8,24 +8,27 @@ export default function PricingBox({
   productName,
 }: { price: number; currency: string; slug: string; productName: string }) {
   return (
-    <aside className="border border-cyan-400/30 bg-[#0B1020] p-6">
-      <p className="font-mono text-sm uppercase tracking-widest text-slate-500">Direct checkout</p>
-      <div className="mt-3 font-mono text-4xl text-cyan-300">{formatPrice(price, currency)}</div>
+    <aside className="rounded-3xl border border-white/10 bg-white/[0.07] p-6 shadow-2xl shadow-black/20 backdrop-blur">
+      <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Direct checkout</p>
+      <div className="mt-3">
+        <p className="text-5xl font-semibold tracking-normal text-white">{formatPrice(price, currency)}</p>
+        <p className="mt-2 text-sm text-slate-400">One-time purchase. Lifetime access to current downloads.</p>
+      </div>
       <BuyButton slug={slug} price={price} productName={productName} />
       {price > 0 ? (
         <a
           href="https://razorpay.com/"
           target="_blank"
           rel="noreferrer"
-          className="mt-4 inline-flex"
+          className="mx-auto mt-4 flex w-fit items-center justify-center"
           aria-label="Razorpay payment gateway"
         >
           {/* Razorpay provides this hosted badge as an embeddable img snippet. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             referrerPolicy="origin"
-            src="https://badges.razorpay.com/badge-dark.png"
-            style={{ height: 45, width: 113 }}
+            src="https://badges.razorpay.com/badge-light.png"
+            className="block h-[45px] w-[113px]"
             alt="Razorpay | Payment Gateway | Neobank"
           />
         </a>

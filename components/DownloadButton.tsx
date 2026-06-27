@@ -33,7 +33,7 @@ export default function DownloadButton({ fileId, label = "Download" }: { fileId:
         onClick={handleDownload}
         disabled={isLoading}
         aria-busy={isLoading}
-        className="inline-flex min-w-32 items-center justify-center gap-2 border border-cyan-200 bg-cyan-300 px-5 py-3 text-sm font-semibold text-black shadow-[0_0_0_0_rgba(103,232,249,0)] transition duration-150 hover:-translate-y-0.5 hover:bg-cyan-200 hover:shadow-[0_0_24px_rgba(103,232,249,0.28)] active:translate-y-0 active:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-[#0B1020] disabled:cursor-wait disabled:border-slate-600 disabled:bg-slate-700 disabled:text-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+        className="inline-flex min-w-32 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition duration-150 hover:-translate-y-0.5 hover:bg-slate-100 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B1020] disabled:cursor-wait disabled:bg-slate-700 disabled:text-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
       >
         {isLoading ? (
           <>

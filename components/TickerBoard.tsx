@@ -81,35 +81,35 @@ export default function TickerBoard() {
   const latestUpdate = tickers.find((ticker) => ticker.updatedAt)?.updatedAt ?? null;
 
   return (
-    <section className="border-y border-slate-800/80 bg-[#070B14]/90">
+    <section className="border-y border-white/10 bg-white/[0.03]">
       <div className="mx-auto max-w-6xl px-6 py-5">
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
+            <p className="text-xs font-semibold uppercase tracking-widest text-cyan-200">
               Market pulse
             </p>
             <h2 className="mt-2 text-xl font-semibold text-white">Popular Indian index watchlist</h2>
           </div>
-          <p className="font-mono text-xs uppercase tracking-widest text-slate-500">
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
             {state === "loading" ? "Loading quotes" : state === "error" ? "Free feed unavailable" : `Updated ${formatTime(latestUpdate)}`}
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-slate-800 bg-black/25">
+        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/20 shadow-xl shadow-black/20">
           <div className="ticker-track flex w-max gap-3 px-3 py-3">
             {marqueeItems.map((ticker, index) => {
               const isPositive = typeof ticker.change === "number" && ticker.change >= 0;
               return (
                 <article
                   key={`${ticker.label}-${ticker.symbol}-${index}`}
-                  className="min-w-64 rounded-xl border border-slate-800 bg-[#0B1020] px-4 py-3 shadow-lg shadow-black/20"
+                  className="min-w-64 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 shadow-lg shadow-black/20"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-mono text-xs uppercase tracking-[0.2em] text-slate-500">{ticker.symbol}</p>
                       <h3 className="mt-1 text-lg font-semibold text-white">{ticker.label}</h3>
                     </div>
-                    <span className={`rounded-full px-2.5 py-1 font-mono text-xs ${ticker.available ? "bg-cyan-300/10 text-cyan-200" : "bg-slate-800 text-slate-400"}`}>
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${ticker.available ? "bg-emerald-400/10 text-emerald-200" : "bg-slate-800 text-slate-400"}`}>
                       {ticker.available ? ticker.exchange : "Waiting"}
                     </span>
                   </div>

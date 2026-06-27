@@ -98,7 +98,7 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
       <button
         onClick={handleClick}
         disabled={loading}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 bg-cyan-300 px-5 py-3 text-center font-semibold text-black hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-center font-semibold text-slate-950 shadow-xl shadow-black/20 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? (
           <>

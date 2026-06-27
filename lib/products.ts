@@ -301,4 +301,6 @@ export const products: Product[] = [
 export function getActiveProducts() { return products.filter((product) => product.is_active); }
 export function getProductBySlug(slug: string) { return products.find((product) => product.slug === slug && product.is_active); }
 export function getProductFileById(fileId: string) { return productFiles.find((file) => file.id === fileId && file.is_active); }
-export function formatPrice(price: number, currency = "INR") { return new Intl.NumberFormat("en-IN", { style: "currency", currency, maximumFractionDigits: 0 }).format(price); }
+export function formatPrice(price: number, currency = "INR") {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "code", maximumFractionDigits: 0 }).format(price);
+}
