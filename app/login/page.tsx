@@ -114,6 +114,8 @@ function LoginForm() {
         throw new Error("Use at least 8 characters for your password.");
 
       if (mode === "signup") {
+        if (password !== confirmPassword)
+          throw new Error("Passwords do not match.");
         const { error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
@@ -303,9 +305,9 @@ function LoginForm() {
             </label>
           ) : null}
 
-          {mode === "reset" ? (
+          {mode === "signup" || mode === "reset" ? (
             <label className="block text-sm font-medium text-[#c5d5ee]">
-              Confirm new password
+              {mode === "reset" ? "Confirm new password" : "Confirm password"}
               <input
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
@@ -315,6 +317,11 @@ function LoginForm() {
                 autoComplete="new-password"
                 required
               />
+              {mode === "signup" ? (
+                <span className="mt-2 block text-xs leading-5 text-[#6882a8]">
+                  Fill in all required fields, then click Create account.
+                </span>
+              ) : null}
             </label>
           ) : null}
 
@@ -353,12 +360,12 @@ function LoginForm() {
             </button>
           )}
           <span>
-            Protected by{" "}
+            Account security and data handling are covered in our{" "}
             <Link
               href="/privacy-policy"
               className="text-[#0891b2] hover:text-[#c5d5ee]"
             >
-              privacy-first policies
+              Privacy Policy
             </Link>
             .
           </span>

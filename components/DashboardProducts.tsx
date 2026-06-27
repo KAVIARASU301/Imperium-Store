@@ -85,8 +85,8 @@ export default function DashboardProducts({ products }: { products: Product[] })
                     className="group flex flex-col gap-4 border border-[#1b3055] bg-[#070c17] p-4 transition duration-150 hover:border-[#1e52e8] hover:bg-[#111d35] sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex min-w-0 items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#1b3055] bg-[#c5d5ee] transition duration-150">
-                        <Image src={getPlatformIcon(file)} alt="" width={28} height={28} />
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#1b3055] bg-[#0c1525] p-2 transition duration-150 group-hover:border-[#1e52e8]">
+                        <Image src={getPlatformIcon(file)} alt="" width={28} height={28} className="h-7 w-7 object-contain" />
                       </div>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
@@ -95,7 +95,10 @@ export default function DashboardProducts({ products }: { products: Product[] })
                             v{file.version}
                           </span>
                         </div>
-                        <p className="mt-1 font-mono text-xs uppercase text-[#6882a8]">{file.file_name}</p>
+                        <p className="mt-1 flex items-center gap-2 font-mono text-xs uppercase text-[#6882a8]">
+                          <Image src="/icons/file.svg" alt="" width={16} height={16} className="h-4 w-4 object-contain" />
+                          <span>{file.file_name}</span>
+                        </p>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6882a8]">{getPlatformNote(file)}</p>
                       </div>
                     </div>

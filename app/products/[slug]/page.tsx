@@ -13,16 +13,26 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) return notFound();
+  const keepTitleOnOneLine = product.slug === "imperium-option-trading-terminal";
   return (
     <main className="mx-auto max-w-[1200px] px-6 py-16">
       <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
         <section>
           <p className="inline-flex border border-[#1b3055] bg-[#0c1525] px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-[#0891b2]">{product.type}</p>
           <div className="mt-4 flex items-center gap-4">
-            <span className="border border-[#1b3055] bg-[#c5d5ee] p-2">
-              <Image src={product.icon.src} alt="" width={56} height={56} className="h-12 w-12 shrink-0" priority />
+            <span className="flex h-16 w-16 shrink-0 items-center justify-center border border-[#1b3055] bg-[#0c1525] p-3">
+              <Image
+                src={product.icon.src}
+                alt=""
+                width={product.icon.width}
+                height={product.icon.height}
+                className="max-h-12 w-auto object-contain"
+                priority
+              />
             </span>
-            <h1 className="text-4xl font-extrabold tracking-normal text-[#c5d5ee] md:text-5xl">{product.name}</h1>
+            <h1 className={`${keepTitleOnOneLine ? "whitespace-nowrap text-4xl lg:text-[2.65rem]" : "text-4xl md:text-5xl"} font-extrabold tracking-normal text-[#c5d5ee]`}>
+              {product.name}
+            </h1>
           </div>
           <p className="mt-5 max-w-2xl text-xl leading-8 text-[#c5d5ee]">{product.promise}</p>
           <p className="mt-4 max-w-3xl leading-7 text-[#6882a8]">{product.description}</p>
