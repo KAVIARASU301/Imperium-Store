@@ -9,6 +9,7 @@ import { usePurchasedProducts } from "@/components/usePurchasedProducts";
 
 export default function ProductCard({ product, variant = "horizontal" }: { product: Product; variant?: "horizontal" | "vertical" }) {
   const primaryBadge = product.badges?.[0];
+  const productTypeLabel = getProductTypeLabel(product.type);
   const { purchasedSlugSet } = usePurchasedProducts();
   const isPurchased = purchasedSlugSet.has(product.slug);
   const featurePoints = product.highlights?.slice(0, 3) ?? [];
@@ -35,16 +36,6 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             suppressHydrationWarning
           />
           <div className="absolute inset-x-2 bottom-2 h-16 rounded-b-md bg-gradient-to-t from-card to-transparent" />
-          <div className="absolute left-5 top-5 flex items-center gap-2">
-            <span className="rounded-md border border-cyan-border bg-section/90 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide text-brand shadow-[0_0_16px_rgba(0,207,255,0.12)] backdrop-blur">
-              {product.type === "app" ? "Software" : product.type}
-            </span>
-            {primaryBadge ? (
-              <span className={`hidden rounded-md border px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wide shadow-[0_0_16px_rgba(0,0,0,0.24)] backdrop-blur sm:inline-flex ${primaryBadgeClass}`}>
-                {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
-              </span>
-            ) : null}
-          </div>
         </div>
 
         <div className="relative flex flex-1 flex-col p-4">
@@ -62,7 +53,16 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             </div>
             <div className="min-w-0">
               <h3 className="text-base font-extrabold leading-6 tracking-tight text-white">{product.name}</h3>
-              <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">English</p>
+              <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                <span className="border border-cyan-border bg-main/60 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wide text-brand">
+                  {productTypeLabel}
+                </span>
+                {primaryBadge ? (
+                  <span className={`border px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wide ${primaryBadgeClass}`}>
+                    {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </div>
 
@@ -116,15 +116,17 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
         </div>
         <div className="bg-section p-5">
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">{product.type}</p>
-              {primaryBadge ? (
-                  <span className={`border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${primaryBadgeClass}`}>
-                {primaryBadge === "India + U.S. stocks" ? "India + United States stocks" : primaryBadge}
+            <h3 className="text-lg font-bold tracking-tight text-white">{product.name}</h3>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              <span className="border border-cyan-border bg-main/60 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wide text-brand">
+                {productTypeLabel}
               </span>
+              {primaryBadge ? (
+                <span className={`border px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wide ${primaryBadgeClass}`}>
+                  {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
+                </span>
               ) : null}
             </div>
-            <h3 className="mt-2 text-lg font-bold tracking-tight text-white">{product.name}</h3>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
             {featurePoints.length ? (
               <ul className="mt-4 grid gap-2 lg:grid-cols-3">
@@ -165,4 +167,9 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
         </div>
       </article>
   );
+}
+
+function getProductTypeLabel(type: Product["type"]) {
+  if (type === "app") return "Software";
+  return type;
 }

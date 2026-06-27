@@ -1,8 +1,9 @@
 "use client";
 
 import { addToCart, CART_STORAGE_KEY, CART_UPDATED_EVENT } from "@/lib/cart";
+import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import { useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { usePurchasedProducts } from "@/components/usePurchasedProducts";
 
 const emptyCartSnapshot: string[] = [];
@@ -21,14 +22,32 @@ export default function AddToCartButton({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(false);
   const cart = useSyncExternalStore(subscribeToCart, getCartSnapshot, getEmptyCartSnapshot);
   const { purchasedSlugSet, loaded } = usePurchasedProducts();
   const inCart = cart.includes(slug);
   const isPurchased = purchasedSlugSet.has(slug);
-  const disabled = !loaded || isPurchased;
+  const disabled = !loaded || isPurchased || checkingAuth;
   const buttonClassName = isPurchased
     ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-amber-300/60 bg-amber-300/10 text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.14)] hover:border-amber-300/60 hover:bg-amber-300/10`
     : `${className} disabled:cursor-wait disabled:opacity-70`;
+
+  async function handleAddToCart() {
+    if (isPurchased || checkingAuth) return;
+
+    setCheckingAuth(true);
+    const supabase = getSupabaseBrowserClient();
+    const { data } = await supabase.auth.getSession();
+
+    if (!data.session?.access_token) {
+      router.push(`/login?next=${encodeURIComponent(getCurrentPath())}`);
+      return;
+    }
+
+    addToCart(slug);
+    setCheckingAuth(false);
+    if (checkout) router.push("/cart");
+  }
 
   return (
     <button
@@ -36,15 +55,16 @@ export default function AddToCartButton({
       className={buttonClassName}
       disabled={disabled}
       aria-disabled={disabled}
-      onClick={() => {
-        if (isPurchased) return;
-        addToCart(slug);
-        if (checkout) router.push("/cart");
-      }}
+      onClick={handleAddToCart}
     >
-      {!loaded ? "Checking..." : isPurchased ? "Purchased" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
+      {!loaded || checkingAuth ? "Checking..." : isPurchased ? "Purchased" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
     </button>
   );
+}
+
+function getCurrentPath() {
+  if (typeof window === "undefined") return "/products";
+  return `${window.location.pathname}${window.location.search}`;
 }
 
 function getEmptyCartSnapshot() {

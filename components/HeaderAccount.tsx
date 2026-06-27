@@ -97,7 +97,10 @@ export default function HeaderAccount() {
 
   if (!accountLabel) {
     return (
-      <Link href="/login" className="inline-flex items-center gap-2 btn-primary px-4 py-2 font-semibold text-white shadow-lg shadow-black/20 ">
+      <Link
+        href="/login"
+        className="inline-flex min-h-10 items-center justify-center gap-2 border border-brand/70 bg-brand/10 px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20"
+      >
         <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" />
         <span>Login</span>
       </Link>
