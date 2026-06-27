@@ -89,7 +89,7 @@ export const products: Product[] = [
         src: "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png",
         alt: "Imperium Option Trading Terminal main workspace",
         title: "Execution workspace",
-        caption: "A desktop-first command center for option chain navigation, orders, positions, and market context.",
+        caption: "A desktop-first workspace for option chain navigation, orders, positions, and market context.",
         width: 2048,
         height: 1113,
       },
@@ -205,7 +205,7 @@ export const products: Product[] = [
       {
         icon: "/icons/portfolio.svg",
         title: "One portfolio workspace",
-        text: "Use one command center for holdings, watchlists, scanners, multi-timeframe charts, alerts, risk controls, and performance review.",
+        text: "Use one workspace for holdings, watchlists, scanners, multi-timeframe charts, alerts, risk controls, and performance review.",
       },
     ],
     gallery: [
@@ -228,7 +228,7 @@ export const products: Product[] = [
       {
         src: "/product-resources/imperium-investor/Imperium_investor.png",
         alt: "Imperium Investor desktop investment terminal overview",
-        title: "Investment command center",
+        title: "Investment workspace",
         caption: "Keep portfolio monitoring, scanner discovery, chart validation, broker workflows, alerts, and review context in one desktop workspace.",
         width: 1672,
         height: 941,
@@ -265,7 +265,7 @@ export const products: Product[] = [
       "Drawing tools including trend lines, horizontal levels, rays, rectangles, Fibonacci tools, arrows, and notes",
       "Broker-aware order dialogs, pending orders, order history, order status updates, cancellation/modification paths, and execution tracking",
       "Stop-loss setup, updates, cancellation, triggered-state handling, position synchronization, local P&L, and alert management",
-      "Portfolio intelligence, performance reporting, P&L history, account views, trade logging, news, status indicators, reconnect overlays, sounds, and workspace productivity tools",
+      "Portfolio insights, performance reporting, P&L history, account views, trade logging, news, status indicators, reconnect overlays, sounds, and workspace productivity tools",
     ],
     outcomes: [
       "Monitor Indian and American stock portfolios from a single desktop workflow",
@@ -275,7 +275,7 @@ export const products: Product[] = [
       "Place and manage orders from the same workstation where the stock is analyzed",
       "Keep stop-losses, positions, alerts, pending orders, and P&L close to the portfolio decision workflow",
       "Review portfolio performance, P&L history, order history, and trade logs to improve process quality over time",
-      "Build a dedicated command-center layout using floating windows, chart docks, search, shortcuts, sector views, and settings",
+      "Build a dedicated workspace layout using floating windows, chart docks, search, shortcuts, sector views, and settings",
     ],
     faq: [
       {
@@ -301,6 +301,25 @@ export const products: Product[] = [
 export function getActiveProducts() { return products.filter((product) => product.is_active); }
 export function getProductBySlug(slug: string) { return products.find((product) => product.slug === slug && product.is_active); }
 export function getProductFileById(fileId: string) { return productFiles.find((file) => file.id === fileId && file.is_active); }
+export function formatCurrencySymbol(currency = "INR") {
+  if (currency === "INR") return "₹";
+
+  return (
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      currencyDisplay: "symbol",
+      maximumFractionDigits: 0,
+    })
+      .formatToParts(0)
+      .find((part) => part.type === "currency")?.value ?? currency
+  );
+}
+
+export function formatPriceAmount(price: number) {
+  return new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 }).format(price);
+}
+
 export function formatPrice(price: number, currency = "INR") {
-  return new Intl.NumberFormat("en-US", { style: "currency", currency, currencyDisplay: "code", maximumFractionDigits: 0 }).format(price);
+  return `${formatCurrencySymbol(currency)}${formatPriceAmount(price)}`;
 }

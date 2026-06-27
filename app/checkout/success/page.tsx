@@ -44,20 +44,23 @@ function CheckoutSuccessInner() {
   }, [orderId]);
 
   return (
-    <main className="px-6 py-24 text-center">
-      <h1 className="text-2xl font-semibold text-white">
+    <main className="mx-auto max-w-2xl px-6 py-24 text-center">
+      <section className="border border-[#1b3055] bg-[#0c1525] p-8">
+      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#0891b2]">Checkout status</p>
+      <h1 className="mt-3 text-2xl font-bold text-[#c5d5ee]">
         {status === "paid" ? "Payment Confirmed" : status === "failed" ? "Payment Not Completed" : "Payment Successful"}
       </h1>
-      <p className="text-slate-400 mt-2">
+      <p className="mt-2 text-[#6882a8]">
         {status === "paid"
           ? "Your access is unlocked. Head to your dashboard to download."
           : status === "failed"
             ? "Razorpay reported this payment did not go through. No access was unlocked."
             : "Access unlocks once the server verifies your Razorpay payment. This usually takes a few seconds."}
       </p>
-      <Link href="/dashboard" className="mt-8 inline-block bg-cyan-300 px-6 py-3 font-semibold text-black hover:bg-cyan-200">
+      <Link href="/dashboard" className="mt-8 inline-block bg-[#1e52e8] px-6 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
         Go to My Purchases
       </Link>
+      </section>
     </main>
   );
 }

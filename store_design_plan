@@ -1,0 +1,31 @@
+
+Design plan:
+
+Subject: Imperium Store — professional trading software for Indian market traders (options execution + stock investing)
+Audience: Serious Indian traders who value reliability and precision
+Page's job: Convey institutional trust and clear product value, drive to checkout
+
+Design direction: "Federal Systems"
+
+Background: #070c17 (deep void navy)
+Surface: #0c1525 (elevated navy)
+Card: #111d35 (card surface)
+Border: #1b3055 (structured blue border)
+Text: #c5d5ee (cool white)
+Muted: #6882a8 (steel muted)
+Action: #1e52e8 (official blue)
+Data accent: #0891b2 (cyan kept only for data/numbers)
+
+Signature element: The product image frame — rendered like a classified document viewer, with a header bar showing classification/product info, the full image below without cropping, and a footer with metadata. Not a flashy frame — precise, institutional, borderline austere.
+Typography:
+
+Display: tight tracking, heavy weight (Inter 700-800), structured
+Body: Inter 400, comfortable reading, muted color
+Data/Mono: JetBrains Mono for prices, versions, terminal labels
+
+Layout:
+
+Max width: 1200px, structured grid
+No rounded corners (or very slight: 0-2px) — squared, government-like
+Strong horizontal rules between sections
+Table-like information layouts for specs and features

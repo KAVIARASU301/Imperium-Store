@@ -160,33 +160,33 @@ function LoginForm() {
   const showPasswordFields = mode !== "forgot";
 
   return (
-    <main className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
+    <main className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
       {confirmationEmail ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
           <section
             aria-modal="true"
             role="dialog"
-            className="w-full max-w-lg rounded-2xl border border-cyan-300/30 bg-[#0B1020] p-6 shadow-2xl shadow-cyan-950/40 sm:p-8"
+            className="w-full max-w-lg border border-[#1b3055] bg-[#0c1525] p-6 shadow-2xl shadow-black/40 sm:p-8"
           >
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-[#0891b2]">
               Email confirmation required
             </p>
             <h2 className="mt-4 text-2xl font-semibold text-white">
               Check your inbox before logging in.
             </h2>
-            <p className="mt-4 leading-7 text-slate-300">
+            <p className="mt-4 leading-7 text-[#c5d5ee]">
               We created the account for <span className="font-semibold text-white">{confirmationEmail}</span>. Open the confirmation email and verify your address. Login will work only after the email is confirmed.
             </p>
-            <p className="mt-4 rounded-2xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 text-sm leading-6 text-cyan-100">
+            <p className="mt-4 border border-[#1b3055] bg-[#111d35] px-4 py-3 text-sm leading-6 text-[#c5d5ee]">
               For now, the email sender may show as <span className="font-semibold text-white">Supabase Auth</span>. Search your inbox for that sender if you do not see an Imperium Store email.
             </p>
-            <div className="mt-6 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-100">
+            <div className="mt-6 border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-100">
               If you do not see the email, check spam, promotions, or updates folders before trying to create another account.
             </div>
             <button
               type="button"
               onClick={() => setConfirmationEmail("")}
-              className="mt-6 w-full rounded-2xl bg-cyan-300 px-4 py-3 font-semibold text-black hover:bg-cyan-200"
+              className="mt-6 w-full bg-[#1e52e8] px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]"
             >
               I understand, go to login
             </button>
@@ -194,56 +194,56 @@ function LoginForm() {
         </div>
       ) : null}
       <section className="flex flex-col justify-center">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-[#0891b2]">
           Secure customer access
         </p>
-        <h1 className="mt-5 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+        <h1 className="mt-5 text-4xl font-extrabold tracking-normal text-[#c5d5ee] sm:text-5xl">
           Sign in to your Imperium account.
         </h1>
-        <p className="mt-5 text-base leading-7 text-slate-400">
+        <p className="mt-5 text-base leading-7 text-[#6882a8]">
           Access your purchases, downloads, invoices, and product updates from one
           secure account.
         </p>
-        <div className="mt-8 grid gap-3 text-sm text-slate-300 sm:grid-cols-3">
+        <div className="mt-8 grid gap-px border border-[#1b3055] bg-[#1b3055] text-sm text-[#c5d5ee] sm:grid-cols-3">
           {["Account access", "Download management", "Password recovery"].map((item) => (
             <div
               key={item}
-              className="rounded-2xl border border-slate-800 bg-white/[0.03] p-4"
+              className="bg-[#0c1525] p-4"
             >
-              <span className="text-cyan-300">✓</span>
+              <span className="text-[#0891b2]">✓</span>
               <p className="mt-2">{item}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-3xl border border-slate-800 bg-[#0B1020]/90 p-6 shadow-2xl shadow-cyan-950/20 sm:p-8">
-        <div className="flex rounded-full border border-slate-800 bg-black/20 p-1 text-sm font-semibold">
+      <section className="border border-[#1b3055] bg-[#0c1525]/95 p-6 shadow-2xl shadow-black/20 sm:p-8">
+        <div className="flex border border-[#1b3055] bg-[#070c17] p-1 text-sm font-semibold">
           <button
             type="button"
             onClick={() => switchMode("signin")}
-            className={`flex-1 rounded-full px-4 py-2 ${mode === "signin" ? "bg-cyan-300 text-black" : "text-slate-400 hover:text-white"}`}
+            className={`flex-1 px-4 py-2 ${mode === "signin" ? "bg-[#1e52e8] text-white" : "text-[#6882a8] hover:text-white"}`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => switchMode("signup")}
-            className={`flex-1 rounded-full px-4 py-2 ${mode === "signup" ? "bg-cyan-300 text-black" : "text-slate-400 hover:text-white"}`}
+            className={`flex-1 px-4 py-2 ${mode === "signup" ? "bg-[#1e52e8] text-white" : "text-[#6882a8] hover:text-white"}`}
           >
             Sign up
           </button>
         </div>
 
         <div className="mt-8">
-          <h2 className="text-2xl font-semibold text-white">{title}</h2>
+          <h2 className="text-2xl font-bold text-[#c5d5ee]">{title}</h2>
           <p
-            className={`mt-3 rounded-2xl border px-4 py-3 text-sm leading-6 ${
+            className={`mt-3 border px-4 py-3 text-sm leading-6 ${
               status.tone === "error"
                 ? "border-red-500/30 bg-red-500/10 text-red-200"
                 : status.tone === "success"
                   ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-                  : "border-slate-800 bg-black/20 text-slate-400"
+                  : "border-[#1b3055] bg-[#070c17] text-[#6882a8]"
             }`}
           >
             {status.text}
@@ -252,24 +252,24 @@ function LoginForm() {
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           {mode === "signup" ? (
-            <label className="block text-sm font-medium text-slate-300">
+            <label className="block text-sm font-medium text-[#c5d5ee]">
               Full name
               <input
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/20 px-4 py-3 text-white outline-none focus:border-cyan-300"
+                className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
                 placeholder="Your name"
                 autoComplete="name"
               />
             </label>
           ) : null}
 
-          <label className="block text-sm font-medium text-slate-300">
+          <label className="block text-sm font-medium text-[#c5d5ee]">
             Email address
             <input
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/20 px-4 py-3 text-white outline-none focus:border-cyan-300"
+              className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
               placeholder="you@example.com"
               type="email"
               autoComplete="email"
@@ -278,9 +278,9 @@ function LoginForm() {
           </label>
 
           {showPasswordFields ? (
-            <label className="block text-sm font-medium text-slate-300">
+            <label className="block text-sm font-medium text-[#c5d5ee]">
               {mode === "reset" ? "New password" : "Password"}
-              <div className="mt-2 flex rounded-2xl border border-slate-800 bg-black/20 focus-within:border-cyan-300">
+              <div className="mt-2 flex border border-[#1b3055] bg-[#070c17] focus-within:border-[#1e52e8]">
                 <input
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
@@ -295,7 +295,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((current) => !current)}
-                  className="px-4 text-sm font-semibold text-cyan-300"
+                  className="px-4 text-sm font-semibold text-[#0891b2]"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -304,12 +304,12 @@ function LoginForm() {
           ) : null}
 
           {mode === "reset" ? (
-            <label className="block text-sm font-medium text-slate-300">
+            <label className="block text-sm font-medium text-[#c5d5ee]">
               Confirm new password
               <input
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className="mt-2 w-full rounded-2xl border border-slate-800 bg-black/20 px-4 py-3 text-white outline-none focus:border-cyan-300"
+                className="mt-2 w-full border border-[#1b3055] bg-[#070c17] px-4 py-3 text-white outline-none focus:border-[#1e52e8]"
                 placeholder="Repeat password"
                 type="password"
                 autoComplete="new-password"
@@ -320,7 +320,7 @@ function LoginForm() {
 
           <button
             disabled={loading}
-            className="w-full rounded-2xl bg-cyan-300 px-4 py-3 font-semibold text-black hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full bg-[#1e52e8] px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading
               ? "Please wait..."
@@ -334,12 +334,12 @@ function LoginForm() {
           </button>
         </form>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-400">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-[#6882a8]">
           {mode !== "forgot" && mode !== "reset" ? (
             <button
               type="button"
               onClick={() => switchMode("forgot")}
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="font-semibold text-[#0891b2] hover:text-[#c5d5ee]"
             >
               Forgot password?
             </button>
@@ -347,7 +347,7 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => switchMode("signin")}
-              className="font-semibold text-cyan-300 hover:text-cyan-200"
+              className="font-semibold text-[#0891b2] hover:text-[#c5d5ee]"
             >
               Back to login
             </button>
@@ -356,7 +356,7 @@ function LoginForm() {
             Protected by{" "}
             <Link
               href="/privacy-policy"
-              className="text-cyan-300 hover:text-cyan-200"
+              className="text-[#0891b2] hover:text-[#c5d5ee]"
             >
               privacy-first policies
             </Link>
@@ -372,7 +372,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <main className="mx-auto max-w-md px-6 py-24 text-slate-400">
+        <main className="mx-auto max-w-md px-6 py-24 text-[#6882a8]">
           Loading login...
         </main>
       }

@@ -33,11 +33,11 @@ export default function DownloadButton({ fileId, label = "Download" }: { fileId:
         onClick={handleDownload}
         disabled={isLoading}
         aria-busy={isLoading}
-        className="inline-flex min-w-32 items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition duration-150 hover:-translate-y-0.5 hover:bg-slate-100 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#0B1020] disabled:cursor-wait disabled:bg-slate-700 disabled:text-slate-300 disabled:shadow-none disabled:hover:translate-y-0"
+        className="inline-flex min-w-32 items-center justify-center gap-2 bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition duration-150 hover:bg-[#2b63ff] focus:outline-none focus:ring-2 focus:ring-[#1e52e8] focus:ring-offset-2 focus:ring-offset-[#0c1525] disabled:cursor-wait disabled:bg-[#1b3055] disabled:text-[#6882a8] disabled:shadow-none"
       >
         {isLoading ? (
           <>
-            <span className="h-4 w-4 animate-spin border-2 border-slate-400 border-t-cyan-200" aria-hidden="true" />
+            <span className="h-4 w-4 animate-spin border-2 border-[#6882a8] border-t-white" aria-hidden="true" />
             Preparing
           </>
         ) : (
@@ -47,7 +47,7 @@ export default function DownloadButton({ fileId, label = "Download" }: { fileId:
           </>
         )}
       </button>
-      {isLoading ? <p className="mt-2 text-xs text-cyan-200">Preparing download...</p> : null}
+      {isLoading ? <p className="mt-2 text-xs text-[#0891b2]">Preparing download...</p> : null}
       {message ? <p className="mt-2 text-sm text-amber-200">{message}</p> : null}
     </div>
   );

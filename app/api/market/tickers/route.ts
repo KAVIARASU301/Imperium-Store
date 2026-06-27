@@ -26,6 +26,13 @@ const tickers: TickerConfig[] = [
   { label: "BANKNIFTY", symbol: "^NSEBANK", aliases: ["^NSEBANK"] },
   { label: "SENSEX", symbol: "^BSESN", aliases: ["^BSESN"] },
   { label: "BANKEX", symbol: "BSE-BANK.BO", aliases: ["BSE-BANK.BO", "^BSEBANK", "^BSE-BANK"] },
+  { label: "NIFTY IT", symbol: "^CNXIT", aliases: ["^CNXIT"] },
+  { label: "RELIANCE", symbol: "RELIANCE.NS", aliases: ["RELIANCE.NS", "RELIANCE.BO"] },
+  { label: "HDFCBANK", symbol: "HDFCBANK.NS", aliases: ["HDFCBANK.NS", "HDFCBANK.BO"] },
+  { label: "ICICIBANK", symbol: "ICICIBANK.NS", aliases: ["ICICIBANK.NS", "ICICIBANK.BO"] },
+  { label: "INFY", symbol: "INFY.NS", aliases: ["INFY.NS", "INFY.BO"] },
+  { label: "TCS", symbol: "TCS.NS", aliases: ["TCS.NS", "TCS.BO"] },
+  { label: "SBIN", symbol: "SBIN.NS", aliases: ["SBIN.NS", "SBIN.BO"] },
 ];
 
 async function fetchYahooChart(symbol: string) {

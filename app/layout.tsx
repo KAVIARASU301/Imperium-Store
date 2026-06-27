@@ -6,8 +6,8 @@ import HeaderNav from "@/components/HeaderNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Imperium Store | Trading tools and education",
-  description: "Premium trading apps, templates, and structured options trading education for practice, execution, and review.",
+  title: "Imperium Store | Indian trading software",
+  description: "Professional trading software for Indian market traders focused on options execution, stock investing, risk control, and review.",
   icons: {
     icon: [
       { url: "/icons/imperium_store_icons/imperium_icon_32x32.png", sizes: "32x32", type: "image/png" },
@@ -59,34 +59,25 @@ const darkReaderHydrationCleanup = `
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
       <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <body className="min-h-full bg-[#05070D] text-slate-100">
+      <body className="min-h-full bg-[#070c17] text-[#c5d5ee]">
       <Script
           id="darkreader-hydration-cleanup"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: darkReaderHydrationCleanup }}
       />
-      <div className="border-b border-white/10 bg-black/30">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 px-6 py-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
-          <span>Verified software store</span>
-          <span className="text-slate-700">·</span>
-          <span>Secure checkout via Razorpay</span>
-          <span className="text-slate-700">·</span>
-          <span>Instant digital delivery</span>
-        </div>
-      </div>
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#05070D]/80 backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-          <Link href="/" className="inline-flex items-center gap-3 text-white">
-              <span className="flex h-9 w-9 items-center justify-center rounded-sm border border-white/10 bg-white">
+      <header className="sticky top-0 z-40 border-b border-[#1b3055] bg-[#070c17]/92 backdrop-blur-xl">
+        <nav className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3">
+          <Link href="/" className="inline-flex items-center gap-3 text-[#c5d5ee]">
+              <span className="flex h-9 w-9 items-center justify-center border border-[#1b3055] bg-[#c5d5ee]">
                 <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={28} height={28} className="h-7 w-7" priority />
               </span>
-            <span className="text-base font-semibold tracking-normal">Imperium Store</span>
+            <span className="text-base font-bold uppercase tracking-[0.08em]">Imperium Store</span>
           </Link>
           <HeaderNav />
         </nav>
       </header>
       {children}
-      <footer className="mt-16 border-t border-slate-900 px-6 py-8 text-sm text-slate-500"><div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between"><p>© 2026 Imperium Store. Educational tools only.</p><div className="flex flex-wrap gap-4"><Link href="/disclaimer">Disclaimer</Link><Link href="/refund-policy">Refund Policy</Link><Link href="/terms">Terms</Link><Link href="/privacy-policy">Privacy</Link><Link href="/contact">Contact</Link><Link href="/support">Support</Link></div></div></footer>
+      <footer className="mt-16 border-t border-[#1b3055] bg-[#0c1525]/70 px-6 py-8 text-sm text-[#6882a8]"><div className="mx-auto flex max-w-[1200px] flex-col gap-4 md:flex-row md:items-center md:justify-between"><p>© 2026 Imperium Store. Educational tools only.</p><div className="flex flex-wrap gap-4"><Link href="/disclaimer">Disclaimer</Link><Link href="/refund-policy">Refund Policy</Link><Link href="/terms">Terms</Link><Link href="/privacy-policy">Privacy</Link><Link href="/contact">Contact</Link><Link href="/support">Support</Link></div></div></footer>
       </body>
       </html>
   );

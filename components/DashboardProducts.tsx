@@ -47,13 +47,13 @@ export default function DashboardProducts({ products }: { products: Product[] })
     };
   }, []);
 
-  if (state === "checking") return <p className="mt-8 text-sm text-slate-500">Checking your access...</p>;
+  if (state === "checking") return <p className="mt-8 font-mono text-sm uppercase tracking-[0.12em] text-[#6882a8]">Checking your access...</p>;
 
   if (state === "signed-out") {
     return (
-      <div className="mt-8 rounded-3xl border border-white/10 bg-white/[0.06] p-6 shadow-xl shadow-black/20">
-        <p className="text-slate-300">Log in to see which products you have unlocked.</p>
-        <Link href="/login?next=/dashboard" className="mt-4 inline-block rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 hover:bg-slate-100">
+      <div className="mt-8 border border-[#1b3055] bg-[#0c1525] p-6 shadow-xl shadow-black/20">
+        <p className="text-[#c5d5ee]">Log in to see which products you have unlocked.</p>
+        <Link href="/login?next=/dashboard" className="mt-4 inline-block bg-[#1e52e8] px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 hover:bg-[#2b63ff]">
           Login
         </Link>
       </div>
@@ -61,18 +61,18 @@ export default function DashboardProducts({ products }: { products: Product[] })
   }
 
   return (
-    <div className="mt-8 space-y-5">
+    <div className="mt-8 grid gap-px border border-[#1b3055] bg-[#1b3055]">
       {products.map((product) => {
         const purchase = purchasesBySlug[product.slug];
         const hasAccess = product.price === 0 || purchase?.status === "paid";
         return (
-          <article key={product.slug} className="rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-xl shadow-black/20">
+          <article key={product.slug} className="bg-[#0c1525] p-5 shadow-xl shadow-black/20">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
                 <Image src={product.icon.src} alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
                 <div className="min-w-0">
-                  <h2 className="text-xl font-semibold text-white">{product.name}</h2>
-                  <p className="mt-2 text-sm text-slate-400">{product.short_description}</p>
+                  <h2 className="text-xl font-bold text-[#c5d5ee]">{product.name}</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#6882a8]">{product.short_description}</p>
                 </div>
               </div>
               <StatusBadge hasAccess={hasAccess} status={purchase?.status} />
@@ -82,31 +82,31 @@ export default function DashboardProducts({ products }: { products: Product[] })
                 {product.files?.map((file) => (
                   <div
                     key={file.id}
-                    className="group flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/20 p-4 transition duration-150 hover:border-white/20 hover:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between"
+                    className="group flex flex-col gap-4 border border-[#1b3055] bg-[#070c17] p-4 transition duration-150 hover:border-[#1e52e8] hover:bg-[#111d35] sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex min-w-0 items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white transition duration-150">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-[#1b3055] bg-[#c5d5ee] transition duration-150">
                         <Image src={getPlatformIcon(file)} alt="" width={28} height={28} />
                       </div>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-white">{getPlatformTitle(file)}</p>
-                          <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[11px] font-semibold uppercase text-slate-400">
+                          <p className="font-medium text-[#c5d5ee]">{getPlatformTitle(file)}</p>
+                          <span className="border border-[#1b3055] bg-[#0c1525] px-2 py-1 font-mono text-[11px] font-semibold uppercase text-[#6882a8]">
                             v{file.version}
                           </span>
                         </div>
-                        <p className="mt-1 font-mono text-xs uppercase text-slate-500">{file.file_name}</p>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">{getPlatformNote(file)}</p>
+                        <p className="mt-1 font-mono text-xs uppercase text-[#6882a8]">{file.file_name}</p>
+                        <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6882a8]">{getPlatformNote(file)}</p>
                       </div>
                     </div>
                     <DownloadButton fileId={file.id} label={`Download ${getPlatformLabel(file)}`} />
                   </div>
                 ))}
-                {!product.files?.length ? <p className="text-sm text-slate-500">No downloadable files for this product yet.</p> : null}
+                {!product.files?.length ? <p className="text-sm text-[#6882a8]">No downloadable files for this product yet.</p> : null}
               </div>
             ) : (
               <div className="mt-4">
-                <Link href={`/products/${product.slug}`} className="inline-block rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10">
+                <Link href={`/products/${product.slug}`} className="inline-block border border-[#1b3055] bg-[#111d35] px-4 py-2 text-sm font-semibold text-[#c5d5ee] hover:border-[#1e52e8] hover:bg-[#0c1525]">
                   {purchase?.status === "pending" ? "Complete payment" : "View product"}
                 </Link>
               </div>
@@ -144,5 +144,5 @@ function StatusBadge({ hasAccess, status }: { hasAccess: boolean; status?: strin
   if (hasAccess) return <span className="font-mono text-xs uppercase tracking-widest text-emerald-400">Unlocked</span>;
   if (status === "pending") return <span className="font-mono text-xs uppercase tracking-widest text-amber-300">Payment pending</span>;
   if (status === "failed") return <span className="font-mono text-xs uppercase tracking-widest text-red-400">Payment failed</span>;
-  return <span className="font-mono text-xs uppercase tracking-widest text-slate-500">Locked</span>;
+  return <span className="font-mono text-xs uppercase tracking-widest text-[#6882a8]">Locked</span>;
 }

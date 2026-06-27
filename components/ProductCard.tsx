@@ -1,36 +1,60 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/types/product";
-import { formatPrice } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount } from "@/lib/products";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const primaryBadge = product.badges?.[0];
+  const primaryBadgeClass =
+    primaryBadge === "Indian options"
+      ? "border-[#22C55E]/45 bg-[#22C55E]/10 text-[#86efac]"
+      : primaryBadge === "India + U.S. stocks"
+        ? "border-[#0891b2]/50 bg-[#0891b2]/12 text-[#67e8f9]"
+        : "border-[#1b3055] text-[#6882a8]";
+
   return (
-      <article className="flex flex-col gap-4 p-5 transition hover:bg-white/[0.03] sm:flex-row sm:items-center sm:gap-6">
-        <div className="relative h-20 w-full shrink-0 overflow-hidden rounded-sm border border-white/10 sm:h-20 sm:w-20">
-          <Image src={product.image.src} alt={product.image.alt} fill className="object-cover" sizes="80px" />
+      <article className="grid gap-px border border-[#1b3055] bg-[#1b3055] transition hover:border-[#1e52e8] hover:bg-[#1e52e8] md:grid-cols-[136px_1fr_180px]">
+        <div className="bg-[#0c1525] p-3">
+          <div className="flex h-24 w-full shrink-0 items-center justify-center overflow-hidden border border-[#1b3055] bg-[#070c17] md:h-full">
+            <Image
+              src={product.icon.src}
+              alt={product.icon.alt}
+              width={product.icon.width}
+              height={product.icon.height}
+              className="h-16 w-16 object-contain"
+              sizes="64px"
+            />
+          </div>
         </div>
-        <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div className="bg-[#0c1525] p-5">
           <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">{product.type}</p>
-              {product.badges?.[0] ? (
-                  <span className="border border-white/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-slate-400">
-                {product.badges[0]}
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-[#6882a8]">{product.type}</p>
+              {primaryBadge ? (
+                  <span className={`border px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${primaryBadgeClass}`}>
+                {primaryBadge === "India + U.S. stocks" ? "India + United States stocks" : primaryBadge}
               </span>
               ) : null}
             </div>
-            <h3 className="mt-1 text-lg font-semibold text-white">{product.name}</h3>
-            <p className="mt-1 max-w-xl text-sm leading-5 text-slate-400">{product.short_description}</p>
+            <h3 className="mt-2 text-lg font-bold tracking-tight text-[#c5d5ee]">{product.name}</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#6882a8]">{product.short_description}</p>
           </div>
-          <div className="flex shrink-0 items-center gap-4 sm:flex-col sm:items-end sm:gap-2">
-            <p className="text-lg font-semibold text-white">{formatPrice(product.price, product.currency)}</p>
+        </div>
+        <div className="flex flex-row items-center justify-between gap-3 bg-[#0c1525] p-5 md:flex-col md:items-end">
+            <p className="text-[#c5d5ee]">
+              <span className="mr-1 align-baseline text-sm font-semibold">
+                {formatCurrencySymbol(product.currency)}
+              </span>
+              <span className="font-sans text-lg font-bold tracking-normal tabular-nums">
+                {formatPriceAmount(product.price)}
+              </span>
+            </p>
             <Link
                 href={`/products/${product.slug}`}
-                className="whitespace-nowrap rounded-sm border border-white/15 px-4 py-1.5 text-xs font-semibold text-white hover:border-white/30 hover:bg-white/5"
+                className="whitespace-nowrap bg-[#1e52e8] px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]"
             >
               View Details
             </Link>
-          </div>
         </div>
       </article>
   );
