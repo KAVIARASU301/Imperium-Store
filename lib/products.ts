@@ -116,7 +116,7 @@ export const products: Product[] = [
     audience: [
       "Active intraday options traders",
       "Options scalpers who need fast entries and exits",
-      "Traders using Zerodha Kite Connect",
+      "Traders using Zerodha Demat Account",
       "Traders who monitor multiple strikes and symbols",
       "Traders who want paper trading before using live capital",
       "Semi-systematic traders using CPR, CVD, watchlists, and structured execution tools",

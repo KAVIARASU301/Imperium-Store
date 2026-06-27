@@ -146,7 +146,7 @@ Imperium is built for a dedicated desktop workflow, which can feel faster and mo
 Imperium is best suited for:
 
 - Active intraday options traders.
-- Traders using Zerodha Kite Connect.
+- Traders using Zerodha Demat Account.
 - Traders who need quick execution and exit tools.
 - Traders who want paper trading and live trading in the same interface.
 - Traders who use option-chain, CPR, CVD, watchlist, and P&L workflows.
