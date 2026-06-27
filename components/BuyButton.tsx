@@ -94,25 +94,25 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
   }
 
   return (
-    <div>
-      <button
-        onClick={handleClick}
-        disabled={loading}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-center font-semibold text-slate-950 shadow-xl shadow-black/20 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {loading ? (
-          <>
-            <span className="h-4 w-4 animate-spin border-2 border-slate-600 border-t-black" aria-hidden="true" />
-            Starting checkout...
-          </>
-        ) : (
-          <>
-            <Image src={price === 0 ? "/icons/tick.svg" : "/icons/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
-            {price === 0 ? "Get Access" : "Buy Now"}
-          </>
-        )}
-      </button>
-      {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
-    </div>
+      <div>
+        <button
+            onClick={handleClick}
+            disabled={loading}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-sm bg-white px-5 py-2.5 text-center text-sm font-semibold text-slate-950 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading ? (
+              <>
+                <span className="h-4 w-4 animate-spin border-2 border-slate-600 border-t-black" aria-hidden="true" />
+                Starting checkout...
+              </>
+          ) : (
+              <>
+                <Image src={price === 0 ? "/icons/tick.svg" : "/icons/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
+                {price === 0 ? "Get Access" : "Buy Now"}
+              </>
+          )}
+        </button>
+        {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
+      </div>
   );
 }
