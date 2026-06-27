@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -16,6 +16,10 @@ export const metadata: Metadata = {
     ],
     shortcut: "/icons/imperium_store_icons/imperium_icon_32x32.png",
   },
+};
+
+export const viewport: Viewport = {
+  width: 1200,
 };
 
 const darkReaderHydrationCleanup = `
