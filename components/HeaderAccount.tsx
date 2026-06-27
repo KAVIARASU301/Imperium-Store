@@ -126,7 +126,7 @@ export default function HeaderAccount() {
             {user?.email ? <p className="mt-0.5 truncate text-xs text-slate-500">{user.email}</p> : null}
           </div>
           <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/icons/briefcase.svg" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" />
             My purchases
           </Link>
           <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-slate-900 hover:text-cyan-200" role="menuitem" onClick={() => setIsMenuOpen(false)}>
