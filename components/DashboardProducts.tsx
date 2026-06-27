@@ -79,6 +79,14 @@ export default function DashboardProducts({ products }: { products: Product[] })
             </div>
             {hasAccess ? (
               <div className="mt-4 space-y-3">
+                {purchase?.status === "paid" ? (
+                  <Link
+                    href={`/receipts/${encodeURIComponent(purchase.razorpay_order_id)}`}
+                    className="inline-block border border-[#1b3055] bg-[#111d35] px-4 py-2 text-sm font-semibold text-[#c5d5ee] hover:border-[#1e52e8] hover:bg-[#0c1525]"
+                  >
+                    View payment receipt
+                  </Link>
+                ) : null}
                 {product.files?.map((file) => (
                   <div
                     key={file.id}

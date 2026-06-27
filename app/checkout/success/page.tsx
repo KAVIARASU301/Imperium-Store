@@ -60,6 +60,11 @@ function CheckoutSuccessInner() {
       <Link href="/dashboard" className="mt-8 inline-block bg-[#1e52e8] px-6 py-3 font-semibold uppercase tracking-[0.08em] text-white hover:bg-[#2b63ff]">
         Go to My Purchases
       </Link>
+      {status === "paid" && orderId ? (
+        <Link href={`/receipts/${encodeURIComponent(orderId)}`} className="ml-3 mt-8 inline-block border border-[#1b3055] bg-[#111d35] px-6 py-3 font-semibold uppercase tracking-[0.08em] text-[#c5d5ee] hover:border-[#1e52e8]">
+          View Receipt
+        </Link>
+      ) : null}
       </section>
     </main>
   );
