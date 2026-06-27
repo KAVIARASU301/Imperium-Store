@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import HeaderNav from "@/components/HeaderNav";
 import "./globals.css";
 
@@ -22,58 +21,15 @@ export const viewport: Viewport = {
   width: 1200,
 };
 
-const darkReaderHydrationCleanup = `
-(function () {
-  function cleanDarkReaderAttributes(root) {
-    var nodes = root.querySelectorAll ? root.querySelectorAll('[data-darkreader-inline-color], [data-darkreader-inline-bgcolor], [data-darkreader-inline-border], [style*="--darkreader-inline"]') : [];
-    for (var i = 0; i < nodes.length; i += 1) {
-      var node = nodes[i];
-      node.removeAttribute('data-darkreader-inline-color');
-      node.removeAttribute('data-darkreader-inline-bgcolor');
-      node.removeAttribute('data-darkreader-inline-border');
-      if (node.style) {
-        node.style.removeProperty('--darkreader-inline-color');
-        node.style.removeProperty('--darkreader-inline-bgcolor');
-        node.style.removeProperty('--darkreader-inline-border');
-      }
-    }
-  }
-
-  cleanDarkReaderAttributes(document);
-
-  var observer = new MutationObserver(function () {
-    cleanDarkReaderAttributes(document);
-  });
-
-  observer.observe(document.documentElement, {
-    attributes: true,
-    childList: true,
-    subtree: true,
-  });
-
-  window.addEventListener('DOMContentLoaded', function () {
-    cleanDarkReaderAttributes(document);
-    window.setTimeout(function () {
-      observer.disconnect();
-    }, 1000);
-  });
-})();
-`;
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
       <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-main text-white">
-      <Script
-          id="darkreader-hydration-cleanup"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: darkReaderHydrationCleanup }}
-      />
       <header className="sticky top-0 z-40 border-b border-cyan-border bg-section/92 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3">
           <Link href="/" className="inline-flex items-center gap-3 text-white">
               <span className="flex h-9 w-9 items-center justify-center border border-cyan-border bg-white">
-                <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={28} height={28} className="h-7 w-7" priority />
+                <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={28} height={28} className="h-7 w-7" priority suppressHydrationWarning />
               </span>
             <span className="text-base font-bold uppercase tracking-[0.08em]">Imperium Store</span>
           </Link>

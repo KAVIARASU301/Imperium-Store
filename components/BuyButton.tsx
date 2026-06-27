@@ -2,8 +2,12 @@
 
 import Image from "next/image";
 import AddToCartButton from "@/components/AddToCartButton";
+import { usePurchasedProducts } from "@/components/usePurchasedProducts";
 
 export default function BuyButton({ slug, price, productName }: { slug: string; price: number; productName: string }) {
+  const { purchasedSlugSet } = usePurchasedProducts();
+  const isPurchased = purchasedSlugSet.has(slug);
+
   return (
       <div>
         <AddToCartButton
@@ -15,7 +19,7 @@ export default function BuyButton({ slug, price, productName }: { slug: string; 
           {price === 0 ? "Get Access" : "Review and Pay"}
         </AddToCartButton>
         <p className="mt-2 text-center text-xs font-medium text-muted">
-          {productName} will be added to your cart for final review.
+          {isPurchased ? `${productName} is already available in your account.` : `${productName} will be added to your cart for final review.`}
         </p>
       </div>
   );

@@ -1,6 +1,6 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { getProductBySlug } from "@/lib/products";
-import { createPaidPurchase, createPendingPurchase } from "@/lib/purchases";
+import { createPaidPurchase, createPendingPurchase, hasRecordedPaidPurchase } from "@/lib/purchases";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { NextResponse } from "next/server";
 
@@ -30,6 +30,18 @@ export async function POST(request: Request) {
     const products = productIds.map((productId) => getProductBySlug(productId));
     if (products.some((product) => !product)) return NextResponse.json({ message: "Product not found" }, { status: 404 });
     const validProducts = products.filter((product): product is NonNullable<typeof product> => Boolean(product));
+    const purchasedProductIds = (
+      await Promise.all(validProducts.map(async (product) => ((await hasRecordedPaidPurchase(user.id, product.slug)) ? product.slug : null)))
+    ).filter((productId): productId is string => Boolean(productId));
+    if (purchasedProductIds.length > 0) {
+      return NextResponse.json(
+        {
+          message: "One or more products are already purchased",
+          purchasedProductIds,
+        },
+        { status: 409 },
+      );
+    }
     const currency = validProducts[0].currency;
     if (validProducts.some((product) => product.currency !== currency)) return NextResponse.json({ message: "Cart contains mixed currencies" }, { status: 400 });
 

@@ -3,6 +3,7 @@
 import { addToCart, CART_STORAGE_KEY, CART_UPDATED_EVENT } from "@/lib/cart";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
+import { usePurchasedProducts } from "@/components/usePurchasedProducts";
 
 const emptyCartSnapshot: string[] = [];
 let cartSnapshotKey = "";
@@ -21,18 +22,27 @@ export default function AddToCartButton({
 }) {
   const router = useRouter();
   const cart = useSyncExternalStore(subscribeToCart, getCartSnapshot, getEmptyCartSnapshot);
+  const { purchasedSlugSet, loaded } = usePurchasedProducts();
   const inCart = cart.includes(slug);
+  const isPurchased = purchasedSlugSet.has(slug);
+  const disabled = !loaded || isPurchased;
+  const buttonClassName = isPurchased
+    ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-amber-300/60 bg-amber-300/10 text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.14)] hover:border-amber-300/60 hover:bg-amber-300/10`
+    : `${className} disabled:cursor-wait disabled:opacity-70`;
 
   return (
     <button
       type="button"
-      className={className}
+      className={buttonClassName}
+      disabled={disabled}
+      aria-disabled={disabled}
       onClick={() => {
+        if (isPurchased) return;
         addToCart(slug);
         if (checkout) router.push("/cart");
       }}
     >
-      {children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
+      {!loaded ? "Checking..." : isPurchased ? "Purchased" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
     </button>
   );
 }

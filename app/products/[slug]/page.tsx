@@ -66,7 +66,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </section>
           <section className="mt-12 border border-amber-300/30 bg-amber-300/5 p-5"><h2 className="font-semibold text-amber-200">Disclaimer</h2><p className="mt-2 text-sm leading-6 text-white">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p></section>
         </section>
-        <div className="lg:sticky lg:top-8 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} /></div>
+        <div className="lg:sticky lg:top-24 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} /></div>
       </div>
     </main>
   );

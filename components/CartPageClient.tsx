@@ -9,6 +9,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { markProductsPurchased, usePurchasedProducts } from "@/components/usePurchasedProducts";
 
 interface CreateOrderResponse {
   orderId: string | null;
@@ -16,6 +17,7 @@ interface CreateOrderResponse {
   currency: string;
   keyId?: string;
   productIds?: string[];
+  purchasedProductIds?: string[];
   message?: string;
 }
 
@@ -32,6 +34,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { purchasedSlugs, purchasedSlugSet } = usePurchasedProducts();
 
   useEffect(() => {
     function sync() {
@@ -62,8 +65,16 @@ export default function CartPageClient({ products }: { products: Product[] }) {
     () => cartSlugs.map((slug) => products.find((product) => product.slug === slug)).filter((product): product is Product => Boolean(product)),
     [cartSlugs, products],
   );
-  const total = cartProducts.reduce((sum, product) => sum + product.price, 0);
-  const currency = cartProducts[0]?.currency ?? "INR";
+  const payableProducts = useMemo(
+    () => cartProducts.filter((product) => !purchasedSlugSet.has(product.slug)),
+    [cartProducts, purchasedSlugSet],
+  );
+  const purchasedCartProducts = useMemo(
+    () => cartProducts.filter((product) => purchasedSlugSet.has(product.slug)),
+    [cartProducts, purchasedSlugSet],
+  );
+  const total = payableProducts.reduce((sum, product) => sum + product.price, 0);
+  const currency = payableProducts[0]?.currency ?? cartProducts[0]?.currency ?? "INR";
 
   async function startPayment() {
     setError("");
@@ -77,17 +88,29 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         return;
       }
 
-      const productIds = cartProducts.map((product) => product.slug);
+      const productIds = payableProducts.map((product) => product.slug);
+      if (productIds.length === 0) {
+        clearCartItems(purchasedSlugs);
+        router.push("/dashboard");
+        return;
+      }
       const res = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ productIds }),
       });
       const order: CreateOrderResponse = await res.json();
-      if (!res.ok) throw new Error(order.message ?? "Unable to start checkout");
+      if (!res.ok) {
+        if (order.purchasedProductIds?.length) {
+          markProductsPurchased(order.purchasedProductIds);
+          clearCartItems(order.purchasedProductIds);
+        }
+        throw new Error(order.message ?? "Unable to start checkout");
+      }
 
       if (!order.orderId) {
         clearCartItems(productIds);
+        markProductsPurchased(order.productIds ?? productIds);
         router.push("/dashboard");
         return;
       }
@@ -99,7 +122,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         amount: order.amount,
         currency: order.currency,
         name: "Imperium Store",
-        description: productIds.length === 1 ? cartProducts[0]?.name : `${productIds.length} Imperium products`,
+        description: productIds.length === 1 ? payableProducts[0]?.name : `${productIds.length} Imperium products`,
         prefill: { email: sessionData.session?.user.email ?? undefined },
         theme: { color: "#00CFFF" },
         handler: async (response: RazorpaySuccessResponse) => {
@@ -112,6 +135,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             const verifyPayload = await verifyRes.json();
             if (!verifyRes.ok) throw new Error(verifyPayload.message ?? "Payment verification failed");
             clearCartItems(verifyPayload.productIds ?? productIds);
+            markProductsPurchased(verifyPayload.productIds ?? productIds);
             router.push(`/checkout/success?order_id=${response.razorpay_order_id}`);
           } catch (error) {
             setError(error instanceof Error ? error.message : "Payment verification failed");
@@ -160,13 +184,14 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-border bg-card-hover px-5 py-4">
               <div>
                 <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Selected products</p>
-                <p className="mt-1 text-sm text-muted">{cartProducts.length} item{cartProducts.length === 1 ? "" : "s"} ready for payment</p>
+                <p className="mt-1 text-sm text-muted">{payableProducts.length} item{payableProducts.length === 1 ? "" : "s"} ready for payment</p>
               </div>
               <button type="button" className="border border-cyan-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand" onClick={clearCart}>
                 Clear Cart
               </button>
             </div>
             {cartProducts.map((product) => (
+              purchasedSlugSet.has(product.slug) ? null :
               <article key={product.slug} className="grid gap-4 border-b border-cyan-border bg-section p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-md border border-cyan-border bg-main p-2 shadow-inner shadow-black/30">
                   <Image src={product.icon.src} alt="" width={product.icon.width} height={product.icon.height} className="h-12 w-12 object-contain" />
@@ -188,6 +213,14 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                 </p>
               </article>
             ))}
+            {purchasedCartProducts.length ? (
+              <div className="border-t border-success/30 bg-success/5 p-5">
+                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-success">Already purchased</p>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  {purchasedCartProducts.map((product) => product.name).join(", ")} {purchasedCartProducts.length === 1 ? "has" : "have"} been removed from checkout.
+                </p>
+              </div>
+            ) : null}
           </section>
 
           <aside className="h-fit overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(255,255,255,0.08)_inset] lg:sticky lg:top-24">
@@ -199,7 +232,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
               <div className="rounded-md border-2 border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
                 <div className="space-y-3 text-sm text-muted">
                   <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
-                  <div className="flex justify-between gap-4"><span>Items</span><span>{cartProducts.length}</span></div>
+                  <div className="flex justify-between gap-4"><span>Items</span><span>{payableProducts.length}</span></div>
                   <div className="flex justify-between gap-4"><span>Subtotal</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span></div>
                   <div className="flex justify-between gap-4"><span>GST</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(0)}</span></div>
                 </div>
@@ -209,7 +242,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                 </div>
               </div>
               {email ? (
-                <button type="button" disabled={loading} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-wait disabled:bg-cyan-border disabled:text-muted">
+                <button type="button" disabled={loading || payableProducts.length === 0} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
                   {loading ? "Starting Payment..." : "Pay Securely Now"}
                 </button>
               ) : (

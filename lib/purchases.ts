@@ -19,6 +19,10 @@ export async function createPaidPurchase(input: { userId: string; productSlug: s
 export async function hasPaidAccess(userId: string, productSlug: string) {
   const product = getProductBySlug(productSlug);
   if (product?.price === 0) return true;
+  return hasRecordedPaidPurchase(userId, productSlug);
+}
+
+export async function hasRecordedPaidPurchase(userId: string, productSlug: string) {
   if (!hasSupabaseEnv()) return hasLocalPaidAccess(userId, productSlug);
   const { data, error } = await getSupabaseServerClient(true).from("purchases").select("id").eq("user_id", userId).eq("product_id", productSlug).eq("status", "paid").limit(1);
   if (error) return false;
