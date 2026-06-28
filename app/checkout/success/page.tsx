@@ -4,15 +4,18 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
+import PostPurchaseOnboarding from "@/components/PostPurchaseOnboarding";
 import StatePanel from "@/components/StatePanel";
 
 type Status = "checking" | "paid" | "pending" | "failed" | "unknown" | "stalled" | "error";
+const TERMINAL_PRODUCT_SLUG = "imperium-option-trading-terminal";
 
 function CheckoutSuccessInner() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
   const [status, setStatus] = useState<Status>(orderId ? "checking" : "unknown");
   const [message, setMessage] = useState("");
+  const [confirmedProductIds, setConfirmedProductIds] = useState<string[]>([]);
   const [pollKey, setPollKey] = useState(0);
 
   useEffect(() => {
@@ -34,6 +37,9 @@ function CheckoutSuccessInner() {
         if (!res.ok) throw new Error(typeof payload.message === "string" ? payload.message : "Unable to load payment status");
         lastError = "";
         setMessage("");
+        if (Array.isArray(payload.productIds)) {
+          setConfirmedProductIds(payload.productIds.filter((productId: unknown): productId is string => typeof productId === "string"));
+        }
         if (payload.status === "paid") return setStatus("paid");
         if (payload.status === "failed") return setStatus("failed");
         setStatus("pending");
@@ -58,14 +64,16 @@ function CheckoutSuccessInner() {
   function retryStatusCheck() {
     setStatus(orderId ? "checking" : "unknown");
     setMessage("");
+    setConfirmedProductIds([]);
     setPollKey((key) => key + 1);
   }
 
   const displayedStatus: Status = orderId ? status : "unknown";
   const isWaiting = displayedStatus === "checking" || displayedStatus === "pending";
+  const includesTerminalPurchase = confirmedProductIds.includes(TERMINAL_PRODUCT_SLUG);
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-24">
+    <main className="mx-auto max-w-[1000px] px-6 py-16 lg:py-24">
       <StatePanel
         tone={getStatusTone(displayedStatus)}
         eyebrow="Checkout status"
@@ -76,8 +84,8 @@ function CheckoutSuccessInner() {
           <>
             {displayedStatus === "paid" ? (
               <>
-                <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
-                  Go to my purchases
+                <Link href="/dashboard#downloads" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                  Go to downloads
                 </Link>
                 {orderId ? (
                   <Link href={`/receipts/${encodeURIComponent(orderId)}`} className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
@@ -120,6 +128,14 @@ function CheckoutSuccessInner() {
           </div>
         ) : null}
       </StatePanel>
+      {displayedStatus === "paid" ? (
+        <PostPurchaseOnboarding
+          className="mt-6"
+          context="success"
+          orderId={orderId}
+          showTerminalPasswordStep={includesTerminalPurchase}
+        />
+      ) : null}
     </main>
   );
 }
@@ -162,7 +178,7 @@ function getStatusTitle(status: Status) {
 }
 
 function getStatusDescription(status: Status, message: string) {
-  if (status === "paid") return "Your products are unlocked. Open your purchase library to download builds and view receipts.";
+  if (status === "paid") return "Your products are unlocked. Use the next steps below to download builds, prepare terminal authentication when needed, and keep support details ready.";
   if (status === "failed") return "Razorpay reported that the payment did not complete. You can retry checkout from the cart when you are ready.";
   if (status === "unknown") return message || "This checkout link is missing its Razorpay order reference. Open your cart or purchase library to continue.";
   if (status === "stalled") return message || "You may refresh this status, check your purchase library, or contact support with your payment details.";

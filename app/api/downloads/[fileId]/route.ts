@@ -12,8 +12,14 @@ export async function GET(request: Request, ctx: RouteContext<"/api/downloads/[f
     const user = await getCurrentUserFromRequest(request);
     if (!user) return NextResponse.json({ message: "Authentication required" }, { status: 401 });
     if (!(await hasPaidAccess(user.id, file.product_slug))) return NextResponse.json({ message: "Paid access required" }, { status: 403 });
-    return NextResponse.json({ url: await createGithubReleaseDownloadUrl(file) });
+    try {
+      return NextResponse.json({ url: await createGithubReleaseDownloadUrl(file) });
+    } catch (error) {
+      console.error("Download URL unavailable", error);
+      return NextResponse.json({ message: "Download is not ready. Try again." }, { status: 503 });
+    }
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to create download URL" }, { status: 500 });
+    console.error("Download request failed", error);
+    return NextResponse.json({ message: "Unable to prepare download." }, { status: 500 });
   }
 }

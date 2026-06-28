@@ -18,22 +18,22 @@ export default function DownloadButton({
   className = "",
   wrapperClassName = "",
 }: DownloadButtonProps) {
-  const [message, setMessage] = useState("");
+  const [downloadFailed, setDownloadFailed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleDownload() {
     if (isLoading) return;
     setIsLoading(true);
-    setMessage("");
+    setDownloadFailed(false);
     try {
       const { data } = await getSupabaseBrowserClient().auth.getSession();
       const token = data.session?.access_token;
       const res = await fetch(`/api/downloads/${fileId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-      const payload = await res.json();
-      if (!res.ok) throw new Error(payload.message ?? "Download failed");
+      const payload = await res.json().catch(() => ({}));
+      if (!res.ok || typeof payload.url !== "string") throw new Error("Download failed");
       window.location.href = payload.url;
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Download failed");
+    } catch {
+      setDownloadFailed(true);
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +64,9 @@ export default function DownloadButton({
         )}
       </button>
       {isLoading ? <p className="mt-2 text-xs text-brand">Preparing download...</p> : null}
-      {message ? (
+      {downloadFailed ? (
         <div className="mt-3 rounded-md border border-error/35 bg-error/10 p-3 text-left" role="alert">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-error">Download unavailable</p>
-          <p className="mt-1 text-sm leading-5 text-white">{message}</p>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-error">Download failed</p>
           <div className="mt-3 grid gap-2">
             <button
               type="button"

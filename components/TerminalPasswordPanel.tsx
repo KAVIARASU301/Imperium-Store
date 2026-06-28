@@ -173,7 +173,7 @@ export default function TerminalPasswordPanel() {
   const submitDisabled = loading || cooldownLoading || isCoolingDown || apiUnavailable;
 
   return (
-    <section className="rounded-md border border-gold/35 bg-[linear-gradient(180deg,rgba(54,43,20,0.34),rgba(11,22,38,0.96))] p-5 shadow-[0_20px_58px_rgba(0,0,0,0.30)]">
+    <section id="terminal-password" className="scroll-mt-28 rounded-md border border-gold/35 bg-[linear-gradient(180deg,rgba(54,43,20,0.34),rgba(11,22,38,0.96))] p-5 shadow-[0_20px_58px_rgba(0,0,0,0.30)]">
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:items-start">
         <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-bright">
