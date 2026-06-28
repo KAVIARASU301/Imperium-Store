@@ -1,13 +1,58 @@
 import PricingBox from "@/components/PricingBox";
 import ProductImage from "@/components/ProductImage";
 import { getActiveProducts, getProductBySlug, isProductReady } from "@/lib/products";
+import { truncateDescription } from "@/lib/seo";
 import type { ProductGalleryImage, ProductHighlight } from "@/types/product";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 export function generateStaticParams() {
   return getActiveProducts().map((product) => ({ slug: product.slug }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
+
+  if (!product) {
+    return {
+      title: "Product Not Found | Imperium Store",
+      description: "This product could not be found on Imperium Store.",
+    };
+  }
+
+  const title = `${product.name} | Imperium Store`;
+  const description = truncateDescription(product.short_description);
+  const path = `/products/${product.slug}`;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      title,
+      description,
+      url: path,
+      siteName: "Imperium Store",
+      type: "website",
+      images: [
+        {
+          url: product.image.src,
+          width: product.image.width,
+          height: product.image.height,
+          alt: product.image.alt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [product.image.src],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {

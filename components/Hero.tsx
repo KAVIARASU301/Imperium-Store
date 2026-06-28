@@ -46,7 +46,7 @@ export default function Hero() {
                         Trade faster. Practice safer.
                       </h1>
                       <p className="mt-6 max-w-2xl text-base font-medium leading-7 text-copy sm:text-lg">
-                        One focused desktop terminal for option-chain execution, paper trading, live positions, risk controls, and session review.
+                        {terminal.promise}
                       </p>
                       <div className="mt-7 flex flex-wrap justify-center gap-3">
                         <Link href="/products" className="btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">

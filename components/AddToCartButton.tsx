@@ -24,12 +24,14 @@ export default function AddToCartButton({
   children?: React.ReactNode;
 }) {
   const router = useRouter();
+  const hydrated = useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerHydratedSnapshot);
   const [checkingAuth, setCheckingAuth] = useState(false);
   const cart = useSyncExternalStore(subscribeToCart, getCartSnapshot, getEmptyCartSnapshot);
   const { purchasedSlugSet, loaded } = usePurchasedProducts();
+  const isLoadingPurchaseState = hydrated && !loaded;
   const inCart = cart.includes(slug);
   const isPurchased = purchasedSlugSet.has(slug);
-  const disabled = !loaded || isPurchased || checkingAuth || !isReady;
+  const disabled = isLoadingPurchaseState || isPurchased || checkingAuth || !isReady;
   const baseDisabledClassName = className.replace(/\bbtn-primary\b/g, "");
   const buttonClassName = isPurchased
     ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-success/40 bg-success/10 text-success shadow-none hover:border-success/40 hover:bg-success/10`
@@ -38,7 +40,7 @@ export default function AddToCartButton({
     : `${className} disabled:cursor-wait disabled:opacity-70`;
 
   async function handleAddToCart() {
-    if (!isReady || isPurchased || checkingAuth) return;
+    if (!isReady || isPurchased || checkingAuth || isLoadingPurchaseState) return;
 
     setCheckingAuth(true);
     const supabase = getSupabaseBrowserClient();
@@ -62,9 +64,21 @@ export default function AddToCartButton({
       aria-disabled={disabled}
       onClick={handleAddToCart}
     >
-      {!loaded || checkingAuth ? "Checking..." : isPurchased ? "Purchased" : !isReady ? "Coming Soon" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
+      {isLoadingPurchaseState || checkingAuth ? "Checking..." : isPurchased ? "Purchased" : !isReady ? "Coming Soon" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
     </button>
   );
+}
+
+function subscribeToHydration() {
+  return () => {};
+}
+
+function getHydratedSnapshot() {
+  return true;
+}
+
+function getServerHydratedSnapshot() {
+  return false;
 }
 
 function getCurrentPath() {

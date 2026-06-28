@@ -320,6 +320,14 @@ RAZORPAY_KEY_SECRET=your_key_secret
 RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 ```
 
+Required production site URL for SEO metadata:
+
+```bash
+NEXT_PUBLIC_SITE_URL=https://imperiumstore.in
+```
+
+This controls canonical and social preview URLs. Set this per environment when staging or preview deployments should emit their own absolute metadata URLs. Local development falls back to `http://localhost:3000` when the variable is omitted, but production builds require it.
+
 Supabase env when using real persistence:
 
 ```bash

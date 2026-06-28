@@ -2,9 +2,11 @@ import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import HeaderNav from "@/components/HeaderNav";
+import { getSiteUrl } from "@/lib/seo";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
   title: "Imperium Store | Indian trading software",
   description: "Professional trading software for Indian market traders focused on options execution, stock investing, risk control, and review.",
   icons: {
