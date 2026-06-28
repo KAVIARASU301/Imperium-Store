@@ -9,12 +9,39 @@ type PasswordStatus = {
   text: string;
 };
 
+type CooldownResponse = {
+  canUpdate?: boolean;
+  cooldownSeconds?: number;
+  lastUpdatedAt?: string | null;
+  nextAllowedAt?: string | null;
+  message?: string;
+};
+
+function getRemainingMs(nextAllowedAt: string | null, now: number) {
+  if (!nextAllowedAt) return 0;
+  return Math.max(0, new Date(nextAllowedAt).getTime() - now);
+}
+
+function formatRemaining(ms: number) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  if (minutes === 0) return `${seconds} sec`;
+  if (seconds === 0) return `${minutes} min`;
+  return `${minutes} min ${seconds} sec`;
+}
+
 export default function TerminalPasswordPanel() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cooldownLoading, setCooldownLoading] = useState(true);
+  const [nextAllowedAt, setNextAllowedAt] = useState<string | null>(null);
+  const [apiUnavailable, setApiUnavailable] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const [status, setStatus] = useState<PasswordStatus>({
     tone: "info",
     text: "Create or update the password used to authenticate this account inside the Imperium terminal.",
@@ -23,18 +50,55 @@ export default function TerminalPasswordPanel() {
   useEffect(() => {
     let active = true;
 
-    async function loadEmail() {
-      const { data } = await getSupabaseBrowserClient().auth.getSession();
-      if (!active) return;
-      setEmail(data.session?.user.email ?? "");
+    async function loadPanelState() {
+      setCooldownLoading(true);
+
+      try {
+        const { data } = await getSupabaseBrowserClient().auth.getSession();
+        if (!active) return;
+        const token = data.session?.access_token;
+        setEmail(data.session?.user.email ?? "");
+        if (!token) throw new Error("Sign in again before setting a terminal password.");
+
+        const response = await fetch("/api/auth/terminal-password", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const payload = (await response.json().catch(() => ({}))) as CooldownResponse;
+        if (!active) return;
+        if (!response.ok) {
+          setApiUnavailable(true);
+          throw new Error(payload.message ?? "Unable to load terminal password cooldown.");
+        }
+
+        setApiUnavailable(false);
+        setNextAllowedAt(payload.nextAllowedAt ?? null);
+      } catch (error) {
+        if (!active) return;
+        setStatus({
+          tone: "error",
+          text:
+            error instanceof Error
+              ? error.message
+              : "Unable to load terminal password cooldown.",
+        });
+      } finally {
+        if (active) setCooldownLoading(false);
+      }
     }
 
-    void loadEmail();
+    void loadPanelState();
 
     return () => {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!nextAllowedAt) return;
+
+    const interval = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [nextAllowedAt]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -50,13 +114,37 @@ export default function TerminalPasswordPanel() {
 
       const supabase = getSupabaseBrowserClient();
       const { data } = await supabase.auth.getSession();
-      if (!data.session) throw new Error("Sign in again before setting a terminal password.");
+      const token = data.session?.access_token;
+      if (!token) throw new Error("Sign in again before setting a terminal password.");
 
-      const { error } = await supabase.auth.updateUser({ password });
-      if (error) throw error;
+      const response = await fetch("/api/auth/terminal-password", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password }),
+      });
+      const payload = (await response.json().catch(() => ({}))) as CooldownResponse;
+      if (response.status === 429) {
+        setNextAllowedAt(payload.nextAllowedAt ?? null);
+        setStatus({
+          tone: "info",
+          text:
+            payload.message ??
+            "Terminal password was updated recently. Try again after the cooldown.",
+        });
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Unable to save the terminal password.");
+      }
 
       setPassword("");
       setConfirmPassword("");
+      setNextAllowedAt(payload.nextAllowedAt ?? null);
+      setApiUnavailable(false);
+      setNow(Date.now());
       setStatus({
         tone: "success",
         text: "Terminal password saved. Use your store email and this password when Imperium asks for account authentication.",
@@ -73,6 +161,16 @@ export default function TerminalPasswordPanel() {
       setLoading(false);
     }
   }
+
+  const remainingMs = getRemainingMs(nextAllowedAt, now);
+  const isCoolingDown = remainingMs > 0;
+  const displayStatus = isCoolingDown
+    ? {
+        tone: "info" as const,
+        text: `You can update the terminal password again in ${formatRemaining(remainingMs)}.`,
+      }
+    : status;
+  const submitDisabled = loading || cooldownLoading || isCoolingDown || apiUnavailable;
 
   return (
     <section className="rounded-md border border-gold/35 bg-[linear-gradient(180deg,rgba(54,43,20,0.34),rgba(11,22,38,0.96))] p-5 shadow-[0_20px_58px_rgba(0,0,0,0.30)]">
@@ -132,22 +230,28 @@ export default function TerminalPasswordPanel() {
           </label>
 
           <button
-            disabled={loading}
+            disabled={submitDisabled}
             className="mt-4 w-full btn-primary px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? "Saving..." : "Save terminal password"}
+            {loading
+              ? "Saving..."
+              : cooldownLoading
+                ? "Checking cooldown..."
+                : isCoolingDown
+                  ? `Available in ${formatRemaining(remainingMs)}`
+                  : "Save terminal password"}
           </button>
 
           <p
             className={`mt-4 rounded-md border px-4 py-3 text-sm leading-6 ${
-              status.tone === "success"
+              displayStatus.tone === "success"
                 ? "border-emerald-400/30 bg-emerald-400/10 text-emerald-100"
-                : status.tone === "error"
+                : displayStatus.tone === "error"
                   ? "border-red-500/30 bg-red-500/10 font-semibold text-red-100"
                   : "border-cyan-border bg-card/60 text-muted"
             }`}
           >
-            {status.text}
+            {displayStatus.text}
           </p>
         </form>
       </div>
