@@ -32,7 +32,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
           const map: Record<string, Purchase> = {};
           for (const purchase of payload.purchases as Purchase[]) {
             const existing = map[purchase.product_id];
-            if (!existing || new Date(purchase.created_at) > new Date(existing.created_at)) map[purchase.product_id] = purchase;
+            if (shouldUsePurchaseForProduct(purchase, existing)) map[purchase.product_id] = purchase;
           }
           setPurchasesBySlug(map);
         }
@@ -127,6 +127,13 @@ export default function DashboardProducts({ products }: { products: Product[] })
       })}
     </div>
   );
+}
+
+function shouldUsePurchaseForProduct(purchase: Purchase, existing?: Purchase) {
+  if (!existing) return true;
+  if (existing.status !== "paid" && purchase.status === "paid") return true;
+  if (existing.status === "paid" && purchase.status !== "paid") return false;
+  return new Date(purchase.created_at) > new Date(existing.created_at);
 }
 
 function getPlatformIcon(file: ProductFile) {

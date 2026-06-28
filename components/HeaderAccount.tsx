@@ -101,7 +101,7 @@ export default function HeaderAccount() {
         href="/login"
         className="inline-flex min-h-10 items-center justify-center gap-2 border border-brand/70 bg-brand/10 px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20"
       >
-        <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" />
+        <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
         <span>Login</span>
       </Link>
     );
@@ -116,7 +116,7 @@ export default function HeaderAccount() {
         aria-haspopup="menu"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
-        <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" />
+        <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
         <span className="max-w-32 truncate sm:max-w-44">{accountLabel}</span>
         <span className={`text-[10px] transition ${isMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
       </button>
@@ -129,11 +129,11 @@ export default function HeaderAccount() {
             {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
           </div>
           <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             My purchases
           </Link>
           <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             Support
           </Link>
           <button
@@ -143,7 +143,7 @@ export default function HeaderAccount() {
             disabled={isSigningOut}
             onClick={handleLogout}
           >
-            <Image src="/icons/logout.svg" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/logout.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             {isSigningOut ? "Signing out..." : "Logout"}
           </button>
         </div>
