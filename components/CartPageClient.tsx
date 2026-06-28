@@ -2,7 +2,7 @@
 
 import { CART_UPDATED_EVENT, clearCart, clearCartItems, readCart, removeFromCart } from "@/lib/cart";
 import { createRazorpayCheckout } from "@/lib/razorpay-client";
-import { formatCurrencySymbol, formatPriceAmount } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, getProductsGstInclusiveText } from "@/lib/products";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { Product } from "@/types/product";
 import Image from "next/image";
@@ -75,6 +75,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   );
   const total = payableProducts.reduce((sum, product) => sum + product.price, 0);
   const currency = payableProducts[0]?.currency ?? cartProducts[0]?.currency ?? "INR";
+  const gstInclusiveText = getProductsGstInclusiveText(payableProducts);
 
   async function startPayment() {
     setError("");
@@ -124,7 +125,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         name: "Imperium Store",
         description: productIds.length === 1 ? payableProducts[0]?.name : `${productIds.length} Imperium products`,
         prefill: { email: sessionData.session?.user.email ?? undefined },
-        theme: { color: "#00CFFF" },
+        theme: { color: "#2F6FA6" },
         handler: async (response: RazorpaySuccessResponse) => {
           try {
             const verifyRes = await fetch("/api/razorpay/verify-payment", {
@@ -207,10 +208,13 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                     Remove
                   </button>
                 </div>
-                <p className="font-semibold tabular-nums text-white">
-                  <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
-                  {formatPriceAmount(product.price)}
-                </p>
+                <div className="text-left sm:text-right">
+                  <p className="font-semibold tabular-nums text-white">
+                    <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
+                    {formatPriceAmount(product.price)}
+                  </p>
+                  <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{getProductGstInclusiveText(product)}</p>
+                </div>
               </article>
             ))}
             {purchasedCartProducts.length ? (
@@ -234,7 +238,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                   <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
                   <div className="flex justify-between gap-4"><span>Items</span><span>{payableProducts.length}</span></div>
                   <div className="flex justify-between gap-4"><span>Subtotal</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span></div>
-                  <div className="flex justify-between gap-4"><span>GST</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(0)}</span></div>
+                  <div className="flex justify-between gap-4"><span>GST</span><span className="text-right">{gstInclusiveText}</span></div>
                 </div>
                 <div className="mt-4 flex items-end justify-between gap-4 border-t border-cyan-border pt-4 text-white">
                   <span className="text-sm font-semibold uppercase tracking-[0.08em] text-muted">Total payable</span>

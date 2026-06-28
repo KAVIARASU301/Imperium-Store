@@ -40,18 +40,28 @@ export default function HomePage() {
                 </div>
             </section>
 
-            <section className="border-y border-cyan-border bg-section/80">
-                <div className="mx-auto max-w-[1200px] px-6 py-10">
+            <section className="mx-auto max-w-[1200px] px-6 py-12">
+                <div className="mb-6 border-b border-cyan-border pb-4">
                     <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Why Imperium</p>
-                    <dl className="mt-4 grid gap-px border border-cyan-border bg-cyan-border md:grid-cols-2">
-                        {principles.map((item) => (
-                            <div key={item.title} className="bg-section p-4">
-                                <dt className="text-sm font-semibold text-white">{item.title}</dt>
-                                <dd className="mt-1 text-sm leading-6 text-muted">{item.text}</dd>
-                            </div>
-                        ))}
-                    </dl>
+                    <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">Built for disciplined trading workflows</h2>
                 </div>
+                <dl className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {principles.map((item, index) => (
+                        <div
+                            key={item.title}
+                            className="group min-h-32 rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(16,29,47,0.88),rgba(11,22,38,0.94))] p-5 shadow-[0_14px_34px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:border-gold/40 hover:bg-card-hover hover:shadow-[0_18px_42px_rgba(0,0,0,0.34)]"
+                        >
+                            <div className="mb-4 flex items-center justify-between border-b border-cyan-border pb-3">
+                                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">
+                                    {String(index + 1).padStart(2, "0")}
+                                </span>
+                                <span className="h-px w-10 bg-gold/50 transition group-hover:w-14 group-hover:bg-gold-bright" />
+                            </div>
+                            <dt className="text-sm font-semibold text-white">{item.title}</dt>
+                            <dd className="mt-2 text-sm leading-6 text-muted">{item.text}</dd>
+                        </div>
+                    ))}
+                </dl>
             </section>
 
             <section className="mx-auto max-w-[1200px] px-6 py-12">

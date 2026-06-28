@@ -4,7 +4,19 @@ import { getSupabaseBrowserClient } from "@/lib/supabase";
 import Image from "next/image";
 import { useState } from "react";
 
-export default function DownloadButton({ fileId, label = "Download" }: { fileId: string; label?: string }) {
+type DownloadButtonProps = {
+  fileId: string;
+  label?: string;
+  className?: string;
+  wrapperClassName?: string;
+};
+
+export default function DownloadButton({
+  fileId,
+  label = "Download",
+  className = "",
+  wrapperClassName = "",
+}: DownloadButtonProps) {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,13 +39,16 @@ export default function DownloadButton({ fileId, label = "Download" }: { fileId:
   }
 
   return (
-    <div className="sm:text-right">
+    <div className={wrapperClassName || "sm:text-right"}>
       <button
         type="button"
         onClick={handleDownload}
         disabled={isLoading}
         aria-busy={isLoading}
-        className="inline-flex min-w-32 items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition duration-150  focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-section disabled:cursor-wait disabled:bg-cyan-border disabled:text-muted disabled:shadow-none"
+        className={[
+          "inline-flex min-h-11 min-w-40 cursor-pointer items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 transition duration-150 focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 focus:ring-offset-section disabled:cursor-wait disabled:border-cyan-border disabled:bg-none disabled:bg-card disabled:text-muted disabled:shadow-none",
+          className,
+        ].join(" ")}
       >
         {isLoading ? (
           <>

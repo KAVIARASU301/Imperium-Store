@@ -122,23 +122,29 @@ export default function HeaderAccount() {
       </button>
 
       {isMenuOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-56 overflow-hidden border border-cyan-border bg-section/95 py-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl" role="menu">
-          <div className="border-b border-cyan-border px-4 py-3">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted">Signed in as</p>
-            <p className="mt-1 truncate font-medium text-white">{accountLabel}</p>
-            {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
+        <div className="absolute right-0 z-50 mt-3 w-72 overflow-hidden rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl" role="menu">
+          <div className="mb-2 rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(19,40,68,0.82),rgba(16,29,47,0.72))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gold/30 bg-main/70">
+                <Image src="/icons/profile_avatar.svg" alt="" width={22} height={22} className="h-[22px] w-[22px]" suppressHydrationWarning />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">{accountLabel}</p>
+                {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
+              </div>
+            </div>
           </div>
-          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/dashboard" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             My purchases
           </Link>
-          <Link href="/support" className="flex items-center gap-2 px-4 py-2.5 transition hover:bg-card hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/support" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             Support
           </Link>
           <button
             type="button"
-            className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
+            className="mt-1 flex w-full items-center gap-2 rounded-md border-t border-cyan-border px-3 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
             role="menuitem"
             disabled={isSigningOut}
             onClick={handleLogout}

@@ -47,79 +47,129 @@ export default function DashboardProducts({ products }: { products: Product[] })
     };
   }, []);
 
-  if (state === "checking") return <p className="mt-8 font-mono text-sm uppercase tracking-[0.12em] text-muted">Checking your access...</p>;
+  if (state === "checking") {
+    return (
+      <div className="mt-6 rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+        <div className="flex items-center gap-3 text-sm text-muted">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
+          <span className="font-mono uppercase tracking-[0.12em]">Checking purchase access...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (state === "signed-out") {
     return (
-      <div className="mt-8 border border-cyan-border bg-section p-6 shadow-xl shadow-black/20">
-        <p className="text-white">Log in to see which products you have unlocked.</p>
-        <Link href="/login?next=/dashboard" className="mt-4 inline-block btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/20 ">
-          Login
+      <div className="mt-6 rounded-md border border-cyan-border bg-section p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Secure account required</p>
+        <h2 className="mt-2 text-xl font-bold text-white">Log in to view your purchase library.</h2>
+        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">Your downloads and receipts are tied to the account used during checkout.</p>
+        <Link href="/login?next=/dashboard" className="mt-5 inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+          Log in
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="mt-8 grid gap-px border border-cyan-border bg-cyan-border">
+    <div className="mt-6 grid gap-5">
       {products.map((product) => {
         const purchase = purchasesBySlug[product.slug];
         const hasAccess = product.price === 0 || purchase?.status === "paid";
         return (
-          <article key={product.slug} className="bg-section p-5 shadow-xl shadow-black/20">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
-                <Image src={product.icon.src} alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
+          <article
+            key={product.slug}
+            className="overflow-hidden rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(16,29,47,0.94),rgba(11,22,38,0.98))] p-5 shadow-[0_20px_58px_rgba(0,0,0,0.30)] transition hover:border-brand/40 hover:shadow-[0_24px_70px_rgba(0,0,0,0.38)]"
+          >
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex min-w-0 items-start gap-4">
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-main/70 p-2 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
+                  <Image src={product.icon.src} alt="" width={42} height={42} className="h-10 w-10 object-contain" />
+                </span>
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-white">{product.name}</h2>
-                  <p className="mt-2 text-sm leading-6 text-muted">{product.short_description}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="border border-cyan-border bg-main/55 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-brand">
+                      {product.type === "app" ? "Software" : product.type}
+                    </span>
+                    {hasAccess ? (
+                      <span className="border border-gold/30 bg-gold/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-bright">
+                        Lifetime access
+                      </span>
+                    ) : null}
+                  </div>
+                  <h2 className="mt-3 text-xl font-bold text-white">{product.name}</h2>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
                 </div>
               </div>
               <StatusBadge hasAccess={hasAccess} status={purchase?.status} />
             </div>
             {hasAccess ? (
-              <div className="mt-4 space-y-3">
-                {purchase?.status === "paid" ? (
-                  <Link
-                    href={`/receipts/${encodeURIComponent(purchase.razorpay_order_id)}`}
-                    className="inline-block border border-cyan-border bg-card px-4 py-2 text-sm font-semibold text-white hover:border-brand hover:bg-section"
-                  >
-                    View payment receipt
-                  </Link>
-                ) : null}
-                {product.files?.map((file) => (
-                  <div
-                    key={file.id}
-                    className="group flex flex-col gap-4 border border-cyan-border bg-main p-4 transition duration-150 hover:border-brand hover:bg-card sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex min-w-0 items-start gap-4">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center border border-cyan-border bg-section p-2 transition duration-150 group-hover:border-brand">
-                        <Image src={getPlatformIcon(file)} alt="" width={28} height={28} className="h-7 w-7 object-contain" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <p className="font-medium text-white">{getPlatformTitle(file)}</p>
-                          <span className="border border-cyan-border bg-section px-2 py-1 font-mono text-[11px] font-semibold uppercase text-muted">
-                            v{file.version}
-                          </span>
-                        </div>
-                        <p className="mt-1 flex items-center gap-2 font-mono text-xs uppercase text-muted">
-                          <Image src="/icons/file.svg" alt="" width={16} height={16} className="h-4 w-4 object-contain" />
-                          <span>{file.file_name}</span>
-                        </p>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{getPlatformNote(file)}</p>
-                      </div>
-                    </div>
-                    <DownloadButton fileId={file.id} label={`Download ${getPlatformLabel(file)}`} />
+              <div className="mt-5 border-t border-cyan-border pt-5">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">Licensed builds</p>
+                    <p className="mt-1 text-sm text-muted">Download the current release for your operating system.</p>
                   </div>
-                ))}
-                {!product.files?.length ? <p className="text-sm text-muted">No downloadable files for this product yet.</p> : null}
+                  {purchase?.status === "paid" ? (
+                    <Link
+                      href={`/receipts/${encodeURIComponent(purchase.razorpay_order_id)}`}
+                      className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold text-white hover:border-brand hover:bg-card-hover"
+                    >
+                      View receipt
+                    </Link>
+                  ) : null}
+                </div>
+                {product.files?.length ? (
+                  <div className="grid gap-3">
+                    {product.files.map((file) => (
+                      <div
+                        key={file.id}
+                        className="group grid gap-4 rounded-md border border-cyan-border bg-main/60 p-4 shadow-[0_12px_30px_rgba(0,0,0,0.18)] transition duration-150 hover:border-brand/60 hover:bg-card/80 sm:grid-cols-[minmax(0,1fr)_13rem] sm:items-center"
+                      >
+                        <div className="flex min-w-0 items-start gap-4">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-section p-2 transition duration-150 group-hover:border-gold/40">
+                            <Image src={getPlatformIcon(file)} alt="" width={28} height={28} className="h-7 w-7 object-contain" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-semibold text-white">{getPlatformTitle(file)}</p>
+                              <span className="border border-cyan-border bg-section px-2 py-1 font-mono text-[11px] font-semibold uppercase text-muted">
+                                v{file.version}
+                              </span>
+                            </div>
+                            <p className="mt-1 flex min-w-0 items-center gap-2 font-mono text-xs uppercase text-muted">
+                              <Image src="/icons/file.svg" alt="" width={16} height={16} className="h-4 w-4 shrink-0 object-contain" />
+                              <span className="truncate">{file.file_name}</span>
+                            </p>
+                            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">{getPlatformNote(file)}</p>
+                          </div>
+                        </div>
+                        <DownloadButton
+                          fileId={file.id}
+                          label={`Download ${getPlatformLabel(file)}`}
+                          wrapperClassName="w-full sm:w-52"
+                          className="w-full min-w-0"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-md border border-cyan-border bg-main/45 p-4 text-sm text-muted">
+                    Download files are being prepared for this product.
+                  </div>
+                )}
               </div>
             ) : (
-              <div className="mt-4">
-                <Link href={`/products/${product.slug}`} className="inline-block border border-cyan-border bg-card px-4 py-2 text-sm font-semibold text-white hover:border-brand hover:bg-section">
-                  {purchase?.status === "pending" ? "Complete payment" : "View product"}
-                </Link>
+              <div className="mt-5 rounded-md border border-cyan-border bg-main/45 p-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-white">{getLockedTitle(purchase?.status)}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted">{getLockedMessage(purchase?.status)}</p>
+                  </div>
+                  <Link href={`/products/${product.slug}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand hover:bg-card-hover sm:w-52">
+                    {purchase?.status === "pending" ? "Complete payment" : "View product"}
+                  </Link>
+                </div>
               </div>
             )}
           </article>
@@ -127,6 +177,18 @@ export default function DashboardProducts({ products }: { products: Product[] })
       })}
     </div>
   );
+}
+
+function getLockedTitle(status?: string) {
+  if (status === "pending") return "Payment confirmation pending";
+  if (status === "failed") return "Payment was not completed";
+  return "Product not purchased";
+}
+
+function getLockedMessage(status?: string) {
+  if (status === "pending") return "Open the product page to complete checkout or refresh payment confirmation.";
+  if (status === "failed") return "You can start checkout again when you are ready.";
+  return "Purchase this product to unlock downloads and receipts in your account.";
 }
 
 function shouldUsePurchaseForProduct(purchase: Purchase, existing?: Purchase) {
@@ -159,8 +221,30 @@ function getPlatformNote(file: ProductFile) {
 }
 
 function StatusBadge({ hasAccess, status }: { hasAccess: boolean; status?: string }) {
-  if (hasAccess) return <span className="font-mono text-xs uppercase tracking-widest text-emerald-400">Unlocked</span>;
-  if (status === "pending") return <span className="font-mono text-xs uppercase tracking-widest text-amber-300">Payment pending</span>;
-  if (status === "failed") return <span className="font-mono text-xs uppercase tracking-widest text-red-400">Payment failed</span>;
-  return <span className="font-mono text-xs uppercase tracking-widest text-muted">Locked</span>;
+  if (hasAccess) {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-success/35 bg-success/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-success">
+        Unlocked
+      </span>
+    );
+  }
+  if (status === "pending") {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-warning/35 bg-warning/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-warning">
+        Payment pending
+      </span>
+    );
+  }
+  if (status === "failed") {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-error/35 bg-error/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-error">
+        Payment failed
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-cyan-border bg-main/50 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-muted">
+      Locked
+    </span>
+  );
 }

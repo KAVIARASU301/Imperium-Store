@@ -18,7 +18,7 @@ export default function TerminalPreview() {
           </div>
         ))}
       </div>
-      <div className="mt-4 h-28 border border-cyan-border bg-[linear-gradient(135deg,rgba(0,207,255,.18),transparent_45%),linear-gradient(90deg,rgba(0,207,255,.16)_1px,transparent_1px),linear-gradient(rgba(0,207,255,.16)_1px,transparent_1px)] bg-[length:100%_100%,24px_24px,24px_24px]" />
+      <div className="mt-4 h-28 border border-cyan-border bg-[linear-gradient(135deg,rgba(73,199,232,.10),transparent_45%),linear-gradient(90deg,rgba(73,199,232,.10)_1px,transparent_1px),linear-gradient(rgba(73,199,232,.08)_1px,transparent_1px)] bg-[length:100%_100%,24px_24px,24px_24px]" />
     </div>
   );
 }

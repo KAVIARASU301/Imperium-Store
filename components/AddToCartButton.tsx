@@ -29,7 +29,7 @@ export default function AddToCartButton({
   const isPurchased = purchasedSlugSet.has(slug);
   const disabled = !loaded || isPurchased || checkingAuth;
   const buttonClassName = isPurchased
-    ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-amber-300/60 bg-amber-300/10 text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.14)] hover:border-amber-300/60 hover:bg-amber-300/10`
+    ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-success/40 bg-success/10 text-success shadow-none hover:border-success/40 hover:bg-success/10`
     : `${className} disabled:cursor-wait disabled:opacity-70`;
 
   async function handleAddToCart() {

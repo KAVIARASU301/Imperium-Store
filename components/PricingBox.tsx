@@ -1,17 +1,22 @@
 import BuyButton from "@/components/BuyButton";
-import { formatCurrencySymbol, formatPriceAmount } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText } from "@/lib/products";
+import type { Product } from "@/types/product";
 
 export default function PricingBox({
                                        price,
                                        currency,
                                        slug,
                                        productName,
+                                       productType,
                                    }: {
     price: number;
     currency: string;
     slug: string;
     productName: string;
+    productType: Product["type"];
 }) {
+    const gstInclusiveText = getProductGstInclusiveText({ type: productType });
+
     return (
         <aside className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_24px_60px_rgba(0,0,0,0.46),0_0_0_1px_rgba(255,255,255,0.08)_inset]">
             <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
@@ -35,6 +40,9 @@ export default function PricingBox({
                         <span className="font-sans text-4xl font-extrabold tracking-normal tabular-nums">
                             {formatPriceAmount(price)}
                         </span>
+                    </p>
+                    <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                        {gstInclusiveText}
                     </p>
                     <p className="mt-3 border-t border-cyan-border pt-3 text-sm font-medium leading-6 text-muted">
                         One-time purchase. Lifetime access to current downloads.

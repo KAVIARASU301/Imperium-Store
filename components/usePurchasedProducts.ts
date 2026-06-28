@@ -13,8 +13,8 @@ let cachedPurchasedSlugs: string[] | null = null;
 let loadPromise: Promise<string[]> | null = null;
 
 export function usePurchasedProducts() {
-  const [purchasedSlugs, setPurchasedSlugs] = useState<string[]>(cachedPurchasedSlugs ?? []);
-  const [loaded, setLoaded] = useState(cachedPurchasedSlugs !== null);
+  const [purchasedSlugs, setPurchasedSlugs] = useState<string[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;

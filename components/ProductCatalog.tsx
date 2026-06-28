@@ -46,7 +46,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
                     type="button"
                     className={`min-h-10 rounded-md border px-3 py-1.5 text-left transition ${
                       isActive
-                        ? "border-brand bg-card-hover text-white shadow-[0_0_18px_rgba(0,207,255,0.16)]"
+                        ? "border-brand bg-card-hover text-white shadow-[0_12px_26px_rgba(0,0,0,0.24)]"
                         : "border-cyan-border bg-card text-muted hover:border-brand hover:text-white"
                     }`}
                     onClick={() => setActiveTab(tab.id)}

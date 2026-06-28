@@ -323,3 +323,20 @@ export function formatPriceAmount(price: number) {
 export function formatPrice(price: number, currency = "INR") {
   return `${formatCurrencySymbol(currency)}${formatPriceAmount(price)}`;
 }
+
+export function getProductGstRate(product: Pick<Product, "type">) {
+  if (product.type === "app") return 18;
+  if (product.type === "course") return 18;
+  if (product.type === "template") return 18;
+  return 18;
+}
+
+export function getProductGstInclusiveText(product: Pick<Product, "type">) {
+  return `Inclusive of ${getProductGstRate(product)}% GST`;
+}
+
+export function getProductsGstInclusiveText(productList: Array<Pick<Product, "type">>) {
+  const rates = Array.from(new Set(productList.map((product) => getProductGstRate(product))));
+  if (rates.length === 1) return `Inclusive of ${rates[0]}% GST`;
+  return "Inclusive of applicable GST";
+}
