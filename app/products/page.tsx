@@ -1,7 +1,9 @@
 import { getActiveProducts } from "@/lib/products";
 import ProductCatalog from "@/components/ProductCatalog";
+import { connection } from "next/server";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+    await connection();
     const products = getActiveProducts();
 
     return (

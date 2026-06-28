@@ -2,7 +2,7 @@
 
 import { CART_UPDATED_EVENT, clearCart, clearCartItems, readCart, removeFromCart } from "@/lib/cart";
 import { createRazorpayCheckout } from "@/lib/razorpay-client";
-import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, getProductsGstInclusiveText } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, getProductsGstInclusiveText, isProductReady } from "@/lib/products";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { Product } from "@/types/product";
 import Image from "next/image";
@@ -18,6 +18,7 @@ interface CreateOrderResponse {
   keyId?: string;
   productIds?: string[];
   purchasedProductIds?: string[];
+  unavailableProductIds?: string[];
   message?: string;
 }
 
@@ -66,7 +67,11 @@ export default function CartPageClient({ products }: { products: Product[] }) {
     [cartSlugs, products],
   );
   const payableProducts = useMemo(
-    () => cartProducts.filter((product) => !purchasedSlugSet.has(product.slug)),
+    () => cartProducts.filter((product) => isProductReady(product) && !purchasedSlugSet.has(product.slug)),
+    [cartProducts, purchasedSlugSet],
+  );
+  const unavailableCartProducts = useMemo(
+    () => cartProducts.filter((product) => !isProductReady(product) && !purchasedSlugSet.has(product.slug)),
     [cartProducts, purchasedSlugSet],
   );
   const purchasedCartProducts = useMemo(
@@ -92,6 +97,11 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       const productIds = payableProducts.map((product) => product.slug);
       if (productIds.length === 0) {
         clearCartItems(purchasedSlugs);
+        if (unavailableCartProducts.length > 0) {
+          setError("No ready products are available for checkout yet.");
+          setLoading(false);
+          return;
+        }
         router.push("/dashboard");
         return;
       }
@@ -191,32 +201,50 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                 Clear Cart
               </button>
             </div>
-            {cartProducts.map((product) => (
-              purchasedSlugSet.has(product.slug) ? null :
-              <article key={product.slug} className="grid gap-4 border-b border-cyan-border bg-section p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-md border border-cyan-border bg-main p-2 shadow-inner shadow-black/30">
-                  <Image src={product.icon.src} alt="" width={product.icon.width} height={product.icon.height} className="h-12 w-12 object-contain" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-white">{product.name}</h2>
-                  <p className="mt-1 text-sm leading-6 text-muted">Digital download access after payment confirmation.</p>
-                  <button
-                    type="button"
-                    className="mt-3 border border-cyan-border bg-card px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted hover:border-red-400/50 hover:text-red-100"
-                    onClick={() => removeFromCart(product.slug)}
-                  >
-                    Remove
-                  </button>
-                </div>
-                <div className="text-left sm:text-right">
-                  <p className="font-semibold tabular-nums text-white">
-                    <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
-                    {formatPriceAmount(product.price)}
-                  </p>
-                  <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{getProductGstInclusiveText(product)}</p>
-                </div>
-              </article>
-            ))}
+            {cartProducts.map((product) => {
+              if (purchasedSlugSet.has(product.slug)) return null;
+              const ready = isProductReady(product);
+              return (
+                <article key={product.slug} className="grid gap-4 border-b border-cyan-border bg-section p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-md border border-cyan-border bg-main p-2 shadow-inner shadow-black/30">
+                    <Image src={product.icon.src} alt="" width={product.icon.width} height={product.icon.height} className="h-12 w-12 object-contain" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="font-bold text-white">{product.name}</h2>
+                      {!ready ? (
+                        <span className="border border-warning/40 bg-warning/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-warning">
+                          Coming Soon
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-muted">
+                      {ready ? "Digital download access after payment confirmation." : "This product is not ready for checkout yet."}
+                    </p>
+                    <button
+                      type="button"
+                      className="mt-3 border border-cyan-border bg-card px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted hover:border-red-400/50 hover:text-red-100"
+                      onClick={() => removeFromCart(product.slug)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="text-left sm:text-right">
+                    {ready ? (
+                      <>
+                        <p className="font-semibold tabular-nums text-white">
+                          <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
+                          {formatPriceAmount(product.price)}
+                        </p>
+                        <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{getProductGstInclusiveText(product)}</p>
+                      </>
+                    ) : (
+                      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-warning">Not in checkout</p>
+                    )}
+                  </div>
+                </article>
+              );
+            })}
             {purchasedCartProducts.length ? (
               <div className="border-t border-success/30 bg-success/5 p-5">
                 <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-success">Already purchased</p>
@@ -247,7 +275,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
               </div>
               {email ? (
                 <button type="button" disabled={loading || payableProducts.length === 0} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
-                  {loading ? "Starting Payment..." : "Pay Securely Now"}
+                  {loading ? "Starting Payment..." : payableProducts.length === 0 && unavailableCartProducts.length > 0 ? "No Ready Products" : "Pay Securely Now"}
                 </button>
               ) : (
                 <Link href={`/login?next=${encodeURIComponent("/cart")}`} className="mt-5 block btn-primary px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 ">

@@ -1,4 +1,4 @@
-import type { Product, ProductFile } from "@/types/product";
+import type { Product, ProductFile, ProductStatus } from "@/types/product";
 
 export const productFiles: ProductFile[] = [
   {
@@ -298,8 +298,32 @@ export const products: Product[] = [
   },
 ];
 
-export function getActiveProducts() { return products.filter((product) => product.is_active); }
-export function getProductBySlug(slug: string) { return products.find((product) => product.slug === slug && product.is_active); }
+const READY_STATUS: ProductStatus = "ready";
+const NOT_READY_STATUS: ProductStatus = "not_ready";
+
+export function getProductStatusEnvKey(product: Pick<Product, "slug">) {
+  const key = product.slug.toUpperCase().replace(/[^A-Z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  return `PRODUCT_STATUS_${key}`;
+}
+
+export function getConfiguredProductStatus(product: Pick<Product, "slug">): ProductStatus {
+  const status = process.env[getProductStatusEnvKey(product)]?.trim().toLowerCase();
+  return status === READY_STATUS ? READY_STATUS : NOT_READY_STATUS;
+}
+
+export function withProductStatus<T extends Product>(product: T): T & { status: ProductStatus } {
+  return { ...product, status: getConfiguredProductStatus(product) };
+}
+
+export function isProductReady(product: Pick<Product, "status">) {
+  return product.status === READY_STATUS;
+}
+
+export function getActiveProducts() { return products.filter((product) => product.is_active).map(withProductStatus); }
+export function getProductBySlug(slug: string) {
+  const product = products.find((product) => product.slug === slug && product.is_active);
+  return product ? withProductStatus(product) : undefined;
+}
 export function getProductFileById(fileId: string) { return productFiles.find((file) => file.id === fileId && file.is_active); }
 export function formatCurrencySymbol(currency = "INR") {
   if (currency === "INR") return "₹";

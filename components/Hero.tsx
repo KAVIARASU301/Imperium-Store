@@ -1,9 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { formatCurrencySymbol, formatPriceAmount, getProductBySlug, getProductGstInclusiveText } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductBySlug, getProductGstInclusiveText, isProductReady } from "@/lib/products";
 
 export default function Hero() {
   const terminal = getProductBySlug("imperium-option-trading-terminal");
+  const ready = terminal ? isProductReady(terminal) : false;
   const gstInclusiveText = terminal ? getProductGstInclusiveText(terminal) : null;
   const terminalPrice = terminal ? (
     <>
@@ -38,7 +39,7 @@ export default function Hero() {
                   <div className="relative z-10 flex min-h-[560px] flex-col items-center justify-between p-5 text-center sm:min-h-[640px] sm:p-8 lg:min-h-[700px] lg:p-10">
                     <div className="flex flex-1 flex-col items-center justify-center">
                       <div className="inline-flex border border-brand/45 bg-main/85 px-4 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-brand shadow-[0_12px_28px_rgba(0,0,0,0.28)] sm:text-xs">
-                        Available now / Instant download
+                        {ready ? "Available now / Instant download" : "Coming soon"}
                       </div>
                       <p className="mt-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Imperium Trading Systems / India</p>
                       <h1 className="mt-4 max-w-[12ch] text-5xl font-black uppercase leading-[0.88] tracking-normal text-white sm:text-7xl lg:text-8xl">
@@ -63,9 +64,9 @@ export default function Hero() {
                         <p className="mt-2 font-sans text-sm font-bold normal-case tracking-normal text-white">{terminal.name}</p>
                       </div>
                       <div className="bg-main/88 p-4 backdrop-blur">
-                        <p>One-time purchase</p>
-                        <p className="mt-2 text-lg text-gold-bright">{terminalPrice}</p>
-                        {gstInclusiveText ? <p className="mt-1 text-[10px] text-muted">{gstInclusiveText}</p> : null}
+                        <p>{ready ? "One-time purchase" : "Status"}</p>
+                        <p className="mt-2 text-lg text-gold-bright">{ready ? terminalPrice : "Coming soon"}</p>
+                        {ready && gstInclusiveText ? <p className="mt-1 text-[10px] text-muted">{gstInclusiveText}</p> : null}
                       </div>
                       <div className="bg-main/88 p-4 backdrop-blur">
                         <p>Support</p>

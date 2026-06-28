@@ -1,6 +1,7 @@
 ## Requirements
 
 - Node.js 20.9.0 or newer is required by Next.js 16. Use `nvm use` from the project root to select the version from `.nvmrc` before running npm scripts.
+- Project design, palette, product, checkout, and implementation guidance lives in `docs/PROJECT_REFERENCE.md`.
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

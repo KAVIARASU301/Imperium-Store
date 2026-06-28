@@ -3,6 +3,7 @@ import ProductCard from "@/components/ProductCard";
 import TickerBoard from "@/components/TickerBoard";
 import { getActiveProducts } from "@/lib/products";
 import Link from "next/link";
+import { connection } from "next/server";
 
 const principles = [
     { title: "Built for execution", text: "Strike ladders, quick orders, and live risk controls designed around active sessions." },
@@ -17,7 +18,10 @@ const principles = [
     { title: "Static IP support", text: "Relay server support helps users who need a static-IP-friendly broker connection setup." },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+    await connection();
+    const activeProducts = getActiveProducts();
+
     return (
         <main>
             <TickerBoard />
@@ -34,7 +38,7 @@ export default function HomePage() {
                     </Link>
                 </div>
                 <div className="grid gap-4">
-                    {getActiveProducts().map((product) => (
+                    {activeProducts.map((product) => (
                         <ProductCard key={product.slug} product={product} />
                     ))}
                 </div>

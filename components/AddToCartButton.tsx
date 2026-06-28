@@ -14,11 +14,13 @@ export default function AddToCartButton({
   slug,
   className,
   checkout = false,
+  isReady = true,
   children,
 }: {
   slug: string;
   className: string;
   checkout?: boolean;
+  isReady?: boolean;
   children?: React.ReactNode;
 }) {
   const router = useRouter();
@@ -27,13 +29,16 @@ export default function AddToCartButton({
   const { purchasedSlugSet, loaded } = usePurchasedProducts();
   const inCart = cart.includes(slug);
   const isPurchased = purchasedSlugSet.has(slug);
-  const disabled = !loaded || isPurchased || checkingAuth;
+  const disabled = !loaded || isPurchased || checkingAuth || !isReady;
+  const baseDisabledClassName = className.replace(/\bbtn-primary\b/g, "");
   const buttonClassName = isPurchased
     ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-success/40 bg-success/10 text-success shadow-none hover:border-success/40 hover:bg-success/10`
+    : !isReady
+      ? `${baseDisabledClassName} cursor-not-allowed border border-warning/40 bg-warning/10 text-warning shadow-none hover:border-warning/40 hover:bg-warning/10`
     : `${className} disabled:cursor-wait disabled:opacity-70`;
 
   async function handleAddToCart() {
-    if (isPurchased || checkingAuth) return;
+    if (!isReady || isPurchased || checkingAuth) return;
 
     setCheckingAuth(true);
     const supabase = getSupabaseBrowserClient();
@@ -57,7 +62,7 @@ export default function AddToCartButton({
       aria-disabled={disabled}
       onClick={handleAddToCart}
     >
-      {!loaded || checkingAuth ? "Checking..." : isPurchased ? "Purchased" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
+      {!loaded || checkingAuth ? "Checking..." : isPurchased ? "Purchased" : !isReady ? "Coming Soon" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
     </button>
   );
 }

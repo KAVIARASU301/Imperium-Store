@@ -1,5 +1,5 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { getProductBySlug } from "@/lib/products";
+import { getProductBySlug, isProductReady } from "@/lib/products";
 import { createPaidPurchase, createPendingPurchase, hasRecordedPaidPurchase } from "@/lib/purchases";
 import { getRazorpayClient } from "@/lib/razorpay";
 import { NextResponse } from "next/server";
@@ -30,6 +30,16 @@ export async function POST(request: Request) {
     const products = productIds.map((productId) => getProductBySlug(productId));
     if (products.some((product) => !product)) return NextResponse.json({ message: "Product not found" }, { status: 404 });
     const validProducts = products.filter((product): product is NonNullable<typeof product> => Boolean(product));
+    const unavailableProducts = validProducts.filter((product) => !isProductReady(product));
+    if (unavailableProducts.length > 0) {
+      return NextResponse.json(
+        {
+          message: "One or more products are coming soon and cannot be checked out yet",
+          unavailableProductIds: unavailableProducts.map((product) => product.slug),
+        },
+        { status: 409 },
+      );
+    }
     const purchasedProductIds = (
       await Promise.all(validProducts.map(async (product) => ((await hasRecordedPaidPurchase(user.id, product.slug)) ? product.slug : null)))
     ).filter((productId): productId is string => Boolean(productId));

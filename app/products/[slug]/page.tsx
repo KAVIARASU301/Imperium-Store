@@ -1,9 +1,10 @@
 import PricingBox from "@/components/PricingBox";
 import ProductImage from "@/components/ProductImage";
-import { getActiveProducts, getProductBySlug } from "@/lib/products";
+import { getActiveProducts, getProductBySlug, isProductReady } from "@/lib/products";
 import type { ProductGalleryImage, ProductHighlight } from "@/types/product";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 
 export function generateStaticParams() {
   return getActiveProducts().map((product) => ({ slug: product.slug }));
@@ -11,8 +12,10 @@ export function generateStaticParams() {
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  await connection();
   const product = getProductBySlug(slug);
   if (!product) return notFound();
+  const isReady = isProductReady(product);
   const keepTitleOnOneLine = product.slug === "imperium-option-trading-terminal";
   return (
     <main className="mx-auto max-w-[1200px] px-6 py-16">
@@ -36,9 +39,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </div>
           <p className="mt-5 max-w-2xl text-xl leading-8 text-white">{product.promise}</p>
           <p className="mt-4 max-w-3xl leading-7 text-muted">{product.description}</p>
-          {product.badges?.length ? (
+          {product.badges?.length || !isReady ? (
             <div className="mt-6 flex flex-wrap gap-2">
-              {product.badges.map((badge) => (
+              {!isReady ? (
+                <span className="border border-warning/40 bg-warning/10 px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-warning">
+                  Coming Soon
+                </span>
+              ) : null}
+              {product.badges?.map((badge) => (
                 <span key={badge} className="border border-cyan-border bg-section px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white">
                   {badge}
                 </span>
@@ -66,7 +74,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </section>
           <section className="mt-12 border border-amber-300/30 bg-amber-300/5 p-5"><h2 className="font-semibold text-amber-200">Disclaimer</h2><p className="mt-2 text-sm leading-6 text-white">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p></section>
         </section>
-        <div className="lg:sticky lg:top-24 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} /></div>
+        <div className="lg:sticky lg:top-24 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} /></div>
       </div>
     </main>
   );

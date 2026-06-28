@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Product } from "@/types/product";
-import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, isProductReady } from "@/lib/products";
 import AddToCartButton from "@/components/AddToCartButton";
 import { usePurchasedProducts } from "@/components/usePurchasedProducts";
 
@@ -14,6 +14,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
   const gstInclusiveText = getProductGstInclusiveText(product);
   const { purchasedSlugSet } = usePurchasedProducts();
   const isPurchased = purchasedSlugSet.has(product.slug);
+  const ready = isProductReady(product);
   const featurePoints = product.highlights?.slice(0, 3) ?? [];
   const primaryBadgeClass =
     primaryBadge === "Indian options"
@@ -46,6 +47,11 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
                 {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
               </span>
             ) : null}
+            {!ready ? (
+              <span className="border border-warning/40 bg-warning/10 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide text-warning backdrop-blur">
+                Coming Soon
+              </span>
+            ) : null}
           </div>
         </div>
 
@@ -73,7 +79,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
           <div className="mt-5 border-t border-cyan-border pt-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">One-time purchase</p>
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">{ready ? "One-time purchase" : "Coming soon"}</p>
                 {isPurchased ? <p className="mt-1 text-xs font-semibold text-success">Already in your account</p> : null}
               </div>
               <p className="text-right text-white">
@@ -96,6 +102,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
               </Link>
               <AddToCartButton
                 slug={product.slug}
+                isReady={ready}
                 className="btn-primary flex min-h-10 items-center justify-center rounded-md px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.08em]"
               />
             </div>
@@ -143,6 +150,11 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
                   {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
                 </span>
               ) : null}
+              {!ready ? (
+                <span className="border border-warning/40 bg-warning/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-warning">
+                  Coming Soon
+                </span>
+              ) : null}
             </div>
             <h3 className="mt-3 text-xl font-bold tracking-tight text-white">{product.name}</h3>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
@@ -165,7 +177,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
               </span>
             ) : null}
             <div className="text-center md:text-left">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">One-time purchase</p>
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">{ready ? "One-time purchase" : "Coming soon"}</p>
               <p className="mt-1 text-white">
                 <span className="mr-1 align-baseline text-sm font-semibold">
                   {formatCurrencySymbol(product.currency)}
@@ -184,6 +196,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             </Link>
             <AddToCartButton
                 slug={product.slug}
+                isReady={ready}
                 className="btn-primary flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white"
             />
         </div>

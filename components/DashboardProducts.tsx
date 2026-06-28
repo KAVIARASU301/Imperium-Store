@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import DownloadButton from "@/components/DownloadButton";
+import { isProductReady } from "@/lib/products";
 import type { Product, ProductFile } from "@/types/product";
 import type { Purchase } from "@/types/purchase";
 
@@ -75,7 +76,8 @@ export default function DashboardProducts({ products }: { products: Product[] })
     <div className="mt-6 grid gap-5">
       {products.map((product) => {
         const purchase = purchasesBySlug[product.slug];
-        const hasAccess = product.price === 0 || purchase?.status === "paid";
+        const ready = isProductReady(product);
+        const hasAccess = (ready && product.price === 0) || purchase?.status === "paid";
         return (
           <article
             key={product.slug}
@@ -96,12 +98,17 @@ export default function DashboardProducts({ products }: { products: Product[] })
                         Lifetime access
                       </span>
                     ) : null}
+                    {!ready && !hasAccess ? (
+                      <span className="border border-warning/40 bg-warning/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-warning">
+                        Coming Soon
+                      </span>
+                    ) : null}
                   </div>
                   <h2 className="mt-3 text-xl font-bold text-white">{product.name}</h2>
                   <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
                 </div>
               </div>
-              <StatusBadge hasAccess={hasAccess} status={purchase?.status} />
+              <StatusBadge hasAccess={hasAccess} status={purchase?.status} ready={ready} />
             </div>
             {hasAccess ? (
               <div className="mt-5 border-t border-cyan-border pt-5">
@@ -163,11 +170,11 @@ export default function DashboardProducts({ products }: { products: Product[] })
               <div className="mt-5 rounded-md border border-cyan-border bg-main/45 p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="font-semibold text-white">{getLockedTitle(purchase?.status)}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted">{getLockedMessage(purchase?.status)}</p>
+                    <p className="font-semibold text-white">{getLockedTitle(purchase?.status, ready)}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted">{getLockedMessage(purchase?.status, ready)}</p>
                   </div>
                   <Link href={`/products/${product.slug}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand hover:bg-card-hover sm:w-52">
-                    {purchase?.status === "pending" ? "Complete payment" : "View product"}
+                    {ready && purchase?.status === "pending" ? "Complete payment" : "View product"}
                   </Link>
                 </div>
               </div>
@@ -179,13 +186,15 @@ export default function DashboardProducts({ products }: { products: Product[] })
   );
 }
 
-function getLockedTitle(status?: string) {
+function getLockedTitle(status?: string, ready = true) {
+  if (!ready) return "Coming soon";
   if (status === "pending") return "Payment confirmation pending";
   if (status === "failed") return "Payment was not completed";
   return "Product not purchased";
 }
 
-function getLockedMessage(status?: string) {
+function getLockedMessage(status?: string, ready = true) {
+  if (!ready) return "This product is not ready for checkout yet.";
   if (status === "pending") return "Open the product page to complete checkout or refresh payment confirmation.";
   if (status === "failed") return "You can start checkout again when you are ready.";
   return "Purchase this product to unlock downloads and receipts in your account.";
@@ -220,11 +229,18 @@ function getPlatformNote(file: ProductFile) {
   return "Download package for this platform.";
 }
 
-function StatusBadge({ hasAccess, status }: { hasAccess: boolean; status?: string }) {
+function StatusBadge({ hasAccess, status, ready }: { hasAccess: boolean; status?: string; ready: boolean }) {
   if (hasAccess) {
     return (
       <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-success/35 bg-success/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-success">
         Unlocked
+      </span>
+    );
+  }
+  if (!ready) {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-warning/35 bg-warning/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-warning">
+        Coming soon
       </span>
     );
   }

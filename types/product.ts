@@ -1,4 +1,5 @@
 export type ProductType = "course" | "app" | "template";
+export type ProductStatus = "ready" | "not_ready";
 
 export interface ProductFile {
   id: string;
@@ -38,6 +39,7 @@ export interface Product {
   slug: string;
   name: string;
   type: ProductType;
+  status?: ProductStatus;
   icon: { src: string; alt: string; width: number; height: number };
   short_description: string;
   description: string;

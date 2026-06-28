@@ -1,5 +1,5 @@
 import BuyButton from "@/components/BuyButton";
-import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText } from "@/lib/products";
+import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, isProductReady } from "@/lib/products";
 import type { Product } from "@/types/product";
 
 export default function PricingBox({
@@ -8,23 +8,26 @@ export default function PricingBox({
                                        slug,
                                        productName,
                                        productType,
+                                       status,
                                    }: {
     price: number;
     currency: string;
     slug: string;
     productName: string;
     productType: Product["type"];
+    status: Product["status"];
 }) {
     const gstInclusiveText = getProductGstInclusiveText({ type: productType });
+    const ready = isProductReady({ status });
 
     return (
         <aside className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_24px_60px_rgba(0,0,0,0.46),0_0_0_1px_rgba(255,255,255,0.08)_inset]">
             <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
                 <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">
-                    Direct checkout
+                    {ready ? "Direct checkout" : "Coming soon"}
                 </p>
                 <p className="mt-1 text-sm font-medium text-white">
-                    Secure payment through Razorpay
+                    {ready ? "Secure payment through Razorpay" : "Checkout opens when this product is ready"}
                 </p>
             </div>
 
@@ -45,7 +48,7 @@ export default function PricingBox({
                         {gstInclusiveText}
                     </p>
                     <p className="mt-3 border-t border-cyan-border pt-3 text-sm font-medium leading-6 text-muted">
-                        One-time purchase. Lifetime access to current downloads.
+                        {ready ? "One-time purchase. Lifetime access to current downloads." : "This product is not ready for purchase yet."}
                     </p>
                 </div>
 
@@ -53,11 +56,13 @@ export default function PricingBox({
                     slug={slug}
                     price={price}
                     productName={productName}
+                    isReady={ready}
                 />
 
                 <p className="mt-4 rounded-md border border-cyan-border bg-card px-3 py-2 text-xs font-medium leading-5 text-muted">
-                    After payment, your download access and receipt are added to
-                    your account once Razorpay confirms the transaction.
+                    {ready
+                        ? "After payment, your download access and receipt are added to your account once Razorpay confirms the transaction."
+                        : "When this product is ready, checkout will be enabled from this page."}
                 </p>
             </div>
         </aside>
