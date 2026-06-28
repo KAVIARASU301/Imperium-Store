@@ -92,14 +92,14 @@ export default function HeaderAccount() {
   }
 
   if (!loaded) {
-    return <span className="px-3 py-2 text-muted">Account</span>;
+    return <span className="inline-flex min-h-11 items-center px-3 py-2 text-muted">Account</span>;
   }
 
   if (!accountLabel) {
     return (
       <Link
         href="/login"
-        className="inline-flex min-h-10 items-center justify-center gap-2 border border-brand/70 bg-brand/10 px-3 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-brand/70 bg-brand/10 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20"
       >
         <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
         <span>Login</span>
@@ -111,14 +111,21 @@ export default function HeaderAccount() {
     <div ref={menuRef} className="relative">
       <button
         type="button"
-        className="inline-flex items-center gap-2 border border-cyan-border bg-section px-3 py-2 font-medium text-white transition hover:border-brand hover:bg-card"
+        className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cyan-border bg-section px-3 py-2.5 font-medium text-white transition hover:border-brand hover:bg-card"
         aria-expanded={isMenuOpen}
         aria-haspopup="menu"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
         <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
         <span className="max-w-32 truncate sm:max-w-44">{accountLabel}</span>
-        <span className={`text-[10px] transition ${isMenuOpen ? "rotate-180" : ""}`} aria-hidden="true">▾</span>
+        <Image
+          src="/icons/dropdown-arrow.svg"
+          alt=""
+          width={14}
+          height={14}
+          className={`h-3.5 w-3.5 transition ${isMenuOpen ? "rotate-180" : ""}`}
+          suppressHydrationWarning
+        />
       </button>
 
       {isMenuOpen ? (
@@ -134,17 +141,17 @@ export default function HeaderAccount() {
               </div>
             </div>
           </div>
-          <Link href="/dashboard" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/dashboard" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             My purchases
           </Link>
-          <Link href="/support" className="flex items-center gap-2 rounded-md px-3 py-2.5 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+          <Link href="/support" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
             <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
             Support
           </Link>
           <button
             type="button"
-            className="mt-1 flex w-full items-center gap-2 rounded-md border-t border-cyan-border px-3 py-2.5 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
+            className="mt-1 flex min-h-11 w-full items-center gap-3 rounded-md border-t border-cyan-border px-3 py-3 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
             role="menuitem"
             disabled={isSigningOut}
             onClick={handleLogout}

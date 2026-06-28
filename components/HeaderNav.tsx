@@ -50,29 +50,36 @@ export default function HeaderNav() {
 
       <button
         type="button"
-        className="inline-flex h-10 w-10 items-center justify-center border border-cyan-border bg-section text-white hover:border-brand hover:bg-card md:hidden"
-        aria-label="Open navigation menu"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cyan-border bg-section text-white transition hover:border-brand hover:bg-card md:hidden"
+        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
         aria-haspopup="menu"
         onClick={() => setIsOpen((open) => !open)}
       >
-        <span className="text-xl leading-none" aria-hidden="true">{isOpen ? "×" : "☰"}</span>
+        <Image
+          src={isOpen ? "/icons/cross.svg" : "/icons/menu.svg"}
+          alt=""
+          width={22}
+          height={22}
+          className="h-[22px] w-[22px]"
+          suppressHydrationWarning
+        />
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-64 overflow-visible border border-cyan-border bg-section/95 p-3 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
-          <Link href="/products" className={getMobileNavLinkClass(isProductsActive, "block")} role="menuitem" onClick={() => setIsOpen(false)}>
+        <div className="absolute right-0 z-50 mt-3 w-72 overflow-visible rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
+          <Link href="/products" className={getMobileNavLinkClass(isProductsActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
             Products
           </Link>
-          <Link href="/cart" className={getMobileNavLinkClass(isCartActive, "flex items-center gap-2")} role="menuitem" onClick={() => setIsOpen(false)}>
+          <Link href="/cart" className={getMobileNavLinkClass(isCartActive, "flex items-center gap-3")} role="menuitem" onClick={() => setIsOpen(false)}>
             <Image src="/icons/cart.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
             <span>Cart</span>
             <CartCount />
           </Link>
-          <Link href="/dashboard" className={getMobileNavLinkClass(isDashboardActive, "block")} role="menuitem" onClick={() => setIsOpen(false)}>
+          <Link href="/dashboard" className={getMobileNavLinkClass(isDashboardActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
             My Purchases
           </Link>
-          <div className="mt-2 border-t border-cyan-border px-4 pt-3">
+          <div className="mt-2 border-t border-cyan-border pt-3">
             <HeaderAccount />
           </div>
         </div>
@@ -92,7 +99,7 @@ function getNavLinkClass(isActive: boolean, layoutClass = "") {
 function getMobileNavLinkClass(isActive: boolean, layoutClass: string) {
   return [
     layoutClass,
-    "border border-transparent border-b-2 px-4 py-3 transition hover:border-cyan-border hover:bg-card hover:text-white",
-    isActive ? "border-b-brand bg-card/60 text-white" : "border-b-transparent",
+    "min-h-12 rounded-md border border-transparent px-4 py-3 font-semibold transition hover:border-cyan-border hover:bg-card hover:text-white",
+    isActive ? "border-brand bg-card/70 text-white" : "text-muted",
   ].join(" ");
 }

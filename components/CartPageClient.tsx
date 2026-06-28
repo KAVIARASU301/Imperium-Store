@@ -28,6 +28,13 @@ type RazorpaySuccessResponse = {
   razorpay_signature: string;
 };
 
+const orderSteps = [
+  { label: "Cart", text: "Review products and account email." },
+  { label: "Payment", text: "Complete payment through the secure checkout." },
+  { label: "Access unlocked", text: "Payment verification unlocks purchases." },
+  { label: "Download", text: "Get files from your dashboard." },
+];
+
 export default function CartPageClient({ products }: { products: Product[] }) {
   const router = useRouter();
   const [cartSlugs, setCartSlugs] = useState<string[]>([]);
@@ -177,7 +184,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
           Review Cart and Complete Payment
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-          Review your selected products, add more tools if needed, and complete payment securely through Razorpay from this page.
+          Review your selected products, add more tools if needed, and complete payment through the secure checkout from this page.
         </p>
       </section>
 
@@ -255,10 +262,10 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             ) : null}
           </section>
 
-          <aside className="h-fit overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(255,255,255,0.08)_inset] lg:sticky lg:top-24">
+          <aside className="h-fit overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(255,255,255,0.08)_inset]">
             <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
               <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Payment summary</p>
-              <p className="mt-1 text-sm font-medium text-white">Payments processed securely via Razorpay</p>
+              <p className="mt-1 text-sm font-medium text-white">Payments are processed through secure checkout</p>
             </div>
             <div className="p-5">
               <div className="rounded-md border-2 border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
@@ -285,8 +292,28 @@ export default function CartPageClient({ products }: { products: Product[] }) {
               {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
             </div>
           </aside>
+
+          <OrderSteps />
         </div>
       )}
     </main>
+  );
+}
+
+function OrderSteps() {
+  return (
+    <ol className="grid gap-px overflow-hidden rounded-md border border-cyan-border bg-cyan-border sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
+      {orderSteps.map((step, index) => (
+        <li key={step.label} className="bg-section p-4">
+          <div className="flex items-center gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-brand/45 bg-main font-mono text-xs font-bold text-brand">
+              {index + 1}
+            </span>
+            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-white">{step.label}</p>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-muted">{step.text}</p>
+        </li>
+      ))}
+    </ol>
   );
 }
