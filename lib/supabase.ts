@@ -17,6 +17,24 @@ type DemoSession = { access_token: string; user: DemoUser };
 type BrowserSession = Session | DemoSession | null;
 type BrowserAuthClient = {
   getSession(): Promise<{ data: { session: BrowserSession }; error: null }>;
+  signInWithOAuth(input: {
+    provider: "google";
+    options?: {
+      redirectTo?: string;
+      scopes?: string;
+      queryParams?: Record<string, string>;
+      skipBrowserRedirect?: boolean;
+    };
+  }): Promise<{
+    data: { provider: string; url: string | null };
+    error: Error | null;
+  }>;
+  exchangeCodeForSession(
+    code: string,
+  ): Promise<
+    | { data: { session: BrowserSession }; error: null }
+    | { data: unknown; error: Error }
+  >;
   signInWithPassword(input: {
     email: string;
     password: string;
@@ -68,6 +86,14 @@ function createDemoBrowserClient() {
   return {
     auth: {
       async getSession() {
+        return { data: { session: getDemoSession() }, error: null };
+      },
+      async signInWithOAuth() {
+        window.localStorage.setItem(DEMO_SESSION_KEY, "google-demo@imperium.local");
+        window.dispatchEvent(new Event(DEMO_AUTH_EVENT));
+        return { data: { provider: "google", url: null }, error: null };
+      },
+      async exchangeCodeForSession() {
         return { data: { session: getDemoSession() }, error: null };
       },
       async signInWithPassword({ email }: { email: string; password: string }) {

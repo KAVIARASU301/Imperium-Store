@@ -1,6 +1,7 @@
 "use client";
 
 import { getSupabaseBrowserClient } from "@/lib/supabase";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, type FormEvent, useMemo, useState } from "react";
@@ -27,6 +28,11 @@ function safeRedirectPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//"))
     return "/dashboard";
   return value;
+}
+
+function getOAuthError(value: string | null) {
+  if (!value) return null;
+  return value.slice(0, 240);
 }
 
 async function emailAlreadyExists(email: string) {
@@ -57,6 +63,9 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const initialMode = getAuthMode(searchParams.get("mode"));
   const next = safeRedirectPath(searchParams.get("next"));
+  const oauthError = getOAuthError(
+    searchParams.get("oauth_error") ?? searchParams.get("error_description"),
+  );
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [email, setEmail] = useState("");
@@ -66,10 +75,14 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmationEmail, setConfirmationEmail] = useState("");
-  const [status, setStatus] = useState<AuthStatus>({
-    tone: "info",
-    text: "Sign in to access purchases, downloads, invoices, and product updates.",
-  });
+  const [status, setStatus] = useState<AuthStatus>(() =>
+    oauthError
+      ? { tone: "error", text: oauthError }
+      : {
+          tone: "info",
+          text: "Sign in to access purchases, downloads, invoices, and product updates.",
+        },
+  );
 
   const title = useMemo(() => {
     if (mode === "signup") return "Create your account";
@@ -204,7 +217,46 @@ function LoginForm() {
     }
   }
 
+  async function signInWithGoogle() {
+    setLoading(true);
+    setStatus({ tone: "info", text: "Opening Google sign-in..." });
+
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const callbackPath = `/auth/callback?next=${encodeURIComponent(next)}`;
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: getRedirectUrl(callbackPath),
+          queryParams: { prompt: "select_account" },
+        },
+      });
+
+      if (error) throw error;
+
+      if (!data.url) {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (sessionData.session) {
+          router.push(next);
+          return;
+        }
+
+        throw new Error("Google sign-in did not return a redirect URL.");
+      }
+    } catch (error) {
+      setLoading(false);
+      setStatus({
+        tone: "error",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Unable to start Google sign-in.",
+      });
+    }
+  }
+
   const showPasswordFields = mode !== "forgot";
+  const showGoogleAuth = mode === "signin" || mode === "signup";
 
   return (
     <main className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
@@ -290,6 +342,32 @@ function LoginForm() {
             </p>
           ) : null}
         </div>
+
+        {showGoogleAuth ? (
+          <div className="mt-6 space-y-4">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={signInWithGoogle}
+              className="flex min-h-12 w-full items-center justify-center gap-3 border border-cyan-border bg-white px-4 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-slate-950 shadow-lg shadow-black/20 hover:border-white hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Image
+                src="/icons/google.svg"
+                alt=""
+                width={18}
+                height={18}
+                className="h-[18px] w-[18px]"
+                suppressHydrationWarning
+              />
+              {loading ? "Please wait..." : "Continue with Google"}
+            </button>
+            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+              <span className="h-px flex-1 bg-cyan-border" />
+              <span>Email access</span>
+              <span className="h-px flex-1 bg-cyan-border" />
+            </div>
+          </div>
+        ) : null}
 
         <form onSubmit={submit} className="mt-6 space-y-4">
           {mode === "signup" ? (

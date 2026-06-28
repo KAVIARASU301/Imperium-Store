@@ -2,6 +2,7 @@
 
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 
 type DownloadButtonProps = {
@@ -63,7 +64,28 @@ export default function DownloadButton({
         )}
       </button>
       {isLoading ? <p className="mt-2 text-xs text-brand">Preparing download...</p> : null}
-      {message ? <p className="mt-2 text-sm text-amber-200">{message}</p> : null}
+      {message ? (
+        <div className="mt-3 rounded-md border border-error/35 bg-error/10 p-3 text-left" role="alert">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-error">Download unavailable</p>
+          <p className="mt-1 text-sm leading-5 text-white">{message}</p>
+          <div className="mt-3 grid gap-2">
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={isLoading}
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-error/35 bg-main/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-error disabled:cursor-wait disabled:text-muted"
+            >
+              Try again
+            </button>
+            <Link
+              href="/support"
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-md border border-cyan-border bg-card px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand"
+            >
+              Contact support
+            </Link>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
+import StatePanel from "@/components/StatePanel";
 
 type Receipt = {
   receiptNumber: string;
@@ -21,36 +22,44 @@ type Receipt = {
   note: string;
 };
 
+type ReceiptState = "loading" | "ready" | "signed-out" | "error";
+
 export default function ReceiptPage() {
   const params = useParams<{ orderId: string }>();
+  const orderId = params.orderId;
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [state, setState] = useState<ReceiptState>("loading");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
 
     async function loadReceipt() {
+      setState("loading");
+      setError("");
+      setReceipt(null);
       try {
         const supabase = getSupabaseBrowserClient();
         const { data } = await supabase.auth.getSession();
         const token = data.session?.access_token;
         if (!token) {
-          setError("Log in to view this receipt.");
+          if (active) setState("signed-out");
           return;
         }
 
-        const res = await fetch(`/api/receipts/${encodeURIComponent(params.orderId)}`, {
+        const res = await fetch(`/api/receipts/${encodeURIComponent(orderId)}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const payload = await res.json();
+        const payload = await res.json().catch(() => ({}));
         if (!active) return;
-        if (!res.ok) throw new Error(payload.message ?? "Unable to load receipt");
+        if (!res.ok) throw new Error(typeof payload.message === "string" ? payload.message : "Unable to load receipt");
         setReceipt(payload.receipt as Receipt);
+        setState("ready");
       } catch (error) {
-        if (active) setError(error instanceof Error ? error.message : "Unable to load receipt");
-      } finally {
-        if (active) setLoading(false);
+        if (!active) return;
+        setError(error instanceof Error ? error.message : "Unable to load receipt");
+        setState("error");
       }
     }
 
@@ -58,7 +67,7 @@ export default function ReceiptPage() {
     return () => {
       active = false;
     };
-  }, [params.orderId]);
+  }, [orderId, reloadKey]);
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-12 print:max-w-none print:px-0 print:py-0">
@@ -77,10 +86,74 @@ export default function ReceiptPage() {
         ) : null}
       </div>
 
-      <section className="border border-cyan-border bg-section p-8 text-white shadow-xl shadow-black/20 print:border-slate-300 print:bg-white print:text-slate-950 print:shadow-none">
-        {loading ? <p className="font-mono text-sm uppercase tracking-[0.12em] text-muted">Loading receipt...</p> : null}
-        {error ? <p className="text-sm text-amber-200 print:text-slate-950">{error}</p> : null}
-        {receipt ? (
+      {state === "loading" ? (
+        <StatePanel
+          eyebrow="Payment receipt"
+          title="Loading receipt."
+          description="Fetching your receipt and payment details."
+          icon="/icons/receipt/receipt-96.png"
+        >
+          <div className="flex items-center gap-3 rounded-md border border-cyan-border bg-main/60 p-3 text-sm text-muted" role="status" aria-live="polite">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
+            <span>Loading receipt...</span>
+          </div>
+        </StatePanel>
+      ) : null}
+
+      {state === "signed-out" ? (
+        <StatePanel
+          tone="warning"
+          eyebrow="Receipt locked"
+          title="Log in to view this receipt."
+          description="Receipts are available only from the account that completed checkout."
+          icon="/icons/receipt/receipt-96.png"
+          actions={
+            <>
+              <Link href={`/login?next=${encodeURIComponent(`/receipts/${orderId}`)}`} className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                Log in
+              </Link>
+              <Link href="/support" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+                Contact support
+              </Link>
+            </>
+          }
+        />
+      ) : null}
+
+      {state === "error" ? (
+        <StatePanel
+          tone="error"
+          eyebrow="Receipt unavailable"
+          title="We could not load this receipt."
+          description={error || "The receipt service did not return a usable response."}
+          icon="/icons/error/error-color-32.png"
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setReloadKey((key) => key + 1)}
+                className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white"
+              >
+                Retry
+              </button>
+              <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+                My purchases
+              </Link>
+              <Link href="/support" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+                Contact support
+              </Link>
+            </>
+          }
+        >
+          <div className="rounded-md border border-cyan-border bg-main/60 p-3">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-muted">Order reference</p>
+            <p className="mt-1 break-all font-mono text-xs text-white">{orderId}</p>
+          </div>
+        </StatePanel>
+      ) : null}
+
+      {receipt ? (
+        <section className="border border-cyan-border bg-section p-8 text-white shadow-xl shadow-black/20 print:border-slate-300 print:bg-white print:text-slate-950 print:shadow-none">
           <div>
             <div className="flex flex-wrap justify-between gap-6 border-b border-cyan-border pb-6 print:border-slate-300">
               <div>
@@ -139,8 +212,8 @@ export default function ReceiptPage() {
 
             <p className="border-t border-cyan-border pt-5 text-sm leading-6 text-muted print:border-slate-300 print:text-slate-600">{receipt.note}</p>
           </div>
-        ) : null}
-      </section>
+        </section>
+      ) : null}
     </main>
   );
 }

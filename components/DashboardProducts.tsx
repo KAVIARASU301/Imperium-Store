@@ -5,19 +5,26 @@ import Image from "next/image";
 import Link from "next/link";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import DownloadButton from "@/components/DownloadButton";
+import StatePanel from "@/components/StatePanel";
+import TerminalPasswordPanel from "@/components/TerminalPasswordPanel";
 import { isProductReady } from "@/lib/products";
 import type { Product, ProductFile } from "@/types/product";
 import type { Purchase } from "@/types/purchase";
 
-type AccessState = "checking" | "signed-out" | "ready";
+type AccessState = "checking" | "signed-out" | "ready" | "error";
+const TERMINAL_PRODUCT_SLUG = "imperium-option-trading-terminal";
 
 export default function DashboardProducts({ products }: { products: Product[] }) {
   const [state, setState] = useState<AccessState>("checking");
   const [purchasesBySlug, setPurchasesBySlug] = useState<Record<string, Purchase>>({});
+  const [errorMessage, setErrorMessage] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
     async function load() {
+      setState("checking");
+      setErrorMessage("");
       try {
         const supabase = getSupabaseBrowserClient();
         const { data } = await supabase.auth.getSession();
@@ -27,30 +34,34 @@ export default function DashboardProducts({ products }: { products: Product[] })
           return;
         }
         const res = await fetch("/api/purchases/me", { headers: { Authorization: `Bearer ${token}` } });
-        const payload = await res.json();
+        const payload = await res.json().catch(() => ({}));
         if (!active) return;
-        if (res.ok) {
-          const map: Record<string, Purchase> = {};
-          for (const purchase of payload.purchases as Purchase[]) {
-            const existing = map[purchase.product_id];
-            if (shouldUsePurchaseForProduct(purchase, existing)) map[purchase.product_id] = purchase;
-          }
-          setPurchasesBySlug(map);
+        if (!res.ok) {
+          throw new Error(typeof payload.message === "string" ? payload.message : "Unable to load purchases");
         }
+        const map: Record<string, Purchase> = {};
+        for (const purchase of (payload.purchases ?? []) as Purchase[]) {
+          const existing = map[purchase.product_id];
+          if (shouldUsePurchaseForProduct(purchase, existing)) map[purchase.product_id] = purchase;
+        }
+        setPurchasesBySlug(map);
         setState("ready");
-      } catch {
-        if (active) setState("ready");
+      } catch (error) {
+        if (!active) return;
+        setPurchasesBySlug({});
+        setErrorMessage(error instanceof Error ? error.message : "Unable to load purchases");
+        setState("error");
       }
     }
     load();
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadKey]);
 
   if (state === "checking") {
     return (
-      <div className="mt-6 rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
+      <div className="mt-6 rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]" role="status" aria-live="polite">
         <div className="flex items-center gap-3 text-sm text-muted">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
           <span className="font-mono uppercase tracking-[0.12em]">Checking purchase access...</span>
@@ -61,19 +72,109 @@ export default function DashboardProducts({ products }: { products: Product[] })
 
   if (state === "signed-out") {
     return (
-      <div className="mt-6 rounded-md border border-cyan-border bg-section p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Secure account required</p>
-        <h2 className="mt-2 text-xl font-bold text-white">Log in to view your purchase library.</h2>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-muted">Your downloads and receipts are tied to the account used during checkout.</p>
-        <Link href="/login?next=/dashboard" className="mt-5 inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
-          Log in
-        </Link>
-      </div>
+      <StatePanel
+        className="mt-6"
+        eyebrow="Secure account required"
+        title="Log in to view your purchase library."
+        description="Downloads and receipts are tied to the account used during checkout. Sign in with that email to restore access."
+        actions={
+          <>
+            <Link href="/login?next=/dashboard" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+              Log in
+            </Link>
+            <Link href="/support" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+              Get help
+            </Link>
+          </>
+        }
+      />
     );
   }
 
+  if (state === "error") {
+    return (
+      <StatePanel
+        className="mt-6"
+        tone="error"
+        eyebrow="Library unavailable"
+        title="We could not load your purchases."
+        description={errorMessage || "Your account is signed in, but the purchase service did not return a usable response."}
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setReloadKey((key) => key + 1)}
+              className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white"
+            >
+              Retry
+            </button>
+            <Link href="/support" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+              Contact support
+            </Link>
+          </>
+        }
+      />
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <StatePanel
+        className="mt-6"
+        tone="warning"
+        eyebrow="No products available"
+        title="Your library is ready, but there are no active products to show."
+        description="Product listings may be temporarily disabled. Refresh this page or contact support if you expected to see a purchase."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setReloadKey((key) => key + 1)}
+              className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white"
+            >
+              Refresh
+            </button>
+            <Link href="/support" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+              Contact support
+            </Link>
+          </>
+        }
+      />
+    );
+  }
+
+  const unlockedCount = products.filter((product) => {
+    const ready = isProductReady(product);
+    const purchase = purchasesBySlug[product.slug];
+    return (ready && product.price === 0) || purchase?.status === "paid";
+  }).length;
+  const hasTerminalPurchase = purchasesBySlug[TERMINAL_PRODUCT_SLUG]?.status === "paid";
+
   return (
     <div className="mt-6 grid gap-5">
+      {hasTerminalPurchase ? <TerminalPasswordPanel /> : null}
+      {unlockedCount === 0 ? (
+        <StatePanel
+          tone="info"
+          eyebrow="No purchases yet"
+          title="This account does not have unlocked downloads."
+          description="Buy a product with this signed-in account to unlock downloads and receipts here. If you just paid, refresh the library after Razorpay finishes confirmation."
+          actions={
+            <>
+              <Link href="/products" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                Browse products
+              </Link>
+              <button
+                type="button"
+                onClick={() => setReloadKey((key) => key + 1)}
+                className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand"
+              >
+                Refresh library
+              </button>
+            </>
+          }
+        />
+      ) : null}
       {products.map((product) => {
         const purchase = purchasesBySlug[product.slug];
         const ready = isProductReady(product);
@@ -161,9 +262,18 @@ export default function DashboardProducts({ products }: { products: Product[] })
                     ))}
                   </div>
                 ) : (
-                  <div className="rounded-md border border-cyan-border bg-main/45 p-4 text-sm text-muted">
-                    Download files are being prepared for this product.
-                  </div>
+                  <StatePanel
+                    compact
+                    tone="warning"
+                    eyebrow="Builds pending"
+                    title="No download files are published yet."
+                    description="Your license is active. The product build is still being prepared and will appear here when it is published."
+                    actions={
+                      <Link href="/support" className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold text-white hover:border-brand hover:bg-card-hover">
+                        Ask support
+                      </Link>
+                    }
+                  />
                 )}
               </div>
             ) : (

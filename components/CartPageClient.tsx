@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { markProductsPurchased, usePurchasedProducts } from "@/components/usePurchasedProducts";
+import StatePanel from "@/components/StatePanel";
 
 interface CreateOrderResponse {
   orderId: string | null;
@@ -189,13 +190,25 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       </section>
 
       {cartProducts.length === 0 ? (
-        <section className="mt-8 rounded-lg border-2 border-cyan-border bg-section p-8 shadow-[0_24px_60px_rgba(0,0,0,0.36)]">
-          <h2 className="text-xl font-bold text-white">Start your cart</h2>
-          <p className="mt-2 text-sm leading-6 text-muted">Add a product to review your order and pay securely.</p>
-          <Link href="/products" className="mt-6 inline-block btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white ">
-            Browse Products
-          </Link>
-        </section>
+        <div className="mt-8 grid gap-5">
+          <StatePanel
+            eyebrow="Cart is empty"
+            title="Add a product to start checkout."
+            description="Your cart has no products right now. Browse the catalog, or open your purchase library if you already completed payment."
+            icon="/icons/cart.svg"
+            actions={
+              <>
+                <Link href="/products" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                  Browse products
+                </Link>
+                <Link href="/dashboard" className="inline-flex min-h-11 items-center justify-center rounded-md border border-cyan-border bg-card px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+                  My purchases
+                </Link>
+              </>
+            }
+          />
+          <OrderSteps />
+        </div>
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_390px]">
           <section className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_22px_54px_rgba(0,0,0,0.32)]">
@@ -208,6 +221,35 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                 Clear Cart
               </button>
             </div>
+            {payableProducts.length === 0 ? (
+              <div className="border-b border-cyan-border bg-section p-5">
+                <StatePanel
+                  compact
+                  tone={unavailableCartProducts.length > 0 ? "warning" : "success"}
+                  eyebrow="Nothing to pay"
+                  title={unavailableCartProducts.length > 0 ? "No ready products are available for checkout." : "Everything in this cart is already in your account."}
+                  description={
+                    unavailableCartProducts.length > 0
+                      ? "Coming-soon products stay visible for review, but they cannot be paid for until release."
+                      : "Open your purchase library to download licensed builds and receipts, or clear the cart to start over."
+                  }
+                  actions={
+                    <>
+                      <Link href="/dashboard" className="inline-flex min-h-10 items-center justify-center btn-primary px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                        My purchases
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={clearCart}
+                        className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand"
+                      >
+                        Clear cart
+                      </button>
+                    </>
+                  }
+                />
+              </div>
+            ) : null}
             {cartProducts.map((product) => {
               if (purchasedSlugSet.has(product.slug)) return null;
               const ready = isProductReady(product);
@@ -289,7 +331,25 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                   Sign In to Pay
                 </Link>
               )}
-              {error ? <p className="mt-3 text-sm text-amber-200">{error}</p> : null}
+              {error ? (
+                <div className="mt-4 rounded-md border border-error/35 bg-error/10 p-4" role="alert">
+                  <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-error">Checkout could not start</p>
+                  <p className="mt-2 text-sm leading-6 text-white">{error}</p>
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={startPayment}
+                      disabled={loading || payableProducts.length === 0}
+                      className="inline-flex min-h-10 items-center justify-center rounded-md border border-error/35 bg-main/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-error disabled:cursor-not-allowed disabled:text-muted"
+                    >
+                      Try again
+                    </button>
+                    <Link href="/support" className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
+                      Contact support
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </aside>
 
