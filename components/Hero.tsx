@@ -1,6 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { formatCurrencySymbol, formatPriceAmount, getProductBySlug, getProductGstInclusiveText, isProductReady } from "@/lib/products";
+
+const terminalHeroVideoSrc = "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.mp4";
 
 export default function Hero() {
   const terminal = getProductBySlug("imperium-option-trading-terminal");
@@ -23,16 +24,17 @@ export default function Hero() {
           <div className="overflow-hidden border border-cyan-border bg-section shadow-[0_24px_70px_rgba(0,0,0,0.38)]">
             {terminal ? (
                 <div className="relative isolate min-h-[560px] w-full bg-main sm:min-h-[640px] lg:min-h-[700px]">
-                  <Image
-                      src={terminal.image.src}
-                      alt={terminal.image.alt}
-                      width={terminal.image.width}
-                      height={terminal.image.height}
-                      priority
+                  <video
+                      aria-hidden="true"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="auto"
                       className="absolute inset-0 h-full w-full object-contain opacity-80"
-                      sizes="(min-width: 1536px) 1400px, 100vw"
-                      suppressHydrationWarning
-                  />
+                  >
+                    <source src={terminalHeroVideoSrc} type="video/mp4" />
+                  </video>
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(5,8,15,0.66)_0%,rgba(5,8,15,0.48)_26rem,rgba(5,8,15,0.10)_100%)]" />
                   <div className="absolute inset-x-0 bottom-0 h-52 bg-[linear-gradient(0deg,rgba(5,8,15,0.9),transparent)]" />
 
