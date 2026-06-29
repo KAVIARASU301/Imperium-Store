@@ -55,7 +55,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-main text-white">
       <header className="sticky top-0 z-40 border-b border-cyan-border bg-section/92 backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3">
+        <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3">
           <Link href="/" className="inline-flex items-center gap-3 text-white">
               <span className="flex h-9 w-9 items-center justify-center border border-cyan-border bg-white">
                 <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={28} height={28} className="h-7 w-7" priority suppressHydrationWarning />
