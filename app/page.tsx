@@ -2,8 +2,43 @@ import Hero from "@/components/Hero";
 import ProductCard from "@/components/ProductCard";
 import TickerBoard from "@/components/TickerBoard";
 import { getActiveProducts } from "@/lib/products";
+import { getSiteUrl } from "@/lib/seo";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
+
+const homeTitle = "Imperium Option Trading Terminal | Imperium Store";
+const homeDescription =
+    "Download Imperium Option Trading Terminal, a desktop options execution terminal for Indian traders with one-click multi-strike entries and exits, strategy-level risk control, paper trading, NSE/BSE F&O workflows, and free TradingView-style charts.";
+const terminalPreviewImage = "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png";
+const terminalProductPath = "/products/imperium-option-trading-terminal";
+
+export const metadata: Metadata = {
+    title: homeTitle,
+    description: homeDescription,
+    alternates: { canonical: "/" },
+    openGraph: {
+        title: homeTitle,
+        description: homeDescription,
+        url: "/",
+        siteName: "Imperium Store",
+        type: "website",
+        images: [
+            {
+                url: terminalPreviewImage,
+                width: 2048,
+                height: 1113,
+                alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: homeTitle,
+        description: homeDescription,
+        images: [terminalPreviewImage],
+    },
+};
 
 const principles = [
     { title: "Built for execution", text: "Strike ladders, quick orders, and live risk controls designed around active sessions." },
@@ -21,9 +56,46 @@ const principles = [
 export default async function HomePage() {
     await connection();
     const activeProducts = getActiveProducts();
+    const siteUrl = getSiteUrl();
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": `${siteUrl}/#organization`,
+                name: "Imperium Store",
+                url: siteUrl,
+                logo: `${siteUrl}/icons/imperium_store_icons/imperium_icon_64x64.png`,
+            },
+            {
+                "@type": "SoftwareApplication",
+                "@id": `${siteUrl}${terminalProductPath}#software`,
+                name: "Imperium Option Trading Terminal",
+                applicationCategory: "FinanceApplication",
+                operatingSystem: "Windows, Linux",
+                description: homeDescription,
+                image: `${siteUrl}${terminalPreviewImage}`,
+                url: `${siteUrl}${terminalProductPath}`,
+                offers: {
+                    "@type": "Offer",
+                    price: "6999",
+                    priceCurrency: "INR",
+                    availability: "https://schema.org/InStock",
+                    url: `${siteUrl}${terminalProductPath}`,
+                },
+                publisher: {
+                    "@id": `${siteUrl}/#organization`,
+                },
+            },
+        ],
+    };
 
     return (
         <main>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
             <TickerBoard />
             <Hero />
 

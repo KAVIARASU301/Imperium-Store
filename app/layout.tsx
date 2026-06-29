@@ -7,10 +7,37 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "Imperium Store | Indian trading software",
-  description: "Professional trading software for Indian market traders focused on options execution, stock investing, risk control, and review.",
+  applicationName: "Imperium Store",
+  title: "Imperium Option Trading Terminal | Imperium Store",
+  description:
+    "Imperium Option Trading Terminal is desktop trading software for Indian options traders, with one-click multi-strike execution, strategy risk control, NSE/BSE F&O workflows, paper trading, and free TradingView-style charts.",
+  openGraph: {
+    title: "Imperium Option Trading Terminal | Imperium Store",
+    description:
+      "A desktop options execution terminal for Indian traders: one-click multi-strike entries and exits, strategy-level risk control, paper trading, NSE/BSE F&O workflows, and free professional charting.",
+    url: "/",
+    siteName: "Imperium Store",
+    type: "website",
+    images: [
+      {
+        url: "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png",
+        width: 2048,
+        height: 1113,
+        alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Imperium Option Trading Terminal | Imperium Store",
+    description:
+      "One-click multi-strike options execution, strategy risk control, paper trading, NSE/BSE F&O support, and free TradingView-style charts in one desktop terminal.",
+    images: ["/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png"],
+  },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", sizes: "64x64", type: "image/png" },
       { url: "/icons/imperium_store_icons/imperium_icon_32x32.png", sizes: "32x32", type: "image/png" },
       { url: "/icons/imperium_store_icons/imperium_icon_64x64.png", sizes: "64x64", type: "image/png" },
       { url: "/icons/imperium_store_icons/icon.svg", type: "image/svg+xml" },
