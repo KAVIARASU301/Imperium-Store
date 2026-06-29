@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import type { CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type MarketTicker = {
   label: string;
@@ -18,6 +19,10 @@ type TickerResponse = {
   source: string;
   delay: string;
   items: MarketTicker[];
+};
+
+type TickerTrackStyle = CSSProperties & {
+  "--ticker-duration": string;
 };
 
 const fallbackTickers: MarketTicker[] = ["NIFTY", "BANKNIFTY", "SENSEX", "RELIANCE", "HDFCBANK", "INFY"].map((label) => ({
@@ -42,6 +47,9 @@ function formatNumber(value: number | null, digits = 2) {
 
 export default function TickerBoard() {
   const [tickers, setTickers] = useState<MarketTicker[]>(fallbackTickers);
+  const [tickerDuration, setTickerDuration] = useState(68);
+  const tickerSegmentRef = useRef<HTMLDivElement>(null);
+  const marqueeItems = useMemo(() => tickers, [tickers]);
 
   useEffect(() => {
     let active = true;
@@ -66,14 +74,34 @@ export default function TickerBoard() {
     };
   }, []);
 
-  const marqueeItems = useMemo(() => tickers, [tickers]);
+  useEffect(() => {
+    const segment = tickerSegmentRef.current;
+    if (!segment) return;
+
+    const syncTickerDuration = () => {
+      const segmentWidth = segment.scrollWidth;
+      const pixelsPerSecond = 12;
+      setTickerDuration(Math.max(68, Math.round(segmentWidth / pixelsPerSecond)));
+    };
+
+    syncTickerDuration();
+    const resizeObserver = new ResizeObserver(syncTickerDuration);
+    resizeObserver.observe(segment);
+
+    return () => resizeObserver.disconnect();
+  }, [marqueeItems]);
+
+  const tickerTrackStyle: TickerTrackStyle = {
+    "--ticker-duration": `${tickerDuration}s`,
+  };
+
   return (
     <section className="border-b border-cyan-border bg-section">
       <div className="flex h-11 items-center overflow-hidden">
         <div className="min-w-0 flex-1 overflow-hidden">
-          <div className="ticker-track">
+          <div className="ticker-track" style={tickerTrackStyle}>
             {[0, 1].map((segment) => (
-              <div className="ticker-segment" key={segment} aria-hidden={segment === 1}>
+              <div className="ticker-segment" key={segment} ref={segment === 0 ? tickerSegmentRef : null} aria-hidden={segment === 1}>
                 {marqueeItems.map((ticker) => {
                   const isPositive = typeof ticker.change === "number" && ticker.change >= 0;
                   return (
