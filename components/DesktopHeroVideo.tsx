@@ -31,7 +31,7 @@ export default function DesktopHeroVideo({ src }: DesktopHeroVideoProps) {
       muted
       playsInline
       preload="auto"
-      className="absolute inset-0 h-full w-full object-contain opacity-80"
+      className="absolute inset-0 h-full w-full object-contain opacity-20"
     >
       <source src={src} type="video/mp4" />
     </video>
