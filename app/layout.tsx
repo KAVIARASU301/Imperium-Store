@@ -57,21 +57,21 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-main text-white">
         <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/88 backdrop-blur-xl">
-          <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3.5">
+          <nav className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3.5">
             <Link href="/" className="inline-flex items-center gap-3 text-white">
-              <span className="flex h-10 w-10 items-center justify-center rounded-md border border-cyan-border bg-white shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-white shadow-[0_10px_24px_rgba(0,0,0,0.28)] sm:h-10 sm:w-10">
                 <Image
                   src="/icons/imperium_store_icons/imperium_icon_32x32.png"
                   alt=""
                   width={28}
                   height={28}
-                  className="h-7 w-7"
+                  className="h-6 w-6 sm:h-7 sm:w-7"
                   priority
                   suppressHydrationWarning
                 />
               </span>
               <span>
-                <span className="block text-sm font-extrabold uppercase tracking-[0.12em]">Imperium Store</span>
+                <span className="block text-sm font-extrabold uppercase tracking-[0.1em] sm:tracking-[0.12em]">Imperium Store</span>
                 <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted sm:block">Trading tools & learning</span>
               </span>
             </Link>

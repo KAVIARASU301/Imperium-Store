@@ -22,19 +22,16 @@ export default function HeaderNav() {
   useEffect(() => {
     if (!isOpen) return;
 
-    function handlePointerDown(event: PointerEvent) {
-      if (!menuRef.current?.contains(event.target as Node)) setIsOpen(false);
-    }
-
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setIsOpen(false);
     }
 
-    document.addEventListener("pointerdown", handlePointerDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
@@ -55,10 +52,11 @@ export default function HeaderNav() {
 
       <button
         type="button"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cyan-border bg-section text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-brand hover:bg-card md:hidden"
+        className="inline-flex h-12 w-12 touch-manipulation select-none items-center justify-center rounded-md border border-cyan-border bg-section text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition active:border-brand active:bg-card hover:border-brand hover:bg-card md:hidden"
         aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
         aria-haspopup="menu"
+        aria-controls="mobile-navigation"
         onClick={() => setIsOpen((open) => !open)}
       >
         <Image
@@ -72,7 +70,18 @@ export default function HeaderNav() {
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-72 overflow-visible rounded-md border border-cyan-border bg-section/96 p-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
+        <>
+          <button
+            type="button"
+            className="fixed inset-x-0 bottom-0 top-14 z-40 cursor-default bg-black/40 sm:top-[69px] md:hidden"
+            aria-label="Close navigation menu"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            id="mobile-navigation"
+            className="fixed left-3 right-3 top-14 z-50 max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain rounded-md border border-cyan-border bg-section/98 p-2 text-sm text-white shadow-2xl shadow-black/50 backdrop-blur-xl sm:top-[69px] sm:max-h-[calc(100dvh-5.25rem)] md:hidden"
+            role="menu"
+          >
           <Link href="/products?type=software" className={getMobileNavLinkClass(isSoftwareActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
             Software
           </Link>
@@ -88,9 +97,10 @@ export default function HeaderNav() {
             My Purchases
           </Link>
           <div className="mt-2 border-t border-cyan-border pt-3">
-            <HeaderAccount />
+            <HeaderAccount mobile />
           </div>
-        </div>
+          </div>
+        </>
       ) : null}
     </div>
   );

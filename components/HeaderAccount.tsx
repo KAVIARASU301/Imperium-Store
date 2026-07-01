@@ -25,7 +25,7 @@ function getAccountLabel(user: AccountUser | null) {
   return "Account";
 }
 
-export default function HeaderAccount() {
+export default function HeaderAccount({ mobile = false }: { mobile?: boolean }) {
   const [user, setUser] = useState<AccountUser | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -92,14 +92,14 @@ export default function HeaderAccount() {
   }
 
   if (!loaded) {
-    return <span className="inline-flex min-h-11 items-center px-3 py-2 text-muted">Account</span>;
+    return <span className={`${mobile ? "flex w-full" : "inline-flex"} min-h-11 items-center px-3 py-2 text-muted`}>Account</span>;
   }
 
   if (!accountLabel) {
     return (
       <Link
         href="/login"
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-brand/70 bg-brand/10 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20"
+        className={`${mobile ? "flex w-full justify-start" : "inline-flex justify-center"} min-h-11 items-center gap-2 rounded-md border border-brand/70 bg-brand/10 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20`}
       >
         <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
         <span>Login</span>
@@ -108,16 +108,16 @@ export default function HeaderAccount() {
   }
 
   return (
-    <div ref={menuRef} className="relative">
+    <div ref={menuRef} className={mobile ? "relative w-full" : "relative"}>
       <button
         type="button"
-        className="inline-flex min-h-11 items-center gap-2 rounded-md border border-cyan-border bg-section px-3 py-2.5 font-medium text-white transition hover:border-brand hover:bg-card"
+        className={`${mobile ? "flex w-full justify-between" : "inline-flex"} min-h-11 items-center gap-2 rounded-md border border-cyan-border bg-section px-3 py-2.5 font-medium text-white transition hover:border-brand hover:bg-card`}
         aria-expanded={isMenuOpen}
         aria-haspopup="menu"
         onClick={() => setIsMenuOpen((open) => !open)}
       >
         <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
-        <span className="max-w-32 truncate sm:max-w-44">{accountLabel}</span>
+        <span className={`${mobile ? "min-w-0 flex-1 text-left" : "max-w-32 sm:max-w-44"} truncate`}>{accountLabel}</span>
         <Image
           src="/icons/dropdown-arrow.svg"
           alt=""
@@ -129,7 +129,7 @@ export default function HeaderAccount() {
       </button>
 
       {isMenuOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-72 overflow-hidden rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl" role="menu">
+        <div className={`${mobile ? "static mt-2 w-full" : "absolute right-0 z-50 mt-3 w-72"} overflow-hidden rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl`} role="menu">
           <div className="mb-2 rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(19,40,68,0.82),rgba(16,29,47,0.72))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gold/30 bg-main/70">
