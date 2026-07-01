@@ -58,7 +58,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="min-h-full bg-main text-white">
         <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/88 backdrop-blur-xl">
           <nav className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3.5">
-            <Link href="/" className="inline-flex items-center gap-3 text-white">
+            <Link
+              href="/"
+              aria-label="Go to Imperium Store home"
+              className="flex min-h-12 min-w-0 flex-1 items-center gap-3 rounded-md pr-2 text-white transition hover:text-white md:min-h-0 md:flex-none md:pr-0"
+            >
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-white shadow-[0_10px_24px_rgba(0,0,0,0.28)] sm:h-10 sm:w-10">
                 <Image
                   src="/icons/imperium_store_icons/imperium_icon_32x32.png"
