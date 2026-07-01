@@ -1,10 +1,17 @@
 import type { Metadata, Viewport } from "next";
+import { Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { getSiteUrl } from "@/lib/seo";
 import "./globals.css";
+
+const labelFont = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-label",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
@@ -54,7 +61,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" className={`${labelFont.variable} h-full antialiased`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-main text-white">
         <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/88 backdrop-blur-xl">
           <nav className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3.5">

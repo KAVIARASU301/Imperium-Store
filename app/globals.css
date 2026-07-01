@@ -85,7 +85,7 @@
   --color-warning: var(--warning);
   --color-error: var(--error);
   --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --font-mono: var(--font-label), "Aptos", "Segoe UI Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
