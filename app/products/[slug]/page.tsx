@@ -61,68 +61,73 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const product = getProductBySlug(slug);
   if (!product) return notFound();
   const isReady = isProductReady(product);
-  const keepTitleOnOneLine = product.slug === "imperium-option-trading-terminal";
   return (
-    <main className="page-container py-14">
-      <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+    <main className="page-container py-8 sm:py-14">
+      <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_360px]">
         <section>
           <p className="inline-flex rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-brand">{product.type}</p>
-          <div className="mt-4 flex items-center gap-4">
-            <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-section p-3 shadow-[0_12px_28px_rgba(0,0,0,0.24)]">
+          <div className="mt-4 flex items-start gap-3 sm:items-center sm:gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-section p-2 shadow-[0_12px_28px_rgba(0,0,0,0.24)] sm:h-16 sm:w-16 sm:p-3">
               <Image
                 src={product.icon.src}
                 alt=""
                 width={product.icon.width}
                 height={product.icon.height}
-                className="max-h-12 w-auto object-contain"
+                className="max-h-9 w-auto object-contain sm:max-h-12"
                 priority
               />
             </span>
-            <h1 className={`${keepTitleOnOneLine ? "whitespace-nowrap text-4xl lg:text-[2.65rem]" : "text-4xl md:text-5xl"} font-extrabold tracking-normal text-white`}>
+            <h1 className="text-3xl font-extrabold leading-tight tracking-normal text-white sm:text-4xl md:text-5xl lg:text-[2.65rem]">
               {product.name}
             </h1>
           </div>
-          <p className="mt-5 max-w-2xl text-xl leading-8 text-white">{product.promise}</p>
-          <p className="mt-4 max-w-3xl leading-7 text-muted">{product.description}</p>
+          <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:mt-5 sm:text-xl sm:leading-8">{product.promise}</p>
+          <div className="mt-5 lg:hidden">
+            <PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} />
+          </div>
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-muted sm:text-base sm:leading-7">
+            <span className="sm:hidden">{product.short_description}</span>
+            <span className="hidden sm:inline">{product.description}</span>
+          </p>
           {product.badges?.length || !isReady ? (
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2 sm:mt-6">
               {!isReady ? (
                 <span className="border border-warning/40 bg-warning/10 px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-warning">
                   Coming Soon
                 </span>
               ) : null}
-              {product.badges?.map((badge) => (
-                <span key={badge} className="rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white">
+              {product.badges?.map((badge, index) => (
+                <span key={badge} className={`${index >= 5 ? "hidden sm:inline-flex" : "inline-flex"} rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-xs font-semibold uppercase tracking-wider text-white`}>
                   {badge}
                 </span>
               ))}
             </div>
           ) : null}
-          <div className="mt-10"><ProductImage product={product} priority /></div>
+          <div className="mt-6 sm:mt-10"><ProductImage product={product} priority compactMobile /></div>
           {product.highlights?.length ? <Highlights items={product.highlights} /> : null}
           {product.gallery?.length ? <Gallery productName={product.name} items={product.gallery} /> : null}
           <Info title="Who this is for" items={product.audience} />
           <Info title="What problem it solves" items={product.problems} />
           <Info title="What you get" items={product.includes} />
           <Info title="How it helps" items={product.outcomes} />
-          {product.lessons ? <Info title="Course lessons" items={product.lessons.sort((a, b) => a.sort_order - b.sort_order).map((lesson) => `${lesson.title}${lesson.is_preview ? " (preview)" : ""}`)} /> : null}
-          <section className="mt-12">
+          {product.lessons ? <Info title="Course lessons" items={[...product.lessons].sort((a, b) => a.sort_order - b.sort_order).map((lesson) => `${lesson.title}${lesson.is_preview ? " (preview)" : ""}`)} /> : null}
+          <section className="mt-8 sm:mt-12">
             <h2 className="section-title border-b border-cyan-border pb-3">FAQ</h2>
-            <div className="mt-5 grid gap-3">
+            <div className="mt-4 grid gap-2 sm:mt-5 sm:gap-3">
               {product.faq.map((item) => (
-                <div key={item.question} className="surface-panel p-5">
+                <div key={item.question} className="surface-panel p-3 sm:p-5">
                   <h3 className="font-semibold text-white">{item.question}</h3>
                   <p className="mt-2 text-sm leading-6 text-muted">{item.answer}</p>
                 </div>
               ))}
             </div>
           </section>
-          <section className="mt-12 rounded-md border border-amber-300/30 bg-amber-300/5 p-5">
+          <section className="mt-8 rounded-md border border-amber-300/30 bg-amber-300/5 p-4 sm:mt-12 sm:p-5">
             <h2 className="font-semibold text-amber-200">Disclaimer</h2>
             <p className="mt-2 text-sm leading-6 text-white">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p>
           </section>
         </section>
-        <div className="lg:sticky lg:top-24 lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} /></div>
+        <div className="hidden lg:sticky lg:top-24 lg:block lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} /></div>
       </div>
     </main>
   );
@@ -130,11 +135,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
 function Info({ title, items }: { title: string; items: string[] }) {
   return (
-    <section className="mt-12">
+    <section className="mt-8 sm:mt-12">
       <h2 className="section-title border-b border-cyan-border pb-3">{title}</h2>
-      <ul className="mt-5 grid gap-3 md:grid-cols-2">
-        {items.map((item) => (
-          <li key={item} className="surface-panel p-4 text-sm leading-6 text-white">
+      <ul className="mt-4 grid gap-2 sm:mt-5 sm:gap-3 md:grid-cols-2">
+        {items.map((item, index) => (
+          <li key={item} className={`${index >= 6 ? "hidden sm:block" : ""} surface-panel p-3 text-sm leading-6 text-white sm:p-4`}>
             {item}
           </li>
         ))}
@@ -145,13 +150,13 @@ function Info({ title, items }: { title: string; items: string[] }) {
 
 function Highlights({ items }: { items: ProductHighlight[] }) {
   return (
-    <section className="mt-10 grid gap-3 md:grid-cols-3">
-      {items.map((item) => (
-        <div key={item.title} className="surface-panel p-4">
+    <section className="mt-8 grid gap-3 sm:mt-10 md:grid-cols-3">
+      {items.map((item, index) => (
+        <div key={item.title} className={`${index >= 4 ? "hidden md:block" : ""} surface-panel p-3 sm:p-4`}>
           <div className="flex h-10 w-10 items-center justify-center rounded-md border border-cyan-border bg-card">
             <Image src={item.icon} alt="" width={22} height={22} />
           </div>
-          <h2 className="mt-4 font-semibold text-white">{item.title}</h2>
+          <h2 className="mt-3 font-semibold text-white sm:mt-4">{item.title}</h2>
           <p className="mt-2 text-sm leading-6 text-muted">{item.text}</p>
         </div>
       ))}
@@ -161,11 +166,11 @@ function Highlights({ items }: { items: ProductHighlight[] }) {
 
 function Gallery({ productName, items }: { productName: string; items: ProductGalleryImage[] }) {
   return (
-    <section className="mt-12">
+    <section className="mt-8 sm:mt-12">
       <h2 className="section-title border-b border-cyan-border pb-3">{productName} screenshots</h2>
-      <div className="mt-5 grid gap-5">
-        {items.map((item) => (
-          <figure key={item.src} className="surface-panel overflow-hidden">
+      <div className="mt-4 grid gap-4 sm:mt-5 sm:gap-5">
+        {items.map((item, index) => (
+          <figure key={item.src} className={`${index >= 2 ? "hidden sm:block" : ""} surface-panel overflow-hidden`}>
             <div className="grid gap-px bg-cyan-border font-mono text-[10px] uppercase tracking-[0.16em] text-muted sm:grid-cols-[1fr_auto]">
               <div className="bg-card px-3 py-2 text-white">{item.title}</div>
               <div className="bg-card px-3 py-2">Screenshot file</div>
@@ -180,7 +185,7 @@ function Gallery({ productName, items }: { productName: string; items: ProductGa
                 sizes="(min-width: 1024px) 760px, 100vw"
               />
             </div>
-            <figcaption className="p-4">
+            <figcaption className="p-3 sm:p-4">
               <p className="text-sm leading-6 text-muted">{item.caption}</p>
             </figcaption>
           </figure>
