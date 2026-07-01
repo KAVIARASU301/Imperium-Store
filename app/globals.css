@@ -119,12 +119,12 @@ a, button {
 
 @layer components {
   .page-container {
-    width: min(100% - 3rem, 1200px);
+    width: min(100% - 2rem, 1200px);
     margin-inline: auto;
   }
 
   .page-section {
-    padding-block: 3rem;
+    padding-block: 2rem;
   }
 
   .section-heading {
@@ -169,6 +169,22 @@ a, button {
     border-color: rgba(139, 188, 232, 0.34);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
     transform: translateY(-2px);
+  }
+
+  @media (min-width: 640px) {
+    .page-container {
+      width: min(100% - 3rem, 1200px);
+    }
+
+    .page-section {
+      padding-block: 3rem;
+    }
+  }
+
+  @media (hover: none) {
+    .interactive-panel:hover {
+      transform: none;
+    }
   }
 
   .btn-primary {

@@ -97,7 +97,7 @@ export default function TickerBoard() {
 
   return (
     <section className="border-b border-cyan-border bg-section">
-      <div className="flex h-11 items-center overflow-hidden">
+      <div className="flex h-9 items-center overflow-hidden sm:h-11">
         <div className="min-w-0 flex-1 overflow-hidden">
           <div className="ticker-track" style={tickerTrackStyle}>
             {[0, 1].map((segment) => (
@@ -107,7 +107,7 @@ export default function TickerBoard() {
                   return (
                     <div
                       key={`${ticker.label}-${ticker.symbol}-${segment}`}
-                      className="flex h-11 items-center gap-2 whitespace-nowrap font-mono text-xs"
+                      className="flex h-9 items-center gap-2 whitespace-nowrap font-mono text-[11px] sm:h-11 sm:text-xs"
                     >
                       <span className="font-semibold uppercase tracking-[0.08em] text-white">{ticker.label}</span>
                       <span className="text-muted">{formatNumber(ticker.price)}</span>

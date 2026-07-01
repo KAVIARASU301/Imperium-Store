@@ -100,7 +100,7 @@ export default async function HomePage() {
             <Hero />
 
             <section className="page-container page-section" id="products">
-                <div className="section-heading mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div className="section-heading mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-6 sm:gap-4">
                     <div>
                         <p className="section-kicker">Products</p>
                         <h2 className="section-title">Trading Workstations</h2>
@@ -109,7 +109,7 @@ export default async function HomePage() {
                         View all products
                     </Link>
                 </div>
-                <div className="grid gap-4">
+                <div className="grid gap-3 sm:gap-4">
                     {activeProducts.map((product) => (
                         <ProductCard key={product.slug} product={product} />
                     ))}
@@ -117,17 +117,17 @@ export default async function HomePage() {
             </section>
 
             <section className="page-container page-section">
-                <div className="section-heading mb-6">
+                <div className="section-heading mb-4 sm:mb-6">
                     <p className="section-kicker">Why Imperium</p>
                     <h2 className="section-title">Built for disciplined trading workflows</h2>
                 </div>
-                <dl className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <dl className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
                     {principles.map((item, index) => (
                         <div
                             key={item.title}
-                            className="interactive-panel group min-h-32 p-5"
+                            className="interactive-panel group p-4 sm:min-h-32 sm:p-5"
                         >
-                            <div className="mb-4 flex items-center justify-between border-b border-cyan-border pb-3">
+                            <div className="mb-3 flex items-center justify-between border-b border-cyan-border pb-2 sm:mb-4 sm:pb-3">
                                 <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">
                                     {String(index + 1).padStart(2, "0")}
                                 </span>
@@ -141,10 +141,10 @@ export default async function HomePage() {
             </section>
 
             <section className="page-container page-section">
-                <div className="surface-panel grid gap-5 p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+                <div className="surface-panel grid gap-4 p-5 sm:gap-5 sm:p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
                     <div>
                         <p className="section-kicker">Ready to buy</p>
-                        <h2 className="mt-2 text-2xl font-bold text-white">Choose your Imperium workstation.</h2>
+                        <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">Choose your Imperium workstation.</h2>
                         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">One clean checkout, account-based delivery, stored receipts, and current download access from your dashboard.</p>
                     </div>
                     <Link href="/products" className="btn-primary inline-flex min-h-11 items-center justify-center rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">

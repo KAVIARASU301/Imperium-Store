@@ -139,7 +139,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
           </div>
         </div>
 
-        <div className="p-5 md:p-6">
+        <div className="p-4 sm:p-5 md:p-6">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="border border-cyan-border bg-main/60 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-wide text-brand">
@@ -156,10 +156,10 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
                 </span>
               ) : null}
             </div>
-            <h3 className="mt-3 text-xl font-bold tracking-tight text-white">{product.name}</h3>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
+            <h3 className="mt-3 text-lg font-bold tracking-tight text-white sm:text-xl">{product.name}</h3>
+            <p className="mt-2 line-clamp-3 max-w-3xl text-sm leading-6 text-muted sm:line-clamp-none">{product.short_description}</p>
             {featurePoints.length ? (
-              <ul className="mt-5 grid gap-3 lg:grid-cols-3">
+              <ul className="mt-5 hidden gap-3 lg:grid lg:grid-cols-3">
                 {featurePoints.map((feature) => (
                   <li key={feature.title} className="border-l border-gold/35 pl-3">
                     <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-gold-bright">{feature.title}</p>
@@ -170,7 +170,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             ) : null}
           </div>
         </div>
-        <div className="flex flex-col gap-3 border-t border-cyan-border bg-main/36 p-5 sm:flex-row sm:items-stretch sm:justify-between md:border-l md:border-t-0 md:bg-main/28 md:flex-col md:justify-center">
+        <div className="flex flex-col gap-3 border-t border-cyan-border bg-main/36 p-4 sm:flex-row sm:items-stretch sm:justify-between sm:p-5 md:border-l md:border-t-0 md:bg-main/28 md:flex-col md:justify-center">
             {isPurchased ? (
               <span className="flex min-h-9 w-full items-center justify-center rounded-md border border-success/40 bg-success/10 px-3 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-wide text-success">
                 In your account
