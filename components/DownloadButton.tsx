@@ -58,7 +58,7 @@ export default function DownloadButton({
           </>
         ) : (
           <>
-            <Image src="/icons/download/download-16.png" alt="" width={16} height={16} className="h-4 w-4" />
+            <Image src="/icons/download.svg" alt="" width={16} height={16} className="h-4 w-4" />
             {label}
           </>
         )}

@@ -55,7 +55,7 @@ export default function PostPurchaseOnboarding({
         "Choose the Windows or Linux build from your licensed downloads. Access stays tied to the account used during checkout.",
       href: "/dashboard#downloads",
       action: "Go to downloads",
-      icon: "/icons/download/download-32.png",
+      icon: "/icons/download.svg",
       accent: "success",
     },
     ...(showTerminalPasswordStep
@@ -79,7 +79,7 @@ export default function PostPurchaseOnboarding({
         "Receipts help with support and account recovery. Save the Razorpay order reference if you ever need help matching a payment.",
       href: orderId ? `/receipts/${encodeURIComponent(orderId)}` : "/dashboard#downloads",
       action: orderId ? "View receipt" : "Find receipts",
-      icon: "/icons/receipt/receipt-16.png",
+      icon: "/icons/receipt.svg",
     },
     {
       eyebrow: "Support",

@@ -91,7 +91,7 @@ export default function ReceiptPage() {
           eyebrow="Payment receipt"
           title="Loading receipt."
           description="Fetching your receipt and payment details."
-          icon="/icons/receipt/receipt-96.png"
+          icon="/icons/receipt.svg"
         >
           <div className="flex items-center gap-3 rounded-md border border-cyan-border bg-main/60 p-3 text-sm text-muted" role="status" aria-live="polite">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
@@ -106,7 +106,7 @@ export default function ReceiptPage() {
           eyebrow="Receipt locked"
           title="Log in to view this receipt."
           description="Receipts are available only from the account that completed checkout."
-          icon="/icons/receipt/receipt-96.png"
+          icon="/icons/receipt.svg"
           actions={
             <>
               <Link href={`/login?next=${encodeURIComponent(`/receipts/${orderId}`)}`} className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
