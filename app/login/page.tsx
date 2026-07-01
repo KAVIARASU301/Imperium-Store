@@ -35,28 +35,10 @@ function getOAuthError(value: string | null) {
   return value.slice(0, 240);
 }
 
-async function emailAlreadyExists(email: string) {
-  const response = await fetch("/api/auth/email-exists", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-  const payload = (await response.json()) as {
-    exists?: boolean;
-    message?: string;
-  };
-
-  if (!response.ok) {
-    throw new Error(
-      payload.message ?? "Unable to verify whether this email is available.",
-    );
-  }
-
-  return Boolean(payload.exists);
-}
-
 const existingAccountMessage =
   "An account already exists with this email. Use Login or Forgot password to recover that account and keep access to previous purchases. To create a separate account, use a different email address.";
+const signupFailureMessage =
+  "Unable to create this account. If you already have an Imperium account, use Login or Forgot password to recover access.";
 
 function LoginForm() {
   const router = useRouter();
@@ -161,10 +143,6 @@ function LoginForm() {
         if (!confirmPassword) throw new Error("Confirm your password.");
         if (password !== confirmPassword)
           throw new Error("Passwords do not match.");
-        if (await emailAlreadyExists(cleanEmail)) {
-          throw new Error(existingAccountMessage);
-        }
-
         const { data, error } = await supabase.auth.signUp({
           email: cleanEmail,
           password,
@@ -208,7 +186,9 @@ function LoginForm() {
       setStatus({
         tone: "error",
         text:
-          error instanceof Error
+          mode === "signup"
+            ? signupFailureMessage
+            : error instanceof Error
             ? error.message
             : "Unable to authenticate your account.",
       });
@@ -220,6 +200,7 @@ function LoginForm() {
   async function signInWithGoogle() {
     setLoading(true);
     setStatus({ tone: "info", text: "Opening Google sign-in..." });
+    router.prefetch(next);
 
     try {
       const supabase = getSupabaseBrowserClient();
@@ -228,7 +209,6 @@ function LoginForm() {
         provider: "google",
         options: {
           redirectTo: getRedirectUrl(callbackPath),
-          queryParams: { prompt: "select_account" },
         },
       });
 

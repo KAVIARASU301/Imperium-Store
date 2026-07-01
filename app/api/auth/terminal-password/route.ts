@@ -105,12 +105,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(getCooldownPayload(data?.last_updated_at));
   } catch (error) {
+    console.error("Unable to load terminal password cooldown", error);
     return NextResponse.json(
       {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unable to load terminal password cooldown.",
+        message: "Unable to load terminal password cooldown.",
       },
       { status: 500 },
     );
@@ -182,12 +180,10 @@ export async function POST(request: Request) {
       message: "Terminal password saved.",
     });
   } catch (error) {
+    console.error("Unable to save terminal password", error);
     return NextResponse.json(
       {
-        message:
-          error instanceof Error
-            ? error.message
-            : "Unable to save the terminal password.",
+        message: "Unable to save the terminal password.",
       },
       { status: 500 },
     );

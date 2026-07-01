@@ -95,6 +95,7 @@ export async function GET(request: Request, context: { params: Promise<{ orderId
       },
     });
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to load receipt" }, { status: 500 });
+    console.error("Unable to load receipt", error);
+    return NextResponse.json({ message: "Unable to load receipt" }, { status: 500 });
   }
 }

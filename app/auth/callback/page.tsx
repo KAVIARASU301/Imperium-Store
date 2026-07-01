@@ -42,14 +42,20 @@ function OAuthCallback() {
         const supabase = getSupabaseBrowserClient();
         const code = params.get("code");
 
+        let hasSession = false;
+
         if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
+          hasSession = Boolean("session" in data && data.session);
         }
 
-        const { data } = await supabase.auth.getSession();
-        if (!data.session)
-          throw new Error("Google sign-in did not create a session. Try again.");
+        if (!hasSession) {
+          const { data } = await supabase.auth.getSession();
+          hasSession = Boolean(data.session);
+        }
+
+        if (!hasSession) throw new Error("Google sign-in did not create a session. Try again.");
 
         window.dispatchEvent(new Event("imperium-auth-change"));
         router.replace(next);

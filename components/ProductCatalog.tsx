@@ -3,7 +3,7 @@
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types/product";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type CatalogTab = "app" | "course";
 type LanguageFilter = "all" | "english" | "tamil" | "other";
@@ -32,14 +32,9 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
   };
   const visibleTabs = tabs.filter((tab) => productCounts[tab.id] > 0);
 
-  const initialTab = getCatalogTabFromQuery(searchParams.get("type"));
-  const [activeTab, setActiveTab] = useState<CatalogTab>(initialTab);
+  const activeTab = getCatalogTabFromQuery(searchParams.get("type"));
   const [activeLanguage, setActiveLanguage] = useState<LanguageFilter>("all");
   const selectedTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : visibleTabs[0]?.id;
-
-  useEffect(() => {
-    setActiveTab(getCatalogTabFromQuery(searchParams.get("type")));
-  }, [searchParams]);
 
   const visibleProducts = activeProducts.filter((product) => {
     const productLanguage = getProductLanguage();
@@ -47,7 +42,6 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
   });
 
   function selectTab(tab: CatalogTab) {
-    setActiveTab(tab);
     router.replace(`/products?type=${tab === "course" ? "courses" : "software"}`, { scroll: false });
   }
 

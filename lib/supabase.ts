@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { createDemoAccessToken } from "@/lib/demo-auth";
+import { canUseDevelopmentFallbacks } from "@/lib/runtime";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -149,13 +150,57 @@ function createDemoBrowserClient() {
   };
 }
 
+function createUnavailableBrowserClient() {
+  const error = new Error("Authentication is not configured.");
+  return {
+    auth: {
+      async getSession() {
+        return { data: { session: null }, error: null };
+      },
+      async signInWithOAuth() {
+        return { data: { provider: "google", url: null }, error };
+      },
+      async exchangeCodeForSession() {
+        return { data: {}, error };
+      },
+      async signInWithPassword() {
+        return { data: {}, error };
+      },
+      async signUp() {
+        return { data: {}, error };
+      },
+      async resetPasswordForEmail() {
+        return { data: {}, error };
+      },
+      async updateUser() {
+        return { data: { user: null }, error };
+      },
+      async signOut() {
+        return { error: null };
+      },
+      onAuthStateChange() {
+        return {
+          data: {
+            subscription: {
+              unsubscribe: () => {},
+            },
+          },
+        };
+      },
+    },
+  };
+}
+
 export function hasSupabaseEnv() {
   return Boolean(supabaseUrl && supabaseAnonKey);
 }
 export function getSupabaseBrowserClient(): BrowserSupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
-    globalThis.__imperiumDemoBrowserClient ??=
-      createDemoBrowserClient() as BrowserSupabaseClient;
+    globalThis.__imperiumDemoBrowserClient ??= (
+      canUseDevelopmentFallbacks()
+        ? createDemoBrowserClient()
+        : createUnavailableBrowserClient()
+    ) as BrowserSupabaseClient;
     return globalThis.__imperiumDemoBrowserClient;
   }
   globalThis.__imperiumBrowserSupabaseClient ??= createClient(

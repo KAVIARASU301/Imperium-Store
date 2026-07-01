@@ -1,7 +1,9 @@
 import type { ProductFile } from "@/types/product";
 
 interface GitHubReleaseAsset {
+  id: number;
   name: string;
+  url: string;
   browser_download_url: string;
 }
 
@@ -10,29 +12,47 @@ interface GitHubRelease {
   assets: GitHubReleaseAsset[];
 }
 
-export async function createGithubReleaseDownloadUrl(file: ProductFile) {
+export async function createGithubReleaseDownloadResponse(file: ProductFile) {
   const release = await fetchLatestRelease(file.release_repository);
   const platform = file.platform.toLowerCase();
   const asset = release.assets.find((item) => isPlatformZip(item.name, platform));
-  if (asset) return asset.browser_download_url;
+  if (asset) return fetchReleaseAsset(asset);
 
   const bodyUrl = findReleaseBodyZipUrl(release.body, platform);
-  if (bodyUrl) return bodyUrl;
+  if (bodyUrl) return fetch(bodyUrl, { cache: "no-store" });
 
   throw new Error(`No ${file.platform} zip found in ${file.release_repository} latest release`);
 }
 
 async function fetchLatestRelease(repository: string): Promise<GitHubRelease> {
   const res = await fetch(`https://api.github.com/repos/${repository}/releases/latest`, {
-    headers: {
+    headers: getGitHubHeaders({
       Accept: "application/vnd.github+json",
       "User-Agent": "imperium-store",
-    },
+    }),
     next: { revalidate: 60 },
   });
 
   if (!res.ok) throw new Error(`Unable to load latest release from ${repository}`);
   return res.json();
+}
+
+async function fetchReleaseAsset(asset: GitHubReleaseAsset) {
+  const response = await fetch(asset.url, {
+    headers: getGitHubHeaders({
+      Accept: "application/octet-stream",
+      "User-Agent": "imperium-store",
+    }),
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Unable to load release asset ${asset.name}`);
+  return response;
+}
+
+function getGitHubHeaders(headers: Record<string, string>) {
+  const token = process.env.GITHUB_RELEASE_TOKEN?.trim();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 function isPlatformZip(name: string, platform: string) {

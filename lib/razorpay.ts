@@ -39,3 +39,8 @@ export async function getLatestPaymentForOrder(orderId: string) {
     .filter((payment) => payment.order_id === orderId)
     .sort((a, b) => Number(b.created_at ?? 0) - Number(a.created_at ?? 0))[0] as Payments.RazorpayPayment | undefined ?? null;
 }
+
+export async function getPaymentById(paymentId: string) {
+  if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) return null;
+  return getRazorpayClient().payments.fetch(paymentId) as Promise<Payments.RazorpayPayment>;
+}

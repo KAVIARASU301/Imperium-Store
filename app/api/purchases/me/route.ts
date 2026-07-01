@@ -9,6 +9,7 @@ export async function GET(request: Request) {
     const purchases = await getPurchasesForUser(user.id);
     return NextResponse.json({ purchases });
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to load purchases" }, { status: 500 });
+    console.error("Unable to load purchases", error);
+    return NextResponse.json({ message: "Unable to load purchases" }, { status: 500 });
   }
 }

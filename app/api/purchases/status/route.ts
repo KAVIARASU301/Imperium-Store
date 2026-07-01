@@ -30,6 +30,7 @@ export async function GET(request: Request) {
     }
     return NextResponse.json({ status, productId: productIds[0], productIds });
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to load purchase status" }, { status: 500 });
+    console.error("Unable to load purchase status", error);
+    return NextResponse.json({ message: "Unable to load purchase status" }, { status: 500 });
   }
 }

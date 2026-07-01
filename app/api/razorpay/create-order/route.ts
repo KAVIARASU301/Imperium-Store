@@ -2,6 +2,7 @@ import { getCurrentUserFromRequest } from "@/lib/auth";
 import { getProductBySlug, isProductReady } from "@/lib/products";
 import { createPaidPurchase, createPendingPurchase, hasRecordedPaidPurchase } from "@/lib/purchases";
 import { getRazorpayClient } from "@/lib/razorpay";
+import { canUseDevelopmentFallbacks } from "@/lib/runtime";
 import { NextResponse } from "next/server";
 
 function getPublicRazorpayKeyId() {
@@ -63,14 +64,14 @@ export async function POST(request: Request) {
     }
     const amount = Math.round(total * 100);
     if (amount < 100) return NextResponse.json({ message: "Order amount must be at least 100 paise" }, { status: 400 });
-    if (process.env.TEST_CHECKOUT_ENABLED === "true") {
+    if (canUseDevelopmentFallbacks() && process.env.TEST_CHECKOUT_ENABLED === "true") {
       const orderId = `test_order_${Date.now()}`;
       const paymentId = `test_pay_${Date.now()}`;
       await Promise.all(validProducts.map((product) => createPaidPurchase({ userId: user.id, productSlug: product.slug, orderId, amount: product.price, currency: product.currency, paymentId })));
       return NextResponse.json({ orderId: null, amount, currency, productIds: validProducts.map((product) => product.slug), productId: validProducts[0].slug, message: "Test checkout completed" });
     }
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      return NextResponse.json({ message: "Razorpay checkout is not configured. Add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to continue." }, { status: 503 });
+      return NextResponse.json({ message: "Checkout is not configured." }, { status: 503 });
     }
     const order = await getRazorpayClient().orders.create({
       amount,
@@ -81,6 +82,7 @@ export async function POST(request: Request) {
     await Promise.all(validProducts.map((product) => createPendingPurchase({ userId: user.id, productSlug: product.slug, razorpayOrderId: order.id, amount: product.price, currency: product.currency })));
     return NextResponse.json({ orderId: order.id, order_id: order.id, amount, currency, keyId: getPublicRazorpayKeyId(), productIds: validProducts.map((product) => product.slug), productId: validProducts[0].slug });
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to create order" }, { status: getRazorpayErrorStatus(error) });
+    console.error("Unable to create Razorpay order", error);
+    return NextResponse.json({ message: "Unable to create order" }, { status: getRazorpayErrorStatus(error) });
   }
 }

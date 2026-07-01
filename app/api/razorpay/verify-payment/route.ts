@@ -1,6 +1,6 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { getPurchasesByOrderId, updatePurchasesStatus } from "@/lib/purchases";
-import { verifyCheckoutSignature } from "@/lib/razorpay";
+import { getPaymentById, verifyCheckoutSignature } from "@/lib/razorpay";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -27,6 +27,19 @@ export async function POST(request: Request) {
     });
     if (!verified) return NextResponse.json({ message: "Invalid payment signature" }, { status: 400 });
 
+    const payment = await getPaymentById(razorpay_payment_id);
+    const expectedAmount = Math.round(purchases.reduce((sum, purchase) => sum + purchase.amount, 0) * 100);
+    const expectedCurrency = purchases[0]?.currency;
+    if (
+      !payment ||
+      payment.order_id !== razorpay_order_id ||
+      payment.status !== "captured" ||
+      Number(payment.amount) !== expectedAmount ||
+      payment.currency !== expectedCurrency
+    ) {
+      return NextResponse.json({ message: "Payment could not be confirmed" }, { status: 400 });
+    }
+
     const updatedPurchases = await updatePurchasesStatus({
       orderId: razorpay_order_id,
       paymentId: razorpay_payment_id,
@@ -40,6 +53,7 @@ export async function POST(request: Request) {
       productIds: purchases.map((purchase) => purchase.product_id),
     });
   } catch (error) {
-    return NextResponse.json({ message: error instanceof Error ? error.message : "Unable to verify payment" }, { status: 500 });
+    console.error("Unable to verify payment", error);
+    return NextResponse.json({ message: "Unable to verify payment" }, { status: 500 });
   }
 }

@@ -29,9 +29,16 @@ export default function DownloadButton({
       const { data } = await getSupabaseBrowserClient().auth.getSession();
       const token = data.session?.access_token;
       const res = await fetch(`/api/downloads/${fileId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-      const payload = await res.json().catch(() => ({}));
-      if (!res.ok || typeof payload.url !== "string") throw new Error("Download failed");
-      window.location.href = payload.url;
+      if (!res.ok) throw new Error("Download failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = getDownloadFileName(res.headers.get("content-disposition"));
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     } catch {
       setDownloadFailed(true);
     } finally {
@@ -87,4 +94,9 @@ export default function DownloadButton({
       ) : null}
     </div>
   );
+}
+
+function getDownloadFileName(contentDisposition: string | null) {
+  const match = contentDisposition?.match(/filename="([^"]+)"/);
+  return match?.[1] ?? "imperium-download.zip";
 }
