@@ -84,7 +84,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
 
   if (state === "checking") {
     return (
-      <div className="mt-6 rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]" role="status" aria-live="polite">
+      <div className="rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]" role="status" aria-live="polite">
         <div className="flex items-center gap-3 text-sm text-muted">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
           <span className="font-mono uppercase tracking-[0.12em]">Checking purchase access...</span>
@@ -96,7 +96,6 @@ export default function DashboardProducts({ products }: { products: Product[] })
   if (state === "signed-out") {
     return (
       <StatePanel
-        className="mt-6"
         eyebrow="Secure account required"
         title="Log in to view your purchase library."
         description="Downloads and receipts are tied to the account used during checkout. Sign in with that email to restore access."
@@ -117,7 +116,6 @@ export default function DashboardProducts({ products }: { products: Product[] })
   if (state === "error") {
     return (
       <StatePanel
-        className="mt-6"
         tone="error"
         eyebrow="Library unavailable"
         title="We could not load your purchases."
@@ -143,7 +141,6 @@ export default function DashboardProducts({ products }: { products: Product[] })
   if (products.length === 0) {
     return (
       <StatePanel
-        className="mt-6"
         tone="warning"
         eyebrow="No products available"
         title="Your library is ready, but there are no active products to show."
@@ -174,7 +171,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
   const hasTerminalPurchase = purchasesBySlug[TERMINAL_PRODUCT_SLUG]?.status === "paid";
 
   return (
-    <div className="mt-6 grid gap-5">
+    <div className="grid gap-5">
       {unlockedCount > 0 ? <PostPurchaseOnboarding showTerminalPasswordStep={hasTerminalPurchase} /> : null}
       {hasTerminalPurchase ? <TerminalPasswordPanel /> : null}
       <div id="downloads" className="grid scroll-mt-28 gap-5">

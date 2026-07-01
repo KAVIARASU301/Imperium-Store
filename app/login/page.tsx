@@ -292,7 +292,7 @@ function LoginForm() {
           </section>
         </div>
       ) : null}
-      <section className="flex flex-col justify-center">
+      <section className="flex flex-col self-start">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-brand">
           Secure customer access
         </p>
@@ -303,17 +303,6 @@ function LoginForm() {
           Access your purchases, downloads, invoices, and product updates from one
           secure account.
         </p>
-        <div className="mt-8 grid gap-px border border-cyan-border bg-cyan-border text-sm text-white sm:grid-cols-3">
-          {["Account access", "Download management", "Password recovery"].map((item) => (
-            <div
-              key={item}
-              className="bg-section p-4"
-            >
-              <span className="text-brand">✓</span>
-              <p className="mt-2">{item}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       <section className="border border-cyan-border bg-section/95 p-6 shadow-2xl shadow-black/20 sm:p-8">

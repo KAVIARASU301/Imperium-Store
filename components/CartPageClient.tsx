@@ -32,7 +32,6 @@ type RazorpaySuccessResponse = {
 const orderSteps = [
   { label: "Cart", text: "Review products and account email." },
   { label: "Payment", text: "Complete payment through the secure checkout." },
-  { label: "Access unlocked", text: "Payment verification unlocks purchases." },
   { label: "Download", text: "Get files from your dashboard." },
 ];
 
@@ -362,16 +361,16 @@ export default function CartPageClient({ products }: { products: Product[] }) {
 
 function OrderSteps() {
   return (
-    <ol className="grid gap-px overflow-hidden rounded-md border border-cyan-border bg-cyan-border sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
+    <ol className="grid gap-px overflow-hidden rounded-md border border-cyan-border bg-cyan-border sm:grid-cols-3 lg:col-span-2">
       {orderSteps.map((step, index) => (
-        <li key={step.label} className="bg-section p-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-brand/45 bg-main font-mono text-xs font-bold text-brand">
+        <li key={step.label} className="bg-section px-3 py-3">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-brand/45 bg-main font-mono text-[11px] font-bold text-brand">
               {index + 1}
             </span>
-            <p className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-white">{step.label}</p>
+            <p className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-white">{step.label}</p>
           </div>
-          <p className="mt-3 text-sm leading-6 text-muted">{step.text}</p>
+          <p className="mt-2 text-xs leading-5 text-muted">{step.text}</p>
         </li>
       ))}
     </ol>
