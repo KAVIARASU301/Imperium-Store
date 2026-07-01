@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import CartCount from "@/components/CartCount";
 import HeaderAccount from "@/components/HeaderAccount";
@@ -11,7 +11,11 @@ export default function HeaderNav() {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const productType = searchParams.get("type");
   const isProductsActive = pathname === "/products" || pathname.startsWith("/products/");
+  const isSoftwareActive = isProductsActive && productType !== "courses";
+  const isCoursesActive = isProductsActive && productType === "courses";
   const isCartActive = pathname === "/cart";
   const isDashboardActive = pathname === "/dashboard";
 
@@ -37,8 +41,9 @@ export default function HeaderNav() {
 
   return (
     <div ref={menuRef} className="relative">
-      <div className="hidden items-center gap-1 text-sm font-medium text-white md:flex">
-        <Link href="/products" className={getNavLinkClass(isProductsActive)}>Products</Link>
+      <div className="hidden items-center gap-1.5 text-sm font-medium text-white md:flex">
+        <Link href="/products?type=software" className={getNavLinkClass(isSoftwareActive)}>Software</Link>
+        <Link href="/products?type=courses" className={getNavLinkClass(isCoursesActive)}>Courses</Link>
         <Link href="/cart" className={getNavLinkClass(isCartActive, "inline-flex items-center gap-2")}>
           <Image src="/icons/cart.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
           <span>Cart</span>
@@ -50,7 +55,7 @@ export default function HeaderNav() {
 
       <button
         type="button"
-        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cyan-border bg-section text-white transition hover:border-brand hover:bg-card md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-cyan-border bg-section text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition hover:border-brand hover:bg-card md:hidden"
         aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
         aria-expanded={isOpen}
         aria-haspopup="menu"
@@ -67,9 +72,12 @@ export default function HeaderNav() {
       </button>
 
       {isOpen ? (
-        <div className="absolute right-0 z-50 mt-3 w-72 overflow-visible rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
-          <Link href="/products" className={getMobileNavLinkClass(isProductsActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
-            Products
+        <div className="absolute right-0 z-50 mt-3 w-72 overflow-visible rounded-md border border-cyan-border bg-section/96 p-2 text-sm text-white shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden" role="menu">
+          <Link href="/products?type=software" className={getMobileNavLinkClass(isSoftwareActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
+            Software
+          </Link>
+          <Link href="/products?type=courses" className={getMobileNavLinkClass(isCoursesActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
+            Courses
           </Link>
           <Link href="/cart" className={getMobileNavLinkClass(isCartActive, "flex items-center gap-3")} role="menuitem" onClick={() => setIsOpen(false)}>
             <Image src="/icons/cart.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
@@ -90,8 +98,8 @@ export default function HeaderNav() {
 
 function getNavLinkClass(isActive: boolean, layoutClass = "") {
   return [
-    "border border-transparent border-b-2 px-3 py-2 transition hover:border-cyan-border hover:bg-card hover:text-white",
-    isActive ? "border-b-brand bg-card/60 text-white" : "border-b-transparent",
+    "rounded-md border px-3 py-2 transition hover:border-cyan-border hover:bg-card hover:text-white",
+    isActive ? "border-brand/50 bg-card/80 text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)]" : "border-transparent text-muted",
     layoutClass,
   ].join(" ");
 }

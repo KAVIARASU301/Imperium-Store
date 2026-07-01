@@ -2,7 +2,8 @@
 
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/types/product";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type CatalogTab = "app" | "course";
 type LanguageFilter = "all" | "english" | "tamil" | "other";
@@ -20,6 +21,8 @@ const languages: Array<{ id: LanguageFilter; label: string }> = [
 ];
 
 export default function ProductCatalog({ products }: { products: Product[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const activeProducts = products.filter((product) => product.is_active);
   const appCount = activeProducts.filter((product) => product.type === "app").length;
   const courseCount = activeProducts.filter((product) => product.type === "course").length;
@@ -29,21 +32,38 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
   };
   const visibleTabs = tabs.filter((tab) => productCounts[tab.id] > 0);
 
-  const [activeTab, setActiveTab] = useState<CatalogTab>("app");
+  const initialTab = getCatalogTabFromQuery(searchParams.get("type"));
+  const [activeTab, setActiveTab] = useState<CatalogTab>(initialTab);
   const [activeLanguage, setActiveLanguage] = useState<LanguageFilter>("all");
   const selectedTab = visibleTabs.some((tab) => tab.id === activeTab) ? activeTab : visibleTabs[0]?.id;
+
+  useEffect(() => {
+    setActiveTab(getCatalogTabFromQuery(searchParams.get("type")));
+  }, [searchParams]);
 
   const visibleProducts = activeProducts.filter((product) => {
     const productLanguage = getProductLanguage();
     return product.type === selectedTab && (activeLanguage === "all" || productLanguage === activeLanguage);
   });
 
+  function selectTab(tab: CatalogTab) {
+    setActiveTab(tab);
+    router.replace(`/products?type=${tab === "course" ? "courses" : "software"}`, { scroll: false });
+  }
+
   return (
     <section>
-      <div className="rounded-md border border-cyan-border bg-section/90 p-2 shadow-[0_14px_42px_rgba(0,0,0,0.24)]">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="section-heading mb-6">
+        <h1 className="section-title">Imperium software and learning products</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+          Choose the products you want, add them to cart, and complete checkout.
+        </p>
+      </div>
+
+      <div className="surface-panel p-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           {visibleTabs.length ? (
-            <div className={`grid gap-1.5 ${visibleTabs.length > 1 ? "grid-cols-2 sm:w-[320px]" : "grid-cols-1 sm:w-40"}`}>
+            <div className={`grid gap-2 ${visibleTabs.length > 1 ? "grid-cols-2 sm:w-[340px]" : "grid-cols-1 sm:w-44"}`}>
               {visibleTabs.map((tab) => {
                 const isActive = selectedTab === tab.id;
                 const count = productCounts[tab.id];
@@ -51,12 +71,12 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
                   <button
                     key={tab.id}
                     type="button"
-                    className={`min-h-10 rounded-md border px-3 py-1.5 text-left transition ${
+                    className={`min-h-11 rounded-md border px-3 py-2 text-left transition ${
                       isActive
                         ? "border-brand bg-card-hover text-white shadow-[0_12px_26px_rgba(0,0,0,0.24)]"
                         : "border-cyan-border bg-card text-muted hover:border-brand hover:text-white"
                     }`}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => selectTab(tab.id)}
                   >
                     <span className="flex items-center justify-between gap-3">
                       <span>
@@ -118,4 +138,8 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
 
 function getProductLanguage(): Exclude<LanguageFilter, "all"> {
   return "english";
+}
+
+function getCatalogTabFromQuery(value: string | null): CatalogTab {
+  return value === "courses" || value === "course" ? "course" : "app";
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { getSiteUrl } from "@/lib/seo";
 import "./globals.css";
@@ -53,22 +54,55 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-      <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="min-h-full bg-main text-white">
-      <header className="sticky top-0 z-40 border-b border-cyan-border bg-section/92 backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3">
-          <Link href="/" className="inline-flex items-center gap-3 text-white">
-              <span className="flex h-9 w-9 items-center justify-center border border-cyan-border bg-white">
-                <Image src="/icons/imperium_store_icons/imperium_icon_32x32.png" alt="" width={28} height={28} className="h-7 w-7" priority suppressHydrationWarning />
+        <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/88 backdrop-blur-xl">
+          <nav className="mx-auto flex max-w-[1400px] items-center justify-between px-6 py-3.5">
+            <Link href="/" className="inline-flex items-center gap-3 text-white">
+              <span className="flex h-10 w-10 items-center justify-center rounded-md border border-cyan-border bg-white shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
+                <Image
+                  src="/icons/imperium_store_icons/imperium_icon_32x32.png"
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="h-7 w-7"
+                  priority
+                  suppressHydrationWarning
+                />
               </span>
-            <span className="text-base font-bold uppercase tracking-[0.08em]">Imperium Store</span>
-          </Link>
-          <HeaderNav />
-        </nav>
-      </header>
-      {children}
-      <footer className="mt-16 border-t border-cyan-border bg-section/70 px-6 py-8 text-sm text-muted"><div className="mx-auto flex max-w-[1200px] flex-col gap-4 md:flex-row md:items-center md:justify-between"><p>© 2026 Imperium Store. Educational tools only.</p><div className="flex flex-wrap gap-4"><Link href="/disclaimer">Disclaimer</Link><Link href="/refund-policy">Refund Policy</Link><Link href="/terms">Terms</Link><Link href="/privacy-policy">Privacy</Link><Link href="/contact">Contact</Link><Link href="/support">Support</Link></div></div></footer>
+              <span>
+                <span className="block text-sm font-extrabold uppercase tracking-[0.12em]">Imperium Store</span>
+                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted sm:block">Trading tools & learning</span>
+              </span>
+            </Link>
+            <Suspense fallback={null}>
+              <HeaderNav />
+            </Suspense>
+          </nav>
+        </header>
+        {children}
+        <footer className="mt-16 border-t border-cyan-border bg-section/70 px-6 py-10 text-sm text-muted">
+          <div className="mx-auto grid max-w-[1200px] gap-8 md:grid-cols-[1fr_auto] md:items-start">
+            <div>
+              <p className="font-semibold text-white">Imperium Store</p>
+              <p className="mt-2 max-w-xl leading-6">
+                Digital trading tools, account delivery, receipts, and support for Imperium customers. Educational tools only.
+              </p>
+              <p className="mt-4 font-mono text-xs uppercase tracking-[0.14em]">© 2026 Imperium Store</p>
+            </div>
+            <div className="grid min-w-[280px] gap-px overflow-hidden rounded-md border border-cyan-border bg-cyan-border text-xs font-semibold uppercase tracking-[0.08em] text-white sm:grid-cols-2">
+              <Link href="/products" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Products</Link>
+              <Link href="/dashboard" className="bg-main/70 px-4 py-3 hover:bg-card-hover">My Purchases</Link>
+              <Link href="/support" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Support</Link>
+              <Link href="/contact" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Contact</Link>
+              <Link href="/disclaimer" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Disclaimer</Link>
+              <Link href="/refund-policy" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Refund Policy</Link>
+              <Link href="/terms" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Terms</Link>
+              <Link href="/privacy-policy" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Privacy</Link>
+            </div>
+          </div>
+        </footer>
       </body>
-      </html>
+    </html>
   );
 }

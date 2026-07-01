@@ -21,8 +21,8 @@ export default function PricingBox({
     const ready = isProductReady({ status });
 
     return (
-        <aside className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_24px_60px_rgba(0,0,0,0.46),0_0_0_1px_rgba(255,255,255,0.08)_inset]">
-            <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
+        <aside className="surface-panel overflow-hidden">
+            <div className="border-b border-cyan-border bg-card-hover px-5 py-4">
                 <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">
                     {ready ? "Direct checkout" : "Coming soon"}
                 </p>
@@ -32,7 +32,7 @@ export default function PricingBox({
             </div>
 
             <div className="p-5">
-                <div className="rounded-md border-2 border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
+                <div className="rounded-md border border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
                     <p className="font-mono text-[11px] font-semibold uppercase tracking-wider text-muted">
                         Payable amount
                     </p>

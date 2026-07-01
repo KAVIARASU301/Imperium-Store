@@ -329,6 +329,122 @@ export const products: Product[] = [
     ],
     files: productFiles.filter((file) => file.product_slug === "imperium-investor"),
   },
+  {
+    slug: "option-trading-mastery-course",
+    name: "Option Trading Mastery Course",
+    type: "course",
+    icon: {
+      src: "/icons/candlestick.svg",
+      alt: "Option Trading Mastery Course icon",
+      width: 64,
+      height: 64,
+    },
+    short_description:
+      "A structured options trading course, coming soon, that takes learners from option market basics to option buying workflows and practical use of the Imperium Option Trading Terminal.",
+    image: {
+      src: "/product-resources/imperium-option-trading-terminal/strategy_builder.png",
+      alt: "Imperium Option Trading Terminal strategy builder workspace used for options education",
+      width: 1365,
+      height: 767,
+    },
+    description:
+      "Option Trading Mastery Course is a planned learning program for traders who want a structured path into options. The course will start with the basics of options, option chains, premiums, expiry, Greeks, risk, and position sizing, then move into option buying setups, trade planning, execution discipline, and review. It will also teach learners how to use Imperium Option Trading Terminal for faster option-chain navigation, paper trading practice, controlled entries and exits, charting, journaling, and performance review so the learning process connects directly with the trading workspace.",
+    promise:
+      "Learn options from the basics to option buying execution, then practice and apply the workflow inside Imperium Option Trading Terminal.",
+    badges: ["Coming soon", "Options basics", "Option buying", "Terminal training", "Paper trading"],
+    highlights: [
+      {
+        icon: "/icons/help.svg",
+        title: "Basics to execution",
+        text: "Build a foundation in option chains, expiry, premiums, Greeks, risk, and practical trade planning before moving into execution.",
+      },
+      {
+        icon: "/icons/candlestick.svg",
+        title: "Option buying workflows",
+        text: "Learn how to approach option buying with setup selection, entry planning, stoploss discipline, targets, and review.",
+      },
+      {
+        icon: "/icons/bar_chart.svg",
+        title: "Terminal-based practice",
+        text: "Use Imperium Option Trading Terminal features like paper trading, charts, order review, and journaling as part of the learning path.",
+      },
+    ],
+    gallery: [
+      {
+        src: "/product-resources/imperium-option-trading-terminal/strategy_builder.png",
+        alt: "Imperium Option Trading Terminal strategy builder for options course practice",
+        title: "Strategy workflow",
+        caption: "Learners will connect concepts to terminal workflows for planning, practice, and review.",
+        width: 1365,
+        height: 767,
+      },
+      {
+        src: "/product-resources/imperium-option-trading-terminal/price_cvd_chart.png",
+        alt: "Imperium Price CVD chart used for options course market context",
+        title: "Market context",
+        caption: "The course will show how to use chart context and terminal tools while preparing option buying trades.",
+        width: 1365,
+        height: 767,
+      },
+    ],
+    price: 4999,
+    currency: "INR",
+    is_active: true,
+    audience: [
+      "Beginners who want to understand options from the ground up",
+      "Learners who want a structured path into option buying",
+      "Traders who want to practice before placing live orders",
+      "Imperium Option Trading Terminal users who want product-specific training",
+      "Retail traders who want a more disciplined trading and review process",
+    ],
+    problems: [
+      "Options feel confusing because basics, option chain reading, risk, and execution are learned out of order",
+      "Beginners often enter option buying trades without a clear setup, stoploss, target, or review process",
+      "Most learning is disconnected from the actual trading terminal used during market hours",
+      "Traders skip paper trading and practice directly with live capital",
+      "Trade review becomes difficult when entries, charts, journal notes, and P&L are not connected",
+    ],
+    includes: [
+      "Options basics, terminology, option chain reading, expiry, premiums, and Greeks",
+      "Risk management, position sizing, stoploss planning, target planning, and trade invalidation",
+      "Option buying setup planning and execution workflow",
+      "Imperium Option Trading Terminal onboarding and guided practice",
+      "Paper trading practice before using live capital",
+      "Charting, journal, order history, P&L history, and performance review workflows",
+    ],
+    outcomes: [
+      "Understand the core mechanics of options before moving into live execution",
+      "Plan option buying trades with clearer entry, exit, risk, and review rules",
+      "Practice workflows inside Imperium Option Trading Terminal before trading live",
+      "Use terminal tools for option-chain navigation, chart context, journaling, and performance review",
+      "Build a more structured process for learning and improving as an options trader",
+    ],
+    lessons: [
+      { id: "options-foundation", title: "Options foundation and market structure", video_url: "", sort_order: 1, is_preview: true },
+      { id: "option-chain-basics", title: "Option chain, expiry, premiums, and Greeks", video_url: "", sort_order: 2, is_preview: false },
+      { id: "risk-and-position-sizing", title: "Risk, position sizing, stoploss, and targets", video_url: "", sort_order: 3, is_preview: false },
+      { id: "option-buying-setups", title: "Option buying setups and execution planning", video_url: "", sort_order: 4, is_preview: false },
+      { id: "terminal-paper-trading", title: "Paper trading with Imperium Option Trading Terminal", video_url: "", sort_order: 5, is_preview: false },
+      { id: "terminal-workflow", title: "Terminal charts, orders, journal, and review workflow", video_url: "", sort_order: 6, is_preview: false },
+    ],
+    faq: [
+      {
+        question: "Is the course available now?",
+        answer:
+          "No. The course is listed as coming soon, so checkout is disabled until the learning program is ready.",
+      },
+      {
+        question: "Is this only for existing Imperium Option Trading Terminal users?",
+        answer:
+          "No. It is designed to teach options from the basics, but it also includes terminal-specific practice so learners can connect concepts to the actual trading workflow.",
+      },
+      {
+        question: "Will this course guarantee profitable trading?",
+        answer:
+          "No. The course is educational and focuses on process, risk, practice, and terminal workflows. Options trading is risky, and learners remain responsible for their own decisions.",
+      },
+    ],
+  },
 ];
 
 const READY_STATUS: ProductStatus = "ready";

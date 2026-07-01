@@ -259,7 +259,7 @@ function LoginForm() {
   const showGoogleAuth = mode === "signin" || mode === "signup";
 
   return (
-    <main className="mx-auto grid max-w-[1200px] gap-10 px-6 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-24">
+    <main className="page-container grid gap-10 py-14 lg:grid-cols-[0.92fr_1.08fr] lg:py-20">
       {confirmationEmail ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
           <section
@@ -305,7 +305,7 @@ function LoginForm() {
         </p>
       </section>
 
-      <section className="border border-cyan-border bg-section/95 p-6 shadow-2xl shadow-black/20 sm:p-8">
+      <section className="surface-panel p-6 sm:p-8">
         <div className="flex border border-cyan-border bg-main p-1 text-sm font-semibold">
           <button
             type="button"

@@ -1,8 +1,8 @@
 export default function Page() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-16">
-      <section className="border border-cyan-border bg-section p-6">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Store policy</p>
+    <main className="page-container max-w-3xl py-14">
+      <section className="policy-card">
+        <p className="section-kicker">Store policy</p>
         <h1 className="mt-3 text-4xl font-bold text-white">Terms</h1>
         <div className="mt-6 space-y-5 leading-8 text-muted">
           <p>

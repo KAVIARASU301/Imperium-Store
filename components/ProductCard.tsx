@@ -25,7 +25,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
 
   if (variant === "vertical") {
     return (
-      <article className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(16,29,47,0.96),rgba(11,22,38,0.98))] shadow-[0_24px_70px_rgba(0,0,0,0.38),0_0_0_1px_rgba(255,255,255,0.045)_inset] transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-[0_28px_78px_rgba(0,0,0,0.44),0_0_0_1px_rgba(255,255,255,0.06)_inset]">
+      <article className="interactive-panel group relative flex min-h-[430px] flex-col overflow-hidden">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/45 to-transparent" />
         <div className="relative border-b border-cyan-border bg-main/80 p-2">
           <Image
@@ -113,7 +113,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
   }
 
   return (
-    <article className="group overflow-hidden rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(16,29,47,0.94),rgba(11,22,38,0.98))] shadow-[0_20px_58px_rgba(0,0,0,0.32)] transition hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-[0_26px_76px_rgba(0,0,0,0.40)]">
+    <article className="interactive-panel group overflow-hidden">
       <div className="grid md:grid-cols-[180px_minmax(0,1fr)_220px]">
         <div className="relative bg-main/80 p-2 md:min-h-full">
           <Image

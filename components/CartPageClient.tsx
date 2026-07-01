@@ -177,9 +177,9 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   }
 
   return (
-    <main className="mx-auto max-w-[1200px] px-6 py-12">
-      <section className="border-b border-cyan-border pb-8">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-brand">Secure order review</p>
+    <main className="page-container py-12">
+      <section className="section-heading">
+        <p className="section-kicker">Secure order review</p>
         <h1 className="mt-2 max-w-4xl text-3xl font-extrabold tracking-normal text-white sm:text-4xl">
           Review Cart and Complete Payment
         </h1>
@@ -210,7 +210,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         </div>
       ) : (
         <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_390px]">
-          <section className="overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_22px_54px_rgba(0,0,0,0.32)]">
+          <section className="surface-panel overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-border bg-card-hover px-5 py-4">
               <div>
                 <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Selected products</p>
@@ -303,13 +303,13 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             ) : null}
           </section>
 
-          <aside className="h-fit overflow-hidden rounded-lg border-2 border-cyan-border bg-card shadow-[0_28px_70px_rgba(0,0,0,0.48),0_0_0_1px_rgba(255,255,255,0.08)_inset]">
-            <div className="border-b-2 border-cyan-border bg-card-hover px-5 py-4">
+          <aside className="surface-panel h-fit overflow-hidden">
+            <div className="border-b border-cyan-border bg-card-hover px-5 py-4">
               <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Payment summary</p>
               <p className="mt-1 text-sm font-medium text-white">Payments are processed through secure checkout</p>
             </div>
             <div className="p-5">
-              <div className="rounded-md border-2 border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
+              <div className="rounded-md border border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
                 <div className="space-y-3 text-sm text-muted">
                   <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
                   <div className="flex justify-between gap-4"><span>Items</span><span>{payableProducts.length}</span></div>

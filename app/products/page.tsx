@@ -2,6 +2,7 @@ import { getActiveProducts } from "@/lib/products";
 import ProductCatalog from "@/components/ProductCatalog";
 import type { Metadata } from "next";
 import { connection } from "next/server";
+import { Suspense } from "react";
 
 const title = "Trading Software & Courses | Imperium Store";
 const description =
@@ -40,8 +41,10 @@ export default async function ProductsPage() {
     const products = getActiveProducts();
 
     return (
-        <main className="mx-auto max-w-[1200px] px-6 py-6">
-            <ProductCatalog products={products} />
+        <main className="page-container py-10">
+            <Suspense fallback={null}>
+                <ProductCatalog products={products} />
+            </Suspense>
         </main>
     );
 }
