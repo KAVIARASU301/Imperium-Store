@@ -8,80 +8,137 @@ type PurchaseResponse = {
   purchases?: Purchase[];
 };
 
+type PurchaseCache = {
+  userId: string | null;
+  slugs: string[];
+  loaded: boolean;
+  refreshing: boolean;
+};
+
 const PURCHASED_PRODUCTS_UPDATED_EVENT = "imperium-purchased-products-updated";
-let cachedPurchasedSlugs: string[] | null = null;
+const AUTH_CHANGE_EVENT = "imperium-auth-change";
+const PURCHASE_LOAD_TIMEOUT_MS = 8000;
+
+let cache: PurchaseCache = { userId: null, slugs: [], loaded: false, refreshing: false };
 let loadPromise: Promise<string[]> | null = null;
+let isListeningForAuthChanges = false;
 
 export function usePurchasedProducts() {
-  const [purchasedSlugs, setPurchasedSlugs] = useState<string[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const [snapshot, setSnapshot] = useState(cache);
 
   useEffect(() => {
     let cancelled = false;
 
-    if (!loadPromise) {
-      loadPromise = loadPurchasedSlugs();
+    function syncSnapshot() {
+      if (!cancelled) setSnapshot({ ...cache });
     }
 
-    loadPromise.then((slugs) => {
-      if (!cancelled) {
-        setPurchasedSlugs(slugs);
-        setLoaded(true);
-      }
-    });
+    void refreshPurchasedProducts({ force: false });
+    syncSnapshot();
 
-    function syncPurchasedSlugs() {
-      setPurchasedSlugs(cachedPurchasedSlugs ?? []);
-      setLoaded(cachedPurchasedSlugs !== null);
-    }
+    ensureAuthChangeListener();
 
-    window.addEventListener(PURCHASED_PRODUCTS_UPDATED_EVENT, syncPurchasedSlugs);
+    window.addEventListener(PURCHASED_PRODUCTS_UPDATED_EVENT, syncSnapshot);
+    window.addEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
 
     return () => {
       cancelled = true;
-      window.removeEventListener(PURCHASED_PRODUCTS_UPDATED_EVENT, syncPurchasedSlugs);
+      window.removeEventListener(PURCHASED_PRODUCTS_UPDATED_EVENT, syncSnapshot);
+      window.removeEventListener(AUTH_CHANGE_EVENT, handleAuthChange);
     };
   }, []);
 
-  const purchasedSlugSet = useMemo(() => new Set(purchasedSlugs), [purchasedSlugs]);
+  const purchasedSlugSet = useMemo(() => new Set(snapshot.slugs), [snapshot.slugs]);
 
-  return { purchasedSlugs, purchasedSlugSet, loaded };
+  return {
+    purchasedSlugs: snapshot.slugs,
+    purchasedSlugSet,
+    loaded: snapshot.loaded,
+    refreshing: snapshot.refreshing,
+  };
 }
 
 export function markProductsPurchased(productSlugs: string[]) {
   if (productSlugs.length === 0) return;
-  cachedPurchasedSlugs = Array.from(new Set([...(cachedPurchasedSlugs ?? []), ...productSlugs]));
-  window.dispatchEvent(new Event(PURCHASED_PRODUCTS_UPDATED_EVENT));
+  cache = {
+    ...cache,
+    slugs: Array.from(new Set([...cache.slugs, ...productSlugs])),
+    loaded: true,
+    refreshing: false,
+  };
+  notifyPurchasedProductsUpdated();
+}
+
+export async function refreshPurchasedProducts({ force = true }: { force?: boolean } = {}) {
+  if (loadPromise && !force) return loadPromise;
+  if (cache.loaded && !force) return cache.slugs;
+
+  loadPromise = loadPurchasedSlugs();
+  return loadPromise.finally(() => {
+    loadPromise = null;
+  });
+}
+
+function ensureAuthChangeListener() {
+  if (isListeningForAuthChanges) return;
+  isListeningForAuthChanges = true;
+  const supabase = getSupabaseBrowserClient();
+  supabase.auth.onAuthStateChange(() => {
+    handleAuthChange();
+  });
+}
+
+function handleAuthChange() {
+  cache = { userId: null, slugs: [], loaded: false, refreshing: false };
+  loadPromise = null;
+  notifyPurchasedProductsUpdated();
+  void refreshPurchasedProducts({ force: true });
 }
 
 async function loadPurchasedSlugs() {
-  if (cachedPurchasedSlugs !== null) return cachedPurchasedSlugs;
+  cache = { ...cache, refreshing: true };
+  notifyPurchasedProductsUpdated();
 
   try {
     const supabase = getSupabaseBrowserClient();
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
+    const userId = data.session?.user?.id ?? null;
+
     if (!token) {
-      cachedPurchasedSlugs = [];
-      return cachedPurchasedSlugs;
+      cache = { userId: null, slugs: [], loaded: true, refreshing: false };
+      notifyPurchasedProductsUpdated();
+      return cache.slugs;
     }
 
-    const response = await fetch("/api/purchases/me", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) {
-      cachedPurchasedSlugs = [];
-      return cachedPurchasedSlugs;
-    }
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), PURCHASE_LOAD_TIMEOUT_MS);
 
-    const payload = (await response.json()) as PurchaseResponse;
-    const paidSlugs = Array.from(
-      new Set((payload.purchases ?? []).filter((purchase) => purchase.status === "paid").map((purchase) => purchase.product_id)),
-    );
-    cachedPurchasedSlugs = paidSlugs;
-    return cachedPurchasedSlugs;
+    try {
+      const response = await fetch("/api/purchases/me", {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: controller.signal,
+      });
+
+      if (!response.ok) throw new Error("Unable to load purchases");
+
+      const payload = (await response.json()) as PurchaseResponse;
+      const paidSlugs = Array.from(
+        new Set((payload.purchases ?? []).filter((purchase) => purchase.status === "paid").map((purchase) => purchase.product_id)),
+      );
+      cache = { userId, slugs: paidSlugs, loaded: true, refreshing: false };
+      notifyPurchasedProductsUpdated();
+      return cache.slugs;
+    } finally {
+      window.clearTimeout(timeout);
+    }
   } catch {
-    cachedPurchasedSlugs = [];
-    return cachedPurchasedSlugs;
+    cache = { ...cache, loaded: true, refreshing: false };
+    notifyPurchasedProductsUpdated();
+    return cache.slugs;
   }
+}
+
+function notifyPurchasedProductsUpdated() {
+  window.dispatchEvent(new Event(PURCHASED_PRODUCTS_UPDATED_EVENT));
 }
