@@ -16,6 +16,8 @@ type DemoUser = {
 };
 type DemoSession = { access_token: string; user: DemoUser };
 type BrowserSession = Session | DemoSession | null;
+type SignOutOptions = { scope?: "global" | "local" | "others" };
+
 type BrowserAuthClient = {
   getSession(): Promise<{ data: { session: BrowserSession }; error: null }>;
   signInWithOAuth(input: {
@@ -31,39 +33,39 @@ type BrowserAuthClient = {
     error: Error | null;
   }>;
   exchangeCodeForSession(
-    code: string,
+      code: string,
   ): Promise<
-    | { data: { session: BrowserSession }; error: null }
-    | { data: unknown; error: Error }
+      | { data: { session: BrowserSession }; error: null }
+      | { data: unknown; error: Error }
   >;
   signInWithPassword(input: {
     email: string;
     password: string;
   }): Promise<
-    | { data: { session: BrowserSession }; error: null }
-    | { data: unknown; error: Error }
+      | { data: { session: BrowserSession }; error: null }
+      | { data: unknown; error: Error }
   >;
   signUp(input: {
     email: string;
     password: string;
     options?: unknown;
   }): Promise<
-    | { data: { session: BrowserSession; user: User | DemoUser | null }; error: null }
-    | { data: unknown; error: Error }
+      | { data: { session: BrowserSession; user: User | DemoUser | null }; error: null }
+      | { data: unknown; error: Error }
   >;
   resetPasswordForEmail(
-    email: string,
-    options?: unknown,
+      email: string,
+      options?: unknown,
   ): Promise<{ data: unknown; error: Error | null }>;
   updateUser(
-    attributes: unknown,
+      attributes: unknown,
   ): Promise<{ data: { user: User | DemoUser | null }; error: Error | null }>;
-  signOut(): Promise<{ error: Error | null }>;
+  signOut(options?: SignOutOptions): Promise<{ error: Error | null }>;
   onAuthStateChange(
-    callback: (
-      event: AuthChangeEvent | string,
-      session: BrowserSession,
-    ) => void,
+      callback: (
+          event: AuthChangeEvent | string,
+          session: BrowserSession,
+      ) => void,
   ): { data: { subscription: { unsubscribe: () => void } } };
 };
 type BrowserSupabaseClient = { auth: BrowserAuthClient };
@@ -99,22 +101,22 @@ function createDemoBrowserClient() {
       },
       async signInWithPassword({ email }: { email: string; password: string }) {
         window.localStorage.setItem(
-          DEMO_SESSION_KEY,
-          email.trim().toLowerCase(),
+            DEMO_SESSION_KEY,
+            email.trim().toLowerCase(),
         );
         window.dispatchEvent(new Event(DEMO_AUTH_EVENT));
         return { data: { session: getDemoSession() }, error: null };
       },
       async signUp({
-        email,
-      }: {
+                     email,
+                   }: {
         email: string;
         password: string;
         options?: unknown;
       }) {
         window.localStorage.setItem(
-          DEMO_SESSION_KEY,
-          email.trim().toLowerCase(),
+            DEMO_SESSION_KEY,
+            email.trim().toLowerCase(),
         );
         window.dispatchEvent(new Event(DEMO_AUTH_EVENT));
         const session = getDemoSession();
@@ -126,13 +128,13 @@ function createDemoBrowserClient() {
       async updateUser() {
         return { data: { user: getDemoSession()?.user ?? null }, error: null };
       },
-      async signOut() {
+      async signOut(_options?: SignOutOptions) {
         window.localStorage.removeItem(DEMO_SESSION_KEY);
         window.dispatchEvent(new Event(DEMO_AUTH_EVENT));
         return { error: null };
       },
       onAuthStateChange(
-        callback: (_event: string, session: DemoSession | null) => void,
+          callback: (_event: string, session: DemoSession | null) => void,
       ) {
         const handler = () => callback("SIGNED_IN", getDemoSession());
         window.addEventListener(DEMO_AUTH_EVENT, handler);
@@ -140,7 +142,7 @@ function createDemoBrowserClient() {
           data: {
             subscription: {
               unsubscribe: () =>
-                window.removeEventListener(DEMO_AUTH_EVENT, handler),
+                  window.removeEventListener(DEMO_AUTH_EVENT, handler),
             },
           },
           error: null,
@@ -175,7 +177,7 @@ function createUnavailableBrowserClient() {
       async updateUser() {
         return { data: { user: null }, error };
       },
-      async signOut() {
+      async signOut(_options?: SignOutOptions) {
         return { error: null };
       },
       onAuthStateChange() {
@@ -197,15 +199,15 @@ export function hasSupabaseEnv() {
 export function getSupabaseBrowserClient(): BrowserSupabaseClient {
   if (!supabaseUrl || !supabaseAnonKey) {
     globalThis.__imperiumDemoBrowserClient ??= (
-      canUseDevelopmentFallbacks()
-        ? createDemoBrowserClient()
-        : createUnavailableBrowserClient()
+        canUseDevelopmentFallbacks()
+            ? createDemoBrowserClient()
+            : createUnavailableBrowserClient()
     ) as BrowserSupabaseClient;
     return globalThis.__imperiumDemoBrowserClient;
   }
   globalThis.__imperiumBrowserSupabaseClient ??= createClient(
-    supabaseUrl,
-    supabaseAnonKey,
+      supabaseUrl,
+      supabaseAnonKey,
   ) as BrowserSupabaseClient;
   return globalThis.__imperiumBrowserSupabaseClient;
 }
@@ -216,10 +218,10 @@ export function getSupabaseServerClient(useServiceRole = false) {
   return createClient(supabaseUrl, key, { auth: { persistSession: false } });
 }
 export const supabase =
-  supabaseUrl && supabaseAnonKey
-    ? typeof window === "undefined"
-      ? createClient(supabaseUrl, supabaseAnonKey, {
-          auth: { persistSession: false },
-        })
-      : getSupabaseBrowserClient()
-    : null;
+    supabaseUrl && supabaseAnonKey
+        ? typeof window === "undefined"
+            ? createClient(supabaseUrl, supabaseAnonKey, {
+              auth: { persistSession: false },
+            })
+            : getSupabaseBrowserClient()
+        : null;

@@ -17,7 +17,7 @@ type PurchaseCache = {
 
 const PURCHASED_PRODUCTS_UPDATED_EVENT = "imperium-purchased-products-updated";
 const AUTH_CHANGE_EVENT = "imperium-auth-change";
-const PURCHASE_LOAD_TIMEOUT_MS = 8000;
+const PURCHASE_LOAD_TIMEOUT_MS = 5000;
 
 let cache: PurchaseCache = { userId: null, slugs: [], loaded: false, refreshing: false };
 let loadPromise: Promise<string[]> | null = null;
@@ -124,7 +124,7 @@ async function loadPurchasedSlugs() {
 
       const payload = (await response.json()) as PurchaseResponse;
       const paidSlugs = Array.from(
-        new Set((payload.purchases ?? []).filter((purchase) => purchase.status === "paid").map((purchase) => purchase.product_id)),
+          new Set((payload.purchases ?? []).filter((purchase) => purchase.status === "paid").map((purchase) => purchase.product_id)),
       );
       cache = { userId, slugs: paidSlugs, loaded: true, refreshing: false };
       notifyPurchasedProductsUpdated();

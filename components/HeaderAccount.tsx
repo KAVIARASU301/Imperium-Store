@@ -84,11 +84,15 @@ export default function HeaderAccount({ mobile = false }: { mobile?: boolean }) 
 
   async function handleLogout() {
     setIsSigningOut(true);
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
     setUser(null);
     setIsMenuOpen(false);
-    setIsSigningOut(false);
+
+    const supabase = getSupabaseBrowserClient();
+    try {
+      await supabase.auth.signOut({ scope: "local" });
+    } finally {
+      setIsSigningOut(false);
+    }
   }
 
   if (!loaded) {
@@ -97,70 +101,70 @@ export default function HeaderAccount({ mobile = false }: { mobile?: boolean }) 
 
   if (!accountLabel) {
     return (
-      <Link
-        href="/login"
-        className={`${mobile ? "flex w-full justify-start" : "inline-flex justify-center"} min-h-11 items-center gap-2 rounded-md border border-brand/70 bg-brand/10 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20`}
-      >
-        <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
-        <span>Login</span>
-      </Link>
+        <Link
+            href="/login"
+            className={`${mobile ? "flex w-full justify-start" : "inline-flex justify-center"} min-h-11 items-center gap-2 rounded-md border border-brand/70 bg-brand/10 px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:border-brand hover:bg-brand/20`}
+        >
+          <Image src="/icons/login.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
+          <span>Login</span>
+        </Link>
     );
   }
 
   return (
-    <div ref={menuRef} className={mobile ? "relative w-full" : "relative"}>
-      <button
-        type="button"
-        className={`${mobile ? "flex w-full justify-between" : "inline-flex"} min-h-11 items-center gap-2 rounded-md border border-cyan-border bg-section px-3 py-2.5 font-medium text-white transition hover:border-brand hover:bg-card`}
-        aria-expanded={isMenuOpen}
-        aria-haspopup="menu"
-        onClick={() => setIsMenuOpen((open) => !open)}
-      >
-        <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
-        <span className={`${mobile ? "min-w-0 flex-1 text-left" : "max-w-32 sm:max-w-44"} truncate`}>{accountLabel}</span>
-        <Image
-          src="/icons/dropdown-arrow.svg"
-          alt=""
-          width={14}
-          height={14}
-          className={`h-3.5 w-3.5 transition ${isMenuOpen ? "rotate-180" : ""}`}
-          suppressHydrationWarning
-        />
-      </button>
+      <div ref={menuRef} className={mobile ? "relative w-full" : "relative"}>
+        <button
+            type="button"
+            className={`${mobile ? "flex w-full justify-between" : "inline-flex"} min-h-11 items-center gap-2 rounded-md border border-cyan-border bg-section px-3 py-2.5 font-medium text-white transition hover:border-brand hover:bg-card`}
+            aria-expanded={isMenuOpen}
+            aria-haspopup="menu"
+            onClick={() => setIsMenuOpen((open) => !open)}
+        >
+          <Image src="/icons/profile_avatar.svg" alt="" width={18} height={18} className="h-[18px] w-[18px]" suppressHydrationWarning />
+          <span className={`${mobile ? "min-w-0 flex-1 text-left" : "max-w-32 sm:max-w-44"} truncate`}>{accountLabel}</span>
+          <Image
+              src="/icons/dropdown-arrow.svg"
+              alt=""
+              width={14}
+              height={14}
+              className={`h-3.5 w-3.5 transition ${isMenuOpen ? "rotate-180" : ""}`}
+              suppressHydrationWarning
+          />
+        </button>
 
-      {isMenuOpen ? (
-        <div className={`${mobile ? "static mt-2 w-full" : "absolute right-0 z-50 mt-3 w-72"} overflow-hidden rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl`} role="menu">
-          <div className="mb-2 rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(19,40,68,0.82),rgba(16,29,47,0.72))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
-            <div className="flex min-w-0 items-center gap-3">
+        {isMenuOpen ? (
+            <div className={`${mobile ? "static mt-2 w-full" : "absolute right-0 z-50 mt-3 w-72"} overflow-hidden rounded-md border border-cyan-border bg-section/95 p-2 text-sm text-white shadow-[0_24px_70px_rgba(0,0,0,0.48)] backdrop-blur-xl`} role="menu">
+              <div className="mb-2 rounded-md border border-cyan-border bg-[linear-gradient(180deg,rgba(19,40,68,0.82),rgba(16,29,47,0.72))] p-3 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
+                <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gold/30 bg-main/70">
                 <Image src="/icons/profile_avatar.svg" alt="" width={22} height={22} className="h-[22px] w-[22px]" suppressHydrationWarning />
               </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-white">{accountLabel}</p>
-                {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-white">{accountLabel}</p>
+                    {user?.email ? <p className="mt-0.5 truncate text-xs text-muted">{user.email}</p> : null}
+                  </div>
+                </div>
               </div>
+              <Link href="/dashboard" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+                <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
+                My purchases
+              </Link>
+              <Link href="/support" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
+                <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
+                Support
+              </Link>
+              <button
+                  type="button"
+                  className="mt-1 flex min-h-11 w-full items-center gap-3 rounded-md border-t border-cyan-border px-3 py-3 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
+                  role="menuitem"
+                  disabled={isSigningOut}
+                  onClick={handleLogout}
+              >
+                <Image src="/icons/logout.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
+                {isSigningOut ? "Signing out..." : "Logout"}
+              </button>
             </div>
-          </div>
-          <Link href="/dashboard" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/icons/portfolio.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
-            My purchases
-          </Link>
-          <Link href="/support" className="flex min-h-11 items-center gap-3 rounded-md px-3 py-3 text-muted transition hover:bg-card-hover hover:text-white" role="menuitem" onClick={() => setIsMenuOpen(false)}>
-            <Image src="/icons/support/support.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
-            Support
-          </Link>
-          <button
-            type="button"
-            className="mt-1 flex min-h-11 w-full items-center gap-3 rounded-md border-t border-cyan-border px-3 py-3 text-left text-rose-200 transition hover:bg-rose-950/40 hover:text-rose-100 disabled:cursor-wait disabled:opacity-60"
-            role="menuitem"
-            disabled={isSigningOut}
-            onClick={handleLogout}
-          >
-            <Image src="/icons/logout.svg" alt="" width={16} height={16} className="h-4 w-4" suppressHydrationWarning />
-            {isSigningOut ? "Signing out..." : "Logout"}
-          </button>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
   );
 }
