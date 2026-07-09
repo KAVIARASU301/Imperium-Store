@@ -29,6 +29,27 @@ type RazorpaySuccessResponse = {
   razorpay_signature: string;
 };
 
+const PHONE_STORAGE_PREFIX = "imperium.checkout.phone:";
+
+function normalizePhone(value: string) {
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
+  if (digits.length === 11 && digits.startsWith("0")) return digits.slice(1);
+  return digits;
+}
+
+function isValidIndianMobile(value: string) {
+  return /^[6-9]\d{9}$/.test(value);
+}
+
+function getMetadataString(user: unknown, key: string): string {
+  if (!user || typeof user !== "object" || !("user_metadata" in user)) return "";
+  const metadata = (user as { user_metadata?: unknown }).user_metadata;
+  if (!metadata || typeof metadata !== "object") return "";
+  const value = (metadata as Record<string, unknown>)[key];
+  return typeof value === "string" ? value : "";
+}
+
 const orderSteps = [
   { label: "Cart", text: "Review products and account email." },
   { label: "Payment", text: "Complete payment through the secure checkout." },
@@ -39,6 +60,10 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   const router = useRouter();
   const [cartSlugs, setCartSlugs] = useState<string[]>([]);
   const [email, setEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [savedPhone, setSavedPhone] = useState("");
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -63,6 +88,14 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       const supabase = getSupabaseBrowserClient();
       const { data } = await supabase.auth.getSession();
       setEmail(data.session?.user.email ?? null);
+      if (data.session) {
+        const id = data.session.user.id;
+        const metadataPhone = normalizePhone(getMetadataString(data.session.user, "contact_phone"));
+        const storedPhone = normalizePhone(window.localStorage.getItem(PHONE_STORAGE_PREFIX + id) ?? "");
+        setUserId(id);
+        setSavedPhone(metadataPhone);
+        setPhone(storedPhone || metadataPhone);
+      }
       setAuthChecked(true);
     }
 
@@ -112,6 +145,19 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         router.push("/dashboard");
         return;
       }
+      const cleanPhone = normalizePhone(phone);
+      if (!isValidIndianMobile(cleanPhone)) {
+        setPhoneError("Enter your 10-digit mobile number to continue to payment.");
+        setLoading(false);
+        return;
+      }
+      setPhoneError("");
+      window.localStorage.setItem(PHONE_STORAGE_PREFIX + (userId ?? sessionData.session?.user.id ?? ""), cleanPhone);
+      if (cleanPhone !== savedPhone) {
+        setSavedPhone(cleanPhone);
+        void supabase.auth.updateUser({ data: { contact_phone: cleanPhone } });
+      }
+
       const res = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
@@ -141,7 +187,11 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         currency: order.currency,
         name: "Imperium Store",
         description: productIds.length === 1 ? payableProducts[0]?.name : `${productIds.length} Imperium products`,
-        prefill: { email: sessionData.session?.user.email ?? undefined },
+        prefill: {
+          email: sessionData.session?.user.email ?? undefined,
+          contact: `+91${cleanPhone}`,
+          name: getMetadataString(sessionData.session?.user, "full_name") || getMetadataString(sessionData.session?.user, "name") || undefined,
+        },
         theme: { color: "#2F6FA6" },
         handler: async (response: RazorpaySuccessResponse) => {
           try {
@@ -319,9 +369,34 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                 </div>
               </div>
               {email ? (
-                <button type="button" disabled={loading || payableProducts.length === 0} onClick={startPayment} className="mt-5 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
-                  {loading ? "Starting Payment..." : payableProducts.length === 0 && unavailableCartProducts.length > 0 ? "No Ready Products" : "Pay Securely Now"}
-                </button>
+                <>
+                  <label className="mt-5 block text-sm font-medium text-white">
+                    Mobile number
+                    <div className={`mt-2 flex items-center rounded-md border bg-main focus-within:border-brand ${phoneError ? "border-error/50" : "border-cyan-border"}`}>
+                      <span className="pl-4 text-sm font-semibold text-muted">+91</span>
+                      <input
+                        value={phone}
+                        onChange={(event) => {
+                          setPhone(normalizePhone(event.target.value).slice(0, 10));
+                          setPhoneError("");
+                        }}
+                        type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel-national"
+                        placeholder="10-digit mobile"
+                        className="min-w-0 flex-1 bg-transparent px-3 py-3 text-white outline-none"
+                      />
+                    </div>
+                  </label>
+                  {phoneError ? (
+                    <p className="mt-2 text-xs font-medium text-error">{phoneError}</p>
+                  ) : (
+                    <p className="mt-2 text-xs leading-5 text-muted">Used for the payment — checkout opens directly on payment options.</p>
+                  )}
+                  <button type="button" disabled={loading || payableProducts.length === 0} onClick={startPayment} className="mt-4 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
+                    {loading ? "Starting Payment..." : payableProducts.length === 0 && unavailableCartProducts.length > 0 ? "No Ready Products" : "Pay Securely Now"}
+                  </button>
+                </>
               ) : (
                 <Link href={`/login?next=${encodeURIComponent("/cart")}`} className="mt-5 block btn-primary px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30 ">
                   Sign In to Pay
