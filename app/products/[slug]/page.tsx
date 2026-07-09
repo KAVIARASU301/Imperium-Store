@@ -65,7 +65,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     <main className="page-container py-8 sm:py-14">
       <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_360px]">
         <section>
-          <p className="inline-flex rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-brand">{product.type}</p>
+          <p className="inline-flex rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-brand">{product.type === "app" ? "Software" : product.type}</p>
           <div className="mt-4 flex items-start gap-3 sm:items-center sm:gap-4">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-section p-2 shadow-[0_12px_28px_rgba(0,0,0,0.24)] sm:h-16 sm:w-16 sm:p-3">
               <Image
@@ -85,10 +85,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="mt-5 lg:hidden">
             <PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} />
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-6 text-muted sm:text-base sm:leading-7">
-            <span className="sm:hidden">{product.short_description}</span>
-            <span className="hidden sm:inline">{product.description}</span>
-          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-6 text-muted sm:text-base sm:leading-7">{product.description}</p>
           {product.badges?.length || !isReady ? (
             <div className="mt-5 flex flex-wrap gap-2 sm:mt-6">
               {!isReady ? (
@@ -106,10 +103,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="mt-6 sm:mt-10"><ProductImage product={product} priority compactMobile /></div>
           {product.highlights?.length ? <Highlights items={product.highlights} /> : null}
           {product.gallery?.length ? <Gallery productName={product.name} items={product.gallery} /> : null}
-          <Info title="Who this is for" items={product.audience} />
-          <Info title="What problem it solves" items={product.problems} />
           <Info title="What you get" items={product.includes} />
-          <Info title="How it helps" items={product.outcomes} />
           {product.lessons ? <Info title="Course lessons" items={[...product.lessons].sort((a, b) => a.sort_order - b.sort_order).map((lesson) => `${lesson.title}${lesson.is_preview ? " (preview)" : ""}`)} /> : null}
           <section className="mt-8 sm:mt-12">
             <h2 className="section-title border-b border-cyan-border pb-3">FAQ</h2>
@@ -171,9 +165,8 @@ function Gallery({ productName, items }: { productName: string; items: ProductGa
       <div className="mt-4 grid gap-4 sm:mt-5 sm:gap-5">
         {items.map((item, index) => (
           <figure key={item.src} className={`${index >= 2 ? "hidden sm:block" : ""} surface-panel overflow-hidden`}>
-            <div className="grid gap-px bg-cyan-border font-mono text-[10px] uppercase tracking-[0.16em] text-muted sm:grid-cols-[1fr_auto]">
-              <div className="bg-card px-3 py-2 text-white">{item.title}</div>
-              <div className="bg-card px-3 py-2">Screenshot file</div>
+            <div className="border-b border-cyan-border bg-card px-3 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-white">
+              {item.title}
             </div>
             <div className="bg-main p-2">
               <Image

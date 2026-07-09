@@ -45,6 +45,7 @@ export default function AddToCartButton({
     const { data } = await supabase.auth.getSession();
 
     if (!data.session?.access_token) {
+      setCheckingAuth(false);
       router.push(`/login?next=${encodeURIComponent(getCurrentPath())}`);
       return;
     }

@@ -179,13 +179,10 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   return (
     <main className="page-container py-12">
       <section className="section-heading">
-        <p className="section-kicker">Secure order review</p>
-        <h1 className="mt-2 max-w-4xl text-3xl font-extrabold tracking-normal text-white sm:text-4xl">
-          Review Cart and Complete Payment
+        <p className="section-kicker">Checkout</p>
+        <h1 className="mt-2 text-3xl font-extrabold tracking-normal text-white sm:text-4xl">
+          Complete your purchase
         </h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-          Review your selected products, add more tools if needed, and complete payment through the secure checkout from this page.
-        </p>
       </section>
 
       {cartProducts.length === 0 ? (
@@ -193,7 +190,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
           <StatePanel
             eyebrow="Cart is empty"
             title="Add a product to start checkout."
-            description="Your cart has no products right now. Browse the catalog, or open your purchase library if you already completed payment."
+            description="Browse the catalog, or open My Purchases if you already completed payment."
             icon="/icons/cart.svg"
             actions={
               <>

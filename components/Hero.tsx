@@ -34,18 +34,18 @@ export default function Hero() {
                       <div className="inline-flex rounded-md border border-brand/45 bg-main/85 px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-brand shadow-[0_12px_28px_rgba(0,0,0,0.28)] sm:px-4 sm:py-2 sm:text-xs">
                         {ready ? "Available now / Instant download" : "Coming soon"}
                       </div>
-                      <h1 className="mt-4 max-w-[12ch] text-4xl font-black uppercase leading-[0.92] tracking-normal text-white sm:text-7xl lg:text-8xl">
+                      <h1 className="mt-4 max-w-[14ch] text-4xl font-black uppercase leading-[0.95] tracking-normal text-white sm:text-6xl lg:text-7xl">
                         Trade faster. Practice safer.
                       </h1>
                       <p className="mt-4 max-w-2xl text-sm font-medium leading-6 text-copy sm:mt-6 sm:text-lg sm:leading-7">
                         {terminal.promise}
                       </p>
                       <div className="mt-5 flex flex-wrap justify-center gap-2 pb-5 sm:mt-7 sm:gap-3 sm:pb-8">
-                        <Link href="/products" className="btn-primary rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white sm:px-5 sm:py-3 sm:text-sm">
-                          Explore Products
+                        <Link href="/products/imperium-option-trading-terminal" className="btn-primary rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] text-white sm:px-5 sm:py-3 sm:text-sm">
+                          Get the Terminal
                         </Link>
-                        <Link href="/products/imperium-option-trading-terminal" className="btn-ghost rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] backdrop-blur sm:px-5 sm:py-3 sm:text-sm">
-                          View the Terminal
+                        <Link href="/products" className="btn-ghost rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] backdrop-blur sm:px-5 sm:py-3 sm:text-sm">
+                          All Products
                         </Link>
                       </div>
                     </div>
@@ -61,8 +61,8 @@ export default function Hero() {
                         {ready && gstInclusiveText ? <p className="mt-1 text-[10px] text-muted">{gstInclusiveText}</p> : null}
                       </div>
                       <div className="bg-main/88 p-3 backdrop-blur sm:p-4">
-                        <p>Support</p>
-                        <p className="mt-2 font-sans text-sm font-bold normal-case tracking-normal text-white">Email & WhatsApp</p>
+                        <p>Broker support</p>
+                        <p className="mt-2 font-sans text-sm font-bold normal-case tracking-normal text-white">7 Indian brokers</p>
                       </div>
                     </div>
                   </div>

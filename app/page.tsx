@@ -9,7 +9,7 @@ import { connection } from "next/server";
 
 const homeTitle = "Imperium Option Trading Terminal | Imperium Store";
 const homeDescription =
-    "Download Imperium Option Trading Terminal, a desktop options execution terminal for Indian traders with one-click multi-strike entries and exits, strategy-level risk control, paper trading, NSE/BSE F&O workflows, and free TradingView-style charts.";
+    "Imperium Option Trading Terminal: one-click multi-strike execution, strategy-level risk control, trade copier for sub-accounts, and free TradingView-style charts. Works with 7 Indian brokers across NSE and BSE F&O.";
 const terminalPreviewImage = "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png";
 const terminalProductPath = "/products/imperium-option-trading-terminal";
 
@@ -41,16 +41,12 @@ export const metadata: Metadata = {
 };
 
 const principles = [
-    { title: "Built for execution", text: "Strike ladders, quick orders, and live risk controls designed around active sessions." },
-    { title: "Practice first", text: "Paper trading and replay tools let you test a process before using live capital." },
-    { title: "One workspace", text: "Indian and U.S. markets, charts, and portfolio review in a single desktop app." },
-    { title: "Fast entries and exits", text: "Quick trading mode and hotkeys help options traders, especially option buyers, act faster." },
-    { title: "Strategy builder", text: "Preloaded options strategies and grouped positions keep multi-leg trades easier to manage." },
-    { title: "Focused terminal", text: "Zero outside noise: trading tools, charts, orders, and review stay inside one workflow." },
-    { title: "Trading journal", text: "Input journal notes, review trades, and keep decision context close to order history." },
-    { title: "Market replay", text: "Practice repeatedly with market replay using any compatible CSV file." },
-    { title: "Charting included", text: "Built-in TradingView-style charts with tick-data support can reduce the need for a separate chart subscription." },
-    { title: "Static IP support", text: "Relay server support helps users who need a static-IP-friendly broker connection setup." },
+    { title: "7 Indian brokers", text: "Zerodha, Upstox, Angel One, Dhan, Fyers, Groww, and Alice Blue in one terminal." },
+    { title: "One-click multi-strike", text: "Enter and exit multiple strikes in a single click, straight from the option chain." },
+    { title: "Strategy-level risk", text: "Stoploss and target at the portfolio, strategy, and position level." },
+    { title: "Free pro charting", text: "TradingView-style charts with tick data. No separate subscription." },
+    { title: "Trade copier", text: "Mirror orders across your sub-accounts automatically as you trade." },
+    { title: "Practice first", text: "Paper trading and market replay before using live capital." },
 ];
 
 export default async function HomePage() {
@@ -119,36 +115,27 @@ export default async function HomePage() {
             <section className="page-container page-section">
                 <div className="section-heading mb-4 sm:mb-6">
                     <p className="section-kicker">Why Imperium</p>
-                    <h2 className="section-title">Built for disciplined trading workflows</h2>
+                    <h2 className="section-title">Built for serious options traders</h2>
                 </div>
                 <dl className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
-                    {principles.map((item, index) => (
-                        <div
-                            key={item.title}
-                            className="interactive-panel group p-4 sm:min-h-32 sm:p-5"
-                        >
-                            <div className="mb-3 flex items-center justify-between border-b border-cyan-border pb-2 sm:mb-4 sm:pb-3">
-                                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">
-                                    {String(index + 1).padStart(2, "0")}
-                                </span>
-                                <span className="h-px w-10 bg-gold/50 transition group-hover:w-14 group-hover:bg-gold-bright" />
-                            </div>
-                            <dt className="text-sm font-semibold text-white">{item.title}</dt>
-                            <dd className="mt-2 text-sm leading-6 text-muted">{item.text}</dd>
+                    {principles.map((item) => (
+                        <div key={item.title} className="interactive-panel group p-5">
+                            <span className="block h-px w-10 bg-gold/50 transition group-hover:w-14 group-hover:bg-gold-bright" />
+                            <dt className="mt-4 text-sm font-semibold text-white">{item.title}</dt>
+                            <dd className="mt-1.5 text-sm leading-6 text-muted">{item.text}</dd>
                         </div>
                     ))}
                 </dl>
             </section>
 
             <section className="page-container page-section">
-                <div className="surface-panel grid gap-4 p-5 sm:gap-5 sm:p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+                <div className="surface-panel flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6 md:p-8">
                     <div>
-                        <p className="section-kicker">Ready to buy</p>
-                        <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl">Choose your Imperium workstation.</h2>
-                        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">One clean checkout, account-based delivery, stored receipts, and current download access from your dashboard.</p>
+                        <h2 className="text-xl font-bold text-white sm:text-2xl">Ready when you are.</h2>
+                        <p className="mt-1.5 text-sm leading-6 text-muted">One-time purchase. Instant download from your dashboard.</p>
                     </div>
-                    <Link href="/products" className="btn-primary inline-flex min-h-11 items-center justify-center rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
-                        Explore Products
+                    <Link href={terminalProductPath} className="btn-primary inline-flex min-h-11 items-center justify-center rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
+                        Get the Terminal
                     </Link>
                 </div>
             </section>

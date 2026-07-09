@@ -36,9 +36,9 @@ function getOAuthError(value: string | null) {
 }
 
 const existingAccountMessage =
-  "An account already exists with this email. Use Login or Forgot password to recover that account and keep access to previous purchases. To create a separate account, use a different email address.";
+  "An account already exists with this email. Use Login or Forgot password to recover it. To create a separate account, use a different email.";
 const signupFailureMessage =
-  "Unable to create this account. If you already have an Imperium account, use Login or Forgot password to recover access.";
+  "Unable to create this account. If you already have an Imperium account, use Login or Forgot password.";
 
 function LoginForm() {
   const router = useRouter();
@@ -60,10 +60,7 @@ function LoginForm() {
   const [status, setStatus] = useState<AuthStatus>(() =>
     oauthError
       ? { tone: "error", text: oauthError }
-      : {
-          tone: "info",
-          text: "Sign in to access purchases, downloads, invoices, and product updates.",
-        },
+      : { tone: "info", text: "" },
   );
 
   const title = useMemo(() => {
@@ -81,10 +78,10 @@ function LoginForm() {
       tone: "info",
       text:
         nextMode === "forgot"
-          ? "Enter your email and we will send a secure password reset link."
+          ? "Enter your email and we will send a reset link."
           : nextMode === "reset"
-            ? "Use the password reset link from your email, then save a stronger password."
-            : "Sign in to access purchases, downloads, invoices, and product updates.",
+            ? "Set a new password for your account."
+            : "",
     });
   }
 
@@ -108,7 +105,7 @@ function LoginForm() {
         if (error) throw error;
         setStatus({
           tone: "success",
-          text: "Password reset email sent. Check your inbox and follow the secure link.",
+          text: "Reset email sent. Check your inbox and follow the link.",
         });
         return;
       }
@@ -166,7 +163,7 @@ function LoginForm() {
         setConfirmationEmail(cleanEmail);
         setStatus({
           tone: "success",
-          text: `Account created for ${cleanEmail}. You must confirm the email before logging in. For now, the confirmation email may appear from "Supabase Auth".`,
+          text: `Account created for ${cleanEmail}. Confirm the email before logging in.`,
         });
         return;
       }
@@ -239,78 +236,47 @@ function LoginForm() {
   const showGoogleAuth = mode === "signin" || mode === "signup";
 
   return (
-    <main className="page-container grid gap-10 py-14 lg:grid-cols-[0.92fr_1.08fr] lg:py-20">
+    <main className="mx-auto w-full max-w-[440px] px-4 py-12 sm:py-16">
       {confirmationEmail ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4">
           <section
             aria-modal="true"
             role="dialog"
-            className="w-full max-w-lg border border-cyan-border bg-section p-6 shadow-2xl shadow-black/40 sm:p-8"
+            className="w-full max-w-md rounded-md border border-cyan-border bg-section p-6 shadow-2xl shadow-black/40 sm:p-8"
           >
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-brand">
-              Email confirmation required
+              Confirm your email
             </p>
-            <h2 className="mt-4 text-2xl font-semibold text-white">
-              Check your inbox before logging in.
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Check your inbox to activate your account.
             </h2>
-            <p className="mt-4 leading-7 text-white">
-              We created the account for <span className="font-semibold text-white">{confirmationEmail}</span>. Open the confirmation email and verify your address. Login will work only after the email is confirmed.
+            <p className="mt-4 text-sm leading-6 text-muted">
+              We sent a confirmation link to{" "}
+              <span className="font-semibold text-white">{confirmationEmail}</span>.
+              Login works only after the email is confirmed. The sender may appear
+              as <span className="font-semibold text-white">Supabase Auth</span> —
+              check spam or promotions if you do not see it.
             </p>
-            <p className="mt-4 border border-cyan-border bg-card px-4 py-3 text-sm leading-6 text-white">
-              For now, the email sender may show as <span className="font-semibold text-white">Supabase Auth</span>. Search your inbox for that sender if you do not see an Imperium Store email.
-            </p>
-            <div className="mt-6 border border-amber-300/30 bg-amber-300/10 px-4 py-3 text-sm leading-6 text-amber-100">
-              If you do not see the email, check spam, promotions, or updates folders before trying to create another account.
-            </div>
             <button
               type="button"
               onClick={() => setConfirmationEmail("")}
-              className="mt-6 w-full btn-primary px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white "
+              className="btn-primary mt-6 w-full rounded-md px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white"
             >
-              I understand, go to login
+              Go to login
             </button>
           </section>
         </div>
       ) : null}
-      <section className="flex flex-col self-start">
-        <p className="font-mono text-xs font-semibold uppercase tracking-[0.28em] text-brand">
-          Secure customer access
-        </p>
-        <h1 className="mt-5 text-4xl font-extrabold tracking-normal text-white sm:text-5xl">
-          Sign in to your Imperium account.
-        </h1>
-        <p className="mt-5 text-base leading-7 text-muted">
-          Access your purchases, downloads, invoices, and product updates from one
-          secure account.
-        </p>
-      </section>
 
       <section className="surface-panel p-6 sm:p-8">
-        <div className="flex border border-cyan-border bg-main p-1 text-sm font-semibold">
-          <button
-            type="button"
-            onClick={() => switchMode("signin")}
-            className={`flex-1 px-4 py-2 ${mode === "signin" ? "btn-primary text-white" : "text-muted hover:text-white"}`}
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("signup")}
-            className={`flex-1 px-4 py-2 ${mode === "signup" ? "btn-primary text-white" : "text-muted hover:text-white"}`}
-          >
-            Sign up
-          </button>
-        </div>
-
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-white">{title}</h2>
-          {status.tone !== "error" ? (
-            <p className={`mt-2 text-sm leading-6 ${status.tone === "success" ? "text-emerald-300" : "text-muted"}`}>
-              {status.text}
-            </p>
-          ) : null}
-        </div>
+        <h1 className="text-center text-2xl font-bold text-white">{title}</h1>
+        <p className="mt-1.5 text-center text-sm text-muted">
+          {mode === "signin" || mode === "signup"
+            ? "Access your purchases and downloads."
+            : status.tone !== "error"
+              ? status.text
+              : ""}
+        </p>
 
         {showGoogleAuth ? (
           <div className="mt-6 space-y-4">
@@ -318,7 +284,7 @@ function LoginForm() {
               type="button"
               disabled={loading}
               onClick={signInWithGoogle}
-              className="flex min-h-12 w-full items-center justify-center gap-3 border border-cyan-border bg-white px-4 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-slate-950 shadow-lg shadow-black/20 hover:border-white hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex min-h-12 w-full items-center justify-center gap-3 rounded-md border border-cyan-border bg-white px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-black/20 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Image
                 src="/icons/google.svg"
@@ -330,12 +296,18 @@ function LoginForm() {
               />
               {loading ? "Please wait..." : "Continue with Google"}
             </button>
-            <div className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-muted">
+            <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
               <span className="h-px flex-1 bg-cyan-border" />
-              <span>Email access</span>
+              <span>or use email</span>
               <span className="h-px flex-1 bg-cyan-border" />
             </div>
           </div>
+        ) : null}
+
+        {(mode === "signin" || mode === "signup") && status.tone === "success" ? (
+          <p className="mt-4 rounded-md border border-success/30 bg-success/10 px-4 py-3 text-sm leading-6 text-emerald-200">
+            {status.text}
+          </p>
         ) : null}
 
         <form onSubmit={submit} className="mt-6 space-y-4">
@@ -345,7 +317,7 @@ function LoginForm() {
               <input
                 value={fullName}
                 onChange={(event) => setFullName(event.target.value)}
-                className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
+                className="mt-2 w-full rounded-md border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
                 placeholder="Your name"
                 autoComplete="name"
                 minLength={4}
@@ -360,7 +332,7 @@ function LoginForm() {
             <input
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
+              className="mt-2 w-full rounded-md border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
               placeholder="you@example.com"
               type="email"
               autoComplete="email"
@@ -371,7 +343,7 @@ function LoginForm() {
           {showPasswordFields ? (
             <label className="block text-sm font-medium text-white">
               {mode === "reset" ? "New password" : "Password"}
-              <div className="mt-2 flex border border-cyan-border bg-main focus-within:border-brand">
+              <div className="mt-2 flex rounded-md border border-cyan-border bg-main focus-within:border-brand">
                 <input
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
@@ -401,7 +373,7 @@ function LoginForm() {
               <input
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className="mt-2 w-full border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
+                className="mt-2 w-full rounded-md border border-cyan-border bg-main px-4 py-3 text-white outline-none focus:border-brand"
                 placeholder="Repeat password"
                 type="password"
                 minLength={8}
@@ -413,7 +385,7 @@ function LoginForm() {
 
           <button
             disabled={loading}
-            className="w-full btn-primary px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white  disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-primary w-full rounded-md px-4 py-3 font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading
               ? "Please wait..."
@@ -427,21 +399,30 @@ function LoginForm() {
           </button>
 
           {status.tone === "error" ? (
-            <p className="border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-semibold leading-6 text-red-100">
+            <p className="rounded-md border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm leading-6 text-red-100">
               {status.text}
             </p>
           ) : null}
         </form>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
-          {mode !== "forgot" && mode !== "reset" ? (
-            <button
-              type="button"
-              onClick={() => switchMode("forgot")}
-              className="font-semibold text-brand hover:text-white"
-            >
-              Forgot password?
-            </button>
+          {mode === "signin" ? (
+            <>
+              <button
+                type="button"
+                onClick={() => switchMode("forgot")}
+                className="font-semibold text-brand hover:text-white"
+              >
+                Forgot password?
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode("signup")}
+                className="font-semibold text-brand hover:text-white"
+              >
+                New here? Create account
+              </button>
+            </>
           ) : (
             <button
               type="button"
@@ -451,18 +432,16 @@ function LoginForm() {
               Back to login
             </button>
           )}
-          <span>
-            Account security and data handling are covered in our{" "}
-            <Link
-              href="/privacy-policy"
-              className="text-brand hover:text-white"
-            >
-              Privacy Policy
-            </Link>
-            .
-          </span>
         </div>
       </section>
+
+      <p className="mt-4 text-center text-xs text-muted">
+        Your data is handled per our{" "}
+        <Link href="/privacy-policy" className="text-brand hover:text-white">
+          Privacy Policy
+        </Link>
+        .
+      </p>
     </main>
   );
 }

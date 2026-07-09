@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   applicationName: "Imperium Store",
   title: "Imperium Option Trading Terminal | Imperium Store",
   description:
-      "Imperium Option Trading Terminal is desktop trading software for Indian options traders, with one-click multi-strike execution, strategy risk control, NSE/BSE F&O workflows, paper trading, and free TradingView-style charts.",
+      "Imperium Option Trading Terminal: one-click multi-strike execution, strategy-level risk control, trade copier, and free TradingView-style charts. Works with 7 Indian brokers across NSE and BSE F&O.",
   openGraph: {
     title: "Imperium Option Trading Terminal | Imperium Store",
     description:
-        "A desktop options execution terminal for Indian traders: one-click multi-strike entries and exits, strategy-level risk control, paper trading, NSE/BSE F&O workflows, and free professional charting.",
+        "One-click multi-strike execution, strategy-level risk control, trade copier, and free professional charting. Works with 7 Indian brokers across NSE and BSE F&O.",
     url: "/",
     siteName: "Imperium Store",
     type: "website",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Imperium Option Trading Terminal | Imperium Store",
     description:
-        "One-click multi-strike options execution, strategy risk control, paper trading, NSE/BSE F&O support, and free TradingView-style charts in one desktop terminal.",
+        "One-click multi-strike execution, strategy risk control, trade copier, and free TradingView-style charts. Works with 7 Indian brokers.",
     images: ["/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png"],
   },
   icons: {
@@ -88,7 +88,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               </span>
             <span>
                 <span className="block text-sm font-extrabold uppercase tracking-[0.1em] sm:tracking-[0.12em]">Imperium Store</span>
-                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted sm:block">Trading tools & learning</span>
+                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted sm:block">Trading software</span>
               </span>
           </Link>
           <Suspense fallback={null}>
@@ -102,7 +102,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <div>
             <p className="font-semibold text-white">Imperium Store</p>
             <p className="mt-2 max-w-xl leading-6">
-              Digital trading tools, account delivery, receipts, and support for Imperium customers. Educational tools only.
+              Official store for Imperium trading software. Educational tools only.
             </p>
             <p className="mt-4 font-mono text-xs uppercase tracking-[0.14em]">© 2026 Imperium Store</p>
           </div>

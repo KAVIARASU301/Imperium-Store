@@ -8,10 +8,10 @@ export default function BuyButton({ slug, price, productName, isReady }: { slug:
   const { purchasedSlugSet } = usePurchasedProducts();
   const isPurchased = purchasedSlugSet.has(slug);
   const message = isPurchased
-    ? `${productName} is already available in your account.`
+    ? `${productName} is already in your account.`
     : isReady
-      ? `${productName} will be added to your cart for final review.`
-      : `${productName} is coming soon. Checkout is not available yet.`;
+      ? "Secure Razorpay checkout. Instant download after payment."
+      : `${productName} is coming soon.`;
 
   return (
       <div>
@@ -19,10 +19,10 @@ export default function BuyButton({ slug, price, productName, isReady }: { slug:
             slug={slug}
             checkout
             isReady={isReady}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white "
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 btn-primary rounded-md px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.08em] text-white"
         >
           <Image src={price === 0 ? "/icons/tick.svg" : "/icons/cart.svg"} alt="" width={18} height={18} className="h-[18px] w-[18px]" />
-          {isReady ? (price === 0 ? "Get Access" : "Review and Pay") : "Coming Soon"}
+          {isReady ? (price === 0 ? "Get Access" : "Buy Now") : "Coming Soon"}
         </AddToCartButton>
         <p className="mt-2 text-center text-xs font-medium text-muted">
           {message}
