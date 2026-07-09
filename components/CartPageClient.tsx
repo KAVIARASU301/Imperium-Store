@@ -180,6 +180,8 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       }
       if (!order.keyId) throw new Error("Checkout is not configured");
 
+      let paymentFailed = false;
+
       const checkout = await createRazorpayCheckout({
         key: order.keyId,
         order_id: order.orderId,
@@ -193,30 +195,31 @@ export default function CartPageClient({ products }: { products: Product[] }) {
           name: getMetadataString(sessionData.session?.user, "full_name") || getMetadataString(sessionData.session?.user, "name") || undefined,
         },
         theme: { color: "#2F6FA6" },
-        handler: async (response: RazorpaySuccessResponse) => {
-          try {
-            const verifyRes = await fetch("/api/razorpay/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify(response),
-            });
-            const verifyPayload = await verifyRes.json();
-            if (!verifyRes.ok) throw new Error(verifyPayload.message ?? "Payment verification failed");
-            clearCartItems(verifyPayload.productIds ?? productIds);
-            markProductsPurchased(verifyPayload.productIds ?? productIds);
-            router.push(`/checkout/success?order_id=${response.razorpay_order_id}`);
-          } catch (error) {
-            setError(error instanceof Error ? error.message : "Payment verification failed");
-            setLoading(false);
-          }
+        handler: (response: RazorpaySuccessResponse) => {
+          // Kick off server verification but do not gate on it: the success
+          // page polls the status API, which reconciles with Razorpay on its
+          // own. Blocking here risks stranding a charged user on the cart.
+          void fetch("/api/razorpay/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify(response),
+            keepalive: true,
+          }).catch(() => {});
+          router.push(`/checkout/success?order_id=${response.razorpay_order_id}`);
         },
         modal: {
-          ondismiss: () => setLoading(false),
+          ondismiss: () => {
+            setLoading(false);
+            // Failed attempts stay inside the modal so Razorpay can offer a
+            // retry with another method; only a close-after-failure lands on
+            // the failed page.
+            if (paymentFailed) router.push(`/checkout/failed?order_id=${order.orderId}`);
+          },
         },
       });
 
       checkout.on("payment.failed", () => {
-        router.push(`/checkout/failed?order_id=${order.orderId}`);
+        paymentFailed = true;
       });
 
       checkout.open();

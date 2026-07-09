@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
+import { clearCartItems } from "@/lib/cart";
+import { markProductsPurchased } from "@/components/usePurchasedProducts";
 import PostPurchaseOnboarding from "@/components/PostPurchaseOnboarding";
 import StatePanel from "@/components/StatePanel";
 
@@ -37,10 +39,17 @@ function CheckoutSuccessInner() {
         if (!res.ok) throw new Error(typeof payload.message === "string" ? payload.message : "Unable to load payment status");
         lastError = "";
         setMessage("");
-        if (Array.isArray(payload.productIds)) {
-          setConfirmedProductIds(payload.productIds.filter((productId: unknown): productId is string => typeof productId === "string"));
+        const productIds: string[] = Array.isArray(payload.productIds)
+          ? payload.productIds.filter((productId: unknown): productId is string => typeof productId === "string")
+          : [];
+        if (productIds.length) setConfirmedProductIds(productIds);
+        if (payload.status === "paid") {
+          if (productIds.length) {
+            clearCartItems(productIds);
+            markProductsPurchased(productIds);
+          }
+          return setStatus("paid");
         }
-        if (payload.status === "paid") return setStatus("paid");
         if (payload.status === "failed") return setStatus("failed");
         setStatus("pending");
       } catch (error) {
