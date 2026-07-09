@@ -67,8 +67,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/imperium_store_icons/imperium_icon_32x32.png" />
         <link rel="icon" type="image/png" sizes="64x64" href="/icons/imperium_store_icons/imperium_icon_64x64.png" />
       </head>
-      <body className="min-h-full bg-main text-white">
-      <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/88 backdrop-blur-xl">
+      {/* Base color lives on <html>; a body background would paint over the
+          fixed body::before gradient layer (negative z-index). */}
+      <body className="min-h-full text-white">
+      <header className="sticky top-0 z-40 border-b border-cyan-border bg-main/95 md:bg-main/88 md:backdrop-blur-xl">
         <nav className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3.5">
           <Link
               href="/"
@@ -97,26 +99,24 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </nav>
       </header>
       {children}
-      <footer className="mt-16 border-t border-cyan-border bg-section/70 px-6 py-10 text-sm text-muted">
-        <div className="mx-auto grid max-w-[1200px] gap-8 md:grid-cols-[1fr_auto] md:items-start">
+      <footer className="mt-16 border-t border-cyan-border bg-section/70 px-6 py-6 text-sm text-muted">
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-semibold text-white">Imperium Store</p>
-            <p className="mt-2 max-w-xl leading-6">
-              Official store for Imperium trading software. Educational tools only.
-            </p>
-            <p className="mt-4 font-mono text-xs uppercase tracking-[0.14em]">© 2026 Imperium Store</p>
+            <p className="mt-1 text-xs leading-5">Official store for Imperium trading software. Educational tools only.</p>
           </div>
-          <div className="grid min-w-[280px] gap-px overflow-hidden rounded-md border border-cyan-border bg-cyan-border text-xs font-semibold uppercase tracking-[0.08em] text-white sm:grid-cols-2">
-            <Link href="/products" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Products</Link>
-            <Link href="/dashboard" className="bg-main/70 px-4 py-3 hover:bg-card-hover">My Purchases</Link>
-            <Link href="/support" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Support</Link>
-            <Link href="/contact" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Contact</Link>
-            <Link href="/disclaimer" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Disclaimer</Link>
-            <Link href="/refund-policy" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Refund Policy</Link>
-            <Link href="/terms" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Terms</Link>
-            <Link href="/privacy-policy" className="bg-main/70 px-4 py-3 hover:bg-card-hover">Privacy</Link>
-          </div>
+          <nav aria-label="Footer" className="flex max-w-md flex-wrap gap-x-4 gap-y-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] md:justify-end">
+            <Link href="/products" className="hover:text-white">Products</Link>
+            <Link href="/dashboard" className="hover:text-white">My Purchases</Link>
+            <Link href="/support" className="hover:text-white">Support</Link>
+            <Link href="/contact" className="hover:text-white">Contact</Link>
+            <Link href="/disclaimer" className="hover:text-white">Disclaimer</Link>
+            <Link href="/refund-policy" className="hover:text-white">Refund Policy</Link>
+            <Link href="/terms" className="hover:text-white">Terms</Link>
+            <Link href="/privacy-policy" className="hover:text-white">Privacy</Link>
+          </nav>
         </div>
+        <p className="mx-auto mt-4 max-w-[1200px] border-t border-soft-border pt-3 font-mono text-[10px] uppercase tracking-[0.14em]">© 2026 Imperium Store</p>
       </footer>
       </body>
       </html>

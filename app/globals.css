@@ -94,15 +94,21 @@ html {
   scroll-behavior: smooth;
 }
 body {
+  color: var(--text-body);
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+/* background-attachment: fixed forces a full-viewport repaint on every
+   scroll frame on mobile; a fixed pseudo-element layer composites instead. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background:
     radial-gradient(760px 320px at 50% -190px, rgba(47, 111, 166, 0.22), transparent 70%),
     linear-gradient(180deg, rgba(11, 22, 38, 0.98) 0%, rgba(5, 8, 15, 0.99) 32rem, rgba(5, 8, 15, 1) 100%),
     var(--bg-main);
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  background-size: 100% 100%, 100% 100%;
-  color: var(--text-body);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
 }
 ::selection {
   background: rgba(139, 188, 232, 0.28);
