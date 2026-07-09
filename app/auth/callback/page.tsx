@@ -3,6 +3,9 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import { preconnect } from "react-dom";
+
+const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL;
 
 function safeRedirectPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//"))
@@ -16,6 +19,12 @@ function getLoginUrl(next: string, message: string) {
 }
 
 function OAuthCallback() {
+  // Open the Supabase connection early — the code exchange fetch fires as
+  // soon as this page hydrates.
+  if (supabaseOrigin) {
+    preconnect(supabaseOrigin, { crossOrigin: "anonymous" });
+  }
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.toString();
@@ -27,6 +36,10 @@ function OAuthCallback() {
 
   useEffect(() => {
     let cancelled = false;
+
+    // Warm the destination route while the code exchange is in flight so
+    // the post-login navigation doesn't start from a cold cache.
+    router.prefetch(next);
 
     async function finishGoogleSignIn() {
       const params = new URLSearchParams(search);

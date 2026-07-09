@@ -4,7 +4,8 @@ import { getSupabaseBrowserClient } from "@/lib/supabase";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, type FormEvent, useMemo, useState } from "react";
+import { Suspense, type FormEvent, useEffect, useMemo, useState } from "react";
+import { preconnect } from "react-dom";
 
 type AuthMode = "signin" | "signup" | "forgot" | "reset";
 
@@ -40,7 +41,18 @@ const existingAccountMessage =
 const signupFailureMessage =
   "Unable to create this account. If you already have an Imperium account, use Login or Forgot password.";
 
+const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL;
+
 function LoginForm() {
+  // Warm up DNS/TLS for the OAuth redirect chain before the user clicks
+  // "Continue with Google" (navigation and CORS fetches use separate
+  // connection pools, so Supabase gets both variants).
+  if (supabaseOrigin) {
+    preconnect(supabaseOrigin);
+    preconnect(supabaseOrigin, { crossOrigin: "anonymous" });
+    preconnect("https://accounts.google.com");
+  }
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialMode = getAuthMode(searchParams.get("mode"));
@@ -62,6 +74,17 @@ function LoginForm() {
       ? { tone: "error", text: oauthError }
       : { tone: "info", text: "" },
   );
+
+  // If the user backs out of the Google consent screen, the browser may
+  // restore this page from the back/forward cache with the loading state
+  // frozen at true, leaving the buttons stuck on "Please wait...".
+  useEffect(() => {
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) setLoading(false);
+    }
+    window.addEventListener("pageshow", handlePageShow);
+    return () => window.removeEventListener("pageshow", handlePageShow);
+  }, []);
 
   const title = useMemo(() => {
     if (mode === "signup") return "Create your account";
@@ -197,7 +220,6 @@ function LoginForm() {
   async function signInWithGoogle() {
     setLoading(true);
     setStatus({ tone: "info", text: "Opening Google sign-in..." });
-    router.prefetch(next);
 
     try {
       const supabase = getSupabaseBrowserClient();
