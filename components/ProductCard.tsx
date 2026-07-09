@@ -102,9 +102,12 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
               </Link>
               <AddToCartButton
                 slug={product.slug}
+                checkout
                 isReady={ready}
                 className="btn-primary flex min-h-10 items-center justify-center rounded-md px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.08em]"
-              />
+              >
+                {product.price === 0 ? "Get Access" : "Buy Now"}
+              </AddToCartButton>
             </div>
           </div>
         </div>
@@ -196,9 +199,12 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             </Link>
             <AddToCartButton
                 slug={product.slug}
+                checkout
                 isReady={ready}
                 className="btn-primary flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white"
-            />
+            >
+              {product.price === 0 ? "Get Access" : "Buy Now"}
+            </AddToCartButton>
         </div>
       </div>
     </article>
