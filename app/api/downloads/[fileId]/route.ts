@@ -1,5 +1,5 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { createGithubReleaseDownloadResponse } from "@/lib/downloads";
+import { createGithubReleaseDownloadResponse, resolveGithubReleaseDownloadUrl } from "@/lib/downloads";
 import { getProductFileById } from "@/lib/products";
 import { hasPaidAccess } from "@/lib/purchases";
 import { NextResponse } from "next/server";
@@ -13,8 +13,15 @@ export async function GET(request: Request, ctx: RouteContext<"/api/downloads/[f
     if (!user) return NextResponse.json({ message: "Authentication required" }, { status: 401 });
     if (!(await hasPaidAccess(user.id, file.product_slug))) return NextResponse.json({ message: "Paid access required" }, { status: 403 });
     try {
+      const directUrl = await resolveGithubReleaseDownloadUrl(file);
+      if (directUrl) {
+        return NextResponse.json(
+          { url: directUrl, file_name: file.file_name },
+          { headers: { "Cache-Control": "private, no-store" } },
+        );
+      }
       const download = await createGithubReleaseDownloadResponse(file);
-      if (!download.body) return NextResponse.json({ message: "Download is not ready. Try again." }, { status: 503 });
+      if (!download.body) return NextResponse.json({ message: "Your download is not ready yet. Please try again in a moment." }, { status: 503 });
       return new Response(download.body, {
         status: 200,
         headers: {
@@ -26,10 +33,10 @@ export async function GET(request: Request, ctx: RouteContext<"/api/downloads/[f
       });
     } catch (error) {
       console.error("Download unavailable", error);
-      return NextResponse.json({ message: "Download is not ready. Try again." }, { status: 503 });
+      return NextResponse.json({ message: "Your download is not ready yet. Please try again in a moment." }, { status: 503 });
     }
   } catch (error) {
     console.error("Download request failed", error);
-    return NextResponse.json({ message: "Unable to prepare download." }, { status: 500 });
+    return NextResponse.json({ message: "We could not prepare your download. Please try again." }, { status: 500 });
   }
 }

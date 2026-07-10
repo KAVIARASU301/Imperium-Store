@@ -3,7 +3,7 @@
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type DownloadButtonProps = {
   fileId: string;
@@ -12,39 +12,52 @@ type DownloadButtonProps = {
   wrapperClassName?: string;
 };
 
+type DownloadState = "idle" | "loading" | "started" | "failed";
+
 export default function DownloadButton({
   fileId,
   label = "Download",
   className = "",
   wrapperClassName = "",
 }: DownloadButtonProps) {
-  const [downloadFailed, setDownloadFailed] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, setState] = useState<DownloadState>("idle");
+  const startedTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (startedTimeout.current) clearTimeout(startedTimeout.current);
+    };
+  }, []);
 
   async function handleDownload() {
-    if (isLoading) return;
-    setIsLoading(true);
-    setDownloadFailed(false);
+    if (state === "loading") return;
+    if (startedTimeout.current) clearTimeout(startedTimeout.current);
+    setState("loading");
     try {
       const { data } = await getSupabaseBrowserClient().auth.getSession();
       const token = data.session?.access_token;
       const res = await fetch(`/api/downloads/${fileId}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
       if (!res.ok) throw new Error("Download failed");
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = getDownloadFileName(res.headers.get("content-disposition"));
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
+
+      const contentType = res.headers.get("content-type") ?? "";
+      if (contentType.includes("application/json")) {
+        const payload = await res.json();
+        if (typeof payload.url !== "string") throw new Error("Download failed");
+        triggerBrowserDownload(payload.url);
+      } else {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        triggerBrowserDownload(url, getDownloadFileName(res.headers.get("content-disposition")));
+        URL.revokeObjectURL(url);
+      }
+      setState("started");
+      startedTimeout.current = setTimeout(() => setState("idle"), 8000);
     } catch {
-      setDownloadFailed(true);
-    } finally {
-      setIsLoading(false);
+      setState("failed");
     }
   }
+
+  const isLoading = state === "loading";
 
   return (
     <div className={wrapperClassName || "sm:text-right"}>
@@ -61,7 +74,7 @@ export default function DownloadButton({
         {isLoading ? (
           <>
             <span className="h-4 w-4 animate-spin border-2 border-muted border-t-white" aria-hidden="true" />
-            Preparing
+            Starting
           </>
         ) : (
           <>
@@ -70,10 +83,16 @@ export default function DownloadButton({
           </>
         )}
       </button>
-      {isLoading ? <p className="mt-2 text-xs text-brand">Preparing download...</p> : null}
-      {downloadFailed ? (
+      {isLoading ? <p className="mt-2 text-xs text-brand" role="status">Preparing your download...</p> : null}
+      {state === "started" ? (
+        <p className="mt-2 text-xs text-success" role="status">
+          Your download has started. Check your browser&apos;s downloads.
+        </p>
+      ) : null}
+      {state === "failed" ? (
         <div className="mt-3 rounded-md border border-error/35 bg-error/10 p-3 text-left" role="alert">
-          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-error">Download failed</p>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-error">Download did not start</p>
+          <p className="mt-2 text-xs leading-5 text-muted">Please try again. If it keeps failing, contact support and we will sort it out.</p>
           <div className="mt-3 grid gap-2">
             <button
               type="button"
@@ -94,6 +113,16 @@ export default function DownloadButton({
       ) : null}
     </div>
   );
+}
+
+function triggerBrowserDownload(url: string, fileName?: string) {
+  const link = document.createElement("a");
+  link.href = url;
+  link.rel = "noopener";
+  if (fileName) link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 function getDownloadFileName(contentDisposition: string | null) {

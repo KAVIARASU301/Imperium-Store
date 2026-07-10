@@ -50,9 +50,9 @@ export default function PostPurchaseOnboarding({
   const steps: OnboardingStep[] = [
     {
       eyebrow: "Download",
-      title: "Get the correct build from My Purchases.",
+      title: "Download the version for your operating system.",
       description:
-        "Choose the Windows or Linux build from your licensed downloads. Access stays tied to the account used during checkout.",
+        "Choose the Windows or Linux download in My Purchases. Access stays tied to the account you used at checkout.",
       href: "/dashboard#downloads",
       action: "Go to downloads",
       icon: "/icons/download.svg",
@@ -74,18 +74,18 @@ export default function PostPurchaseOnboarding({
       : []),
     {
       eyebrow: "Receipt",
-      title: "Keep the order reference available.",
+      title: "Keep your receipt handy.",
       description:
-        "Receipts help with support and account recovery. Save the Razorpay order reference if you ever need help matching a payment.",
+        "Your receipt carries the order reference we use to verify payments. Keep it available in case you ever need support or account recovery.",
       href: orderId ? `/receipts/${encodeURIComponent(orderId)}` : "/dashboard#downloads",
       action: orderId ? "View receipt" : "Find receipts",
       icon: "/icons/receipt.svg",
     },
     {
       eyebrow: "Support",
-      title: "Contact support if download or login gets stuck.",
+      title: "Contact support if anything gets stuck.",
       description:
-        "Share your registered account email, Razorpay order ID, product name, operating system, and any error message so support can verify quickly.",
+        "Include your account email, order ID, product name, and operating system so we can verify your purchase and help you faster.",
       href: "/support",
       action: "Contact support",
       icon: "/icons/support/support.svg",
@@ -99,13 +99,13 @@ export default function PostPurchaseOnboarding({
       <div className="flex flex-col gap-3 border-b border-cyan-border pb-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-bright">
-            {context === "success" ? "Post-purchase setup" : "Start here"}
+            {context === "success" ? "Post-purchase setup" : "Setup guide"}
           </p>
           <h2 className="mt-2 text-2xl font-bold tracking-normal text-white">
-            {context === "success" ? "Your purchase is ready. Follow these steps next." : "Finish setup from your purchase library."}
+            {context === "success" ? "Your purchase is ready. Follow these steps next." : "New here? Get set up in a few minutes."}
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-            Download first, set terminal authentication when required, keep your receipt, and use support with the right details if anything blocks installation.
+            Download your software, set your terminal password if you signed up with Google, and keep your receipt handy in case you ever need help.
           </p>
         </div>
         <OnboardingLink

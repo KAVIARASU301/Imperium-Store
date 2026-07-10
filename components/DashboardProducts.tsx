@@ -87,7 +87,7 @@ export default function DashboardProducts({ products }: { products: Product[] })
       <div className="rounded-md border border-cyan-border bg-section/90 p-6 shadow-[0_18px_48px_rgba(0,0,0,0.28)]" role="status" aria-live="polite">
         <div className="flex items-center gap-3 text-sm text-muted">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-border border-t-brand" aria-hidden="true" />
-          <span className="font-mono uppercase tracking-[0.12em]">Checking purchase access...</span>
+          <span className="font-mono uppercase tracking-[0.12em]">Loading your purchases...</span>
         </div>
       </div>
     );
@@ -96,9 +96,9 @@ export default function DashboardProducts({ products }: { products: Product[] })
   if (state === "signed-out") {
     return (
       <StatePanel
-        eyebrow="Secure account required"
-        title="Log in to view your purchase library."
-        description="Downloads and receipts are tied to the account used during checkout. Sign in with that email to restore access."
+        eyebrow="Account required"
+        title="Log in to see your purchases."
+        description="Your downloads and receipts are linked to the email you used at checkout. Log in with that email to access them."
         actions={
           <>
             <Link href="/login?next=/dashboard" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
@@ -117,9 +117,9 @@ export default function DashboardProducts({ products }: { products: Product[] })
     return (
       <StatePanel
         tone="error"
-        eyebrow="Library unavailable"
+        eyebrow="Something went wrong"
         title="We could not load your purchases."
-        description={errorMessage || "Your account is signed in, but the purchase service did not return a usable response."}
+        description={errorMessage || "This is usually temporary. Please try again in a moment."}
         actions={
           <>
             <button
@@ -172,15 +172,13 @@ export default function DashboardProducts({ products }: { products: Product[] })
 
   return (
     <div className="grid gap-5">
-      {unlockedCount > 0 ? <PostPurchaseOnboarding showTerminalPasswordStep={hasTerminalPurchase} /> : null}
-      {hasTerminalPurchase ? <TerminalPasswordPanel /> : null}
       <div id="downloads" className="grid scroll-mt-28 gap-5">
         {unlockedCount === 0 ? (
           <StatePanel
             tone="info"
             eyebrow="No purchases yet"
-            title="This account does not have unlocked downloads."
-            description="Buy a product with this signed-in account to unlock downloads and receipts here. If you just paid, refresh the library after Razorpay finishes confirmation."
+            title="You have not purchased anything yet."
+            description="When you buy a product with this account, its downloads and receipt appear here automatically. Just completed a payment? It can take a moment to confirm — refresh to check."
             actions={
               <>
                 <Link href="/products" className="inline-flex min-h-11 items-center justify-center btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
@@ -237,8 +235,8 @@ export default function DashboardProducts({ products }: { products: Product[] })
                 <div className="mt-5 border-t border-cyan-border pt-5">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
-                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">Licensed builds</p>
-                      <p className="mt-1 text-sm text-muted">Download the current release for your operating system.</p>
+                      <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">Your downloads</p>
+                      <p className="mt-1 text-sm text-muted">Download the latest version for your operating system.</p>
                     </div>
                     {purchase?.status === "paid" ? (
                       <Link
@@ -287,9 +285,9 @@ export default function DashboardProducts({ products }: { products: Product[] })
                     <StatePanel
                       compact
                       tone="warning"
-                      eyebrow="Builds pending"
-                      title="No download files are published yet."
-                      description="Your license is active. The product build is still being prepared and will appear here when it is published."
+                      eyebrow="Download in preparation"
+                      title="Your download is on its way."
+                      description="Your purchase is active. We are preparing this version and it will appear here as soon as it is ready."
                       actions={
                         <Link href="/support" className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold text-white hover:border-brand hover:bg-card-hover">
                           Ask support
@@ -315,6 +313,8 @@ export default function DashboardProducts({ products }: { products: Product[] })
           );
         })}
       </div>
+      {hasTerminalPurchase ? <TerminalPasswordPanel /> : null}
+      {unlockedCount > 0 ? <PostPurchaseOnboarding showTerminalPasswordStep={hasTerminalPurchase} /> : null}
     </div>
   );
 }
@@ -327,10 +327,10 @@ function getLockedTitle(status?: string, ready = true) {
 }
 
 function getLockedMessage(status?: string, ready = true) {
-  if (!ready) return "This product is not ready for checkout yet.";
-  if (status === "pending") return "Open the product page to complete checkout or refresh payment confirmation.";
-  if (status === "failed") return "You can start checkout again when you are ready.";
-  return "Purchase this product to unlock downloads and receipts in your account.";
+  if (!ready) return "This product is not available for purchase yet. It will unlock here when it launches.";
+  if (status === "pending") return "We are waiting for your payment to be confirmed. This usually takes less than a minute — refresh this page to check again.";
+  if (status === "failed") return "Your last payment did not go through. You can start checkout again whenever you are ready.";
+  return "Purchase this product to unlock its downloads and receipt here.";
 }
 
 function shouldUsePurchaseForProduct(purchase: Purchase, existing?: Purchase) {
@@ -357,8 +357,8 @@ function getPlatformTitle(file: ProductFile) {
 }
 
 function getPlatformNote(file: ProductFile) {
-  if (file.platform === "linux") return "Developed and tested on Linux Mint. Recommended for Linux Mint users.";
-  if (file.platform === "windows") return "Windows build for users running Imperium on Windows.";
+  if (file.platform === "linux") return "Built and tested on Linux Mint. Recommended if you use a Linux desktop.";
+  if (file.platform === "windows") return "For desktops and laptops running Windows.";
   return "Download package for this platform.";
 }
 

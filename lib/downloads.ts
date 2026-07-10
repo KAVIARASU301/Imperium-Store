@@ -12,6 +12,32 @@ interface GitHubRelease {
   assets: GitHubReleaseAsset[];
 }
 
+export async function resolveGithubReleaseDownloadUrl(file: ProductFile) {
+  const release = await fetchLatestRelease(file.release_repository);
+  const platform = file.platform.toLowerCase();
+  const asset = release.assets.find((item) => isPlatformZip(item.name, platform));
+  if (asset) {
+    const res = await fetch(asset.url, {
+      headers: getGitHubHeaders({
+        Accept: "application/octet-stream",
+        "User-Agent": "imperium-store",
+      }),
+      redirect: "manual",
+      cache: "no-store",
+    });
+    await res.body?.cancel();
+    const location = res.headers.get("location");
+    // No redirect means GitHub is serving the bytes directly; let the
+    // streaming path handle it instead of a direct URL.
+    return location ?? null;
+  }
+
+  const bodyUrl = findReleaseBodyZipUrl(release.body, platform);
+  if (bodyUrl) return bodyUrl;
+
+  throw new Error(`No ${file.platform} zip found in ${file.release_repository} latest release`);
+}
+
 export async function createGithubReleaseDownloadResponse(file: ProductFile) {
   const release = await fetchLatestRelease(file.release_repository);
   const platform = file.platform.toLowerCase();

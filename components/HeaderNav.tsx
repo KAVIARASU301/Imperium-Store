@@ -50,24 +50,27 @@ export default function HeaderNav() {
         <HeaderAccount />
       </div>
 
-      <button
-        type="button"
-        className="inline-flex h-12 w-12 touch-manipulation select-none items-center justify-center rounded-md border border-cyan-border bg-section text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition active:border-brand active:bg-card hover:border-brand hover:bg-card md:hidden"
-        aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-        aria-expanded={isOpen}
-        aria-haspopup="menu"
-        aria-controls="mobile-navigation"
-        onClick={() => setIsOpen((open) => !open)}
-      >
-        <Image
-          src={isOpen ? "/icons/cross.svg" : "/icons/menu.svg"}
-          alt=""
-          width={22}
-          height={22}
-          className="h-[22px] w-[22px]"
-          suppressHydrationWarning
-        />
-      </button>
+      <div className="flex items-center gap-2 md:hidden">
+        <HeaderAccount compact />
+        <button
+          type="button"
+          className="inline-flex h-12 w-12 touch-manipulation select-none items-center justify-center rounded-md border border-cyan-border bg-section text-white shadow-[0_10px_24px_rgba(0,0,0,0.22)] transition active:border-brand active:bg-card hover:border-brand hover:bg-card"
+          aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+          aria-controls="mobile-navigation"
+          onClick={() => setIsOpen((open) => !open)}
+        >
+          <Image
+            src={isOpen ? "/icons/cross.svg" : "/icons/menu.svg"}
+            alt=""
+            width={22}
+            height={22}
+            className="h-[22px] w-[22px]"
+            suppressHydrationWarning
+          />
+        </button>
+      </div>
 
       {isOpen ? (
         <>
@@ -96,9 +99,6 @@ export default function HeaderNav() {
           <Link href="/dashboard" className={getMobileNavLinkClass(isDashboardActive, "flex items-center")} role="menuitem" onClick={() => setIsOpen(false)}>
             My Purchases
           </Link>
-          <div className="mt-2 border-t border-cyan-border pt-3">
-            <HeaderAccount mobile />
-          </div>
           </div>
         </>
       ) : null}
