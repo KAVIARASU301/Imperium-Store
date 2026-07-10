@@ -1,11 +1,12 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { formatPrice, getProductBySlug, getProductsGstInclusiveText } from "@/lib/products";
 import { getPurchasesByOrderId } from "@/lib/purchases";
+import { SUPPORT_EMAIL } from "@/lib/support";
 import { NextResponse } from "next/server";
 
 const defaultSeller = {
   name: "Imperium Store",
-  email: "support@imperiumstore.in",
+  email: SUPPORT_EMAIL,
   address: "India",
 };
 

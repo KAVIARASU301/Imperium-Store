@@ -1,3 +1,5 @@
+export const SUPPORT_EMAIL = "support@imperiumstore.in";
+
 export function getSupportWhatsapp() {
   const rawNumber = process.env.SUPPORT_WHATSAPP_NUMBER;
   const digits = rawNumber?.replace(/\D/g, "") ?? "";
