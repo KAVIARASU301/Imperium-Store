@@ -183,7 +183,7 @@ export default function TerminalPasswordPanel() {
             Create or update your Imperium terminal password.
           </h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-            Google login can unlock your store purchases here, but the desktop terminal signs in with email and password. Set this password for the same Supabase account before opening Imperium.
+            Google login works for the store, but the desktop terminal signs in with your email and a password. Set that password here for your Imperium Store account before opening the terminal.
           </p>
           <div className="mt-4 rounded-md border border-cyan-border bg-main/55 p-4 text-sm leading-6 text-white">
             <p className="font-semibold">Terminal login email</p>

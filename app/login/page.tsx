@@ -274,10 +274,10 @@ function LoginForm() {
             </h2>
             <p className="mt-4 text-sm leading-6 text-muted">
               We sent a confirmation link to{" "}
-              <span className="font-semibold text-white">{confirmationEmail}</span>.
-              Login works only after the email is confirmed. The sender may appear
-              as <span className="font-semibold text-white">Supabase Auth</span> —
-              check spam or promotions if you do not see it.
+              <span className="font-semibold text-white">{confirmationEmail}</span>{" "}
+              from <span className="font-semibold text-white">Imperium Store</span>.
+              Login works only after the email is confirmed — check spam or
+              promotions if you do not see it.
             </p>
             <button
               type="button"
