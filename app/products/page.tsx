@@ -7,7 +7,7 @@ import { Suspense } from "react";
 const title = "Trading Software & Courses | Imperium Store";
 const description =
     "Browse Imperium Store trading software for Indian market traders, including options execution, portfolio management, risk control, and market review tools.";
-const catalogPreviewImage = "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png";
+const catalogPreviewImage = "/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg";
 
 export const metadata: Metadata = {
     title,
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
         images: [
             {
                 url: catalogPreviewImage,
-                width: 2048,
-                height: 1113,
+                width: 1200,
+                height: 653,
                 alt: "Imperium Store catalog with trading software for Indian market traders",
             },
         ],

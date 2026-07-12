@@ -28,9 +28,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png",
-        width: 2048,
-        height: 1113,
+        url: "/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg",
+        width: 1200,
+        height: 653,
         alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
       },
     ],
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: "Imperium Option Trading Terminal | Imperium Store",
     description:
         "One-click multi-strike execution, strategy risk control, trade copier, and free TradingView-style charts. Works with 7 Indian brokers.",
-    images: ["/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png"],
+    images: ["/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg"],
   },
   icons: {
     icon: [

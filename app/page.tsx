@@ -10,7 +10,7 @@ import { connection } from "next/server";
 const homeTitle = "Imperium Option Trading Terminal | Imperium Store";
 const homeDescription =
     "Imperium Option Trading Terminal: one-click multi-strike execution, strategy-level risk control, trade copier for sub-accounts, and free TradingView-style charts. Works with 7 Indian brokers across NSE and BSE F&O.";
-const terminalPreviewImage = "/product-resources/imperium-option-trading-terminal/imperium_option_trading_terminal.png";
+const terminalPreviewImage = "/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg";
 const terminalProductPath = "/products/imperium-option-trading-terminal";
 
 export const metadata: Metadata = {
@@ -26,8 +26,8 @@ export const metadata: Metadata = {
         images: [
             {
                 url: terminalPreviewImage,
-                width: 2048,
-                height: 1113,
+                width: 1200,
+                height: 653,
                 alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
             },
         ],

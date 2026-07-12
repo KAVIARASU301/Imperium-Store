@@ -1,5 +1,21 @@
 import Link from "next/link";
+import Image from "next/image";
 import { formatCurrencySymbol, formatPriceAmount, getProductBySlug, getProductGstInclusiveText, isProductReady } from "@/lib/products";
+
+const brokerIcons = [
+  { src: "/icons/supported_broker_icons/zerodha/zerodha_kite.png", alt: "Zerodha" },
+  { src: "/icons/supported_broker_icons/upstox/upstox.png", alt: "Upstox" },
+  { src: "/icons/supported_broker_icons/angelone/angelone.png", alt: "Angel One" },
+  { src: "/icons/supported_broker_icons/dhan/dhan.png", alt: "Dhan" },
+  { src: "/icons/supported_broker_icons/fyers/fyers.png", alt: "Fyers" },
+  { src: "/icons/supported_broker_icons/groww/groww.png", alt: "Groww" },
+  { src: "/icons/supported_broker_icons/alice_blue/aliceblue.png", alt: "Alice Blue" },
+];
+
+const osIcons = [
+  { src: "/icons/windows.svg", label: "Windows" },
+  { src: "/icons/linux-mint.svg", label: "Linux (Linux Mint)" },
+];
 
 export default function Hero() {
   const terminal = getProductBySlug("imperium-option-trading-terminal");
@@ -41,6 +57,32 @@ export default function Hero() {
                         <Link href="/products" className="btn-ghost rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] sm:px-5 sm:py-3 sm:text-sm">
                           All Products
                         </Link>
+                      </div>
+
+                      <div className="mt-9 flex flex-col items-center gap-3 sm:mt-11">
+                        <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted sm:text-[10px]">Supported brokers</p>
+                        <ul className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                          {brokerIcons.map((broker) => (
+                            <li
+                              key={broker.src}
+                              className="flex h-9 w-9 items-center justify-center rounded-md border border-cyan-border bg-white p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.35)] sm:h-10 sm:w-10"
+                            >
+                              <Image src={broker.src} alt={broker.alt} width={30} height={30} className="h-full w-full object-contain" sizes="40px" />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:mt-7">
+                        <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted sm:text-[10px]">Runs on</span>
+                        {osIcons.map((os) => (
+                          <span key={os.label} className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-md border border-cyan-border bg-white p-1">
+                              <Image src={os.src} alt="" width={18} height={18} className="h-full w-full object-contain" sizes="28px" />
+                            </span>
+                            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-copy">{os.label}</span>
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
