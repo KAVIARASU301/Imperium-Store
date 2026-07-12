@@ -65,7 +65,7 @@ export default function Hero() {
                           {brokerIcons.map((broker) => (
                             <li
                               key={broker.src}
-                              className="flex h-9 w-9 items-center justify-center rounded-md border border-cyan-border bg-white p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.35)] sm:h-10 sm:w-10"
+                              className="flex h-9 w-9 items-center justify-center rounded-md border border-cyan-border bg-card p-1.5 shadow-[0_2px_12px_rgba(0,0,0,0.45)] sm:h-10 sm:w-10"
                             >
                               <Image src={broker.src} alt={broker.alt} width={30} height={30} className="h-full w-full object-contain" sizes="40px" />
                             </li>
@@ -73,16 +73,18 @@ export default function Hero() {
                         </ul>
                       </div>
 
-                      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 sm:mt-7">
+                      <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-7 sm:flex-row sm:gap-5">
                         <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted sm:text-[10px]">Runs on</span>
-                        {osIcons.map((os) => (
-                          <span key={os.label} className="flex items-center gap-2">
-                            <span className="flex h-7 w-7 items-center justify-center rounded-md border border-cyan-border bg-white p-1">
-                              <Image src={os.src} alt="" width={18} height={18} className="h-full w-full object-contain" sizes="28px" />
-                            </span>
-                            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-copy">{os.label}</span>
-                          </span>
-                        ))}
+                        <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:gap-5">
+                          {osIcons.map((os) => (
+                            <li key={os.label} className="flex items-center gap-2 whitespace-nowrap">
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-cyan-border bg-card p-1 shadow-[0_2px_10px_rgba(0,0,0,0.4)]">
+                                <Image src={os.src} alt="" width={18} height={18} className="h-full w-full object-contain" sizes="28px" />
+                              </span>
+                              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-copy">{os.label}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </div>

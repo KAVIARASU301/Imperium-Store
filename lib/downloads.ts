@@ -8,8 +8,29 @@ interface GitHubReleaseAsset {
 }
 
 interface GitHubRelease {
+  tag_name: string;
+  name: string | null;
   body: string | null;
+  published_at: string | null;
   assets: GitHubReleaseAsset[];
+}
+
+export type ReleaseMetadata = {
+  version: string;
+  title: string;
+  notes: string;
+  published_at: string;
+};
+
+export async function getGithubReleaseMetadata(repository: string): Promise<ReleaseMetadata> {
+  const release = await fetchLatestRelease(repository);
+  if (!release.tag_name) throw new Error(`Latest release for ${repository} has no version tag`);
+  return {
+    version: release.tag_name,
+    title: release.name?.trim() || release.tag_name,
+    notes: release.body?.trim() || "",
+    published_at: release.published_at || "",
+  };
 }
 
 export async function resolveGithubReleaseDownloadUrl(file: ProductFile) {
