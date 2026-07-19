@@ -183,7 +183,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           <div className="mt-5 lg:hidden">
             <PricingBox product={product} />
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-6 text-muted sm:text-base sm:leading-7">{product.description}</p>
+          <p className="mt-4 max-w-3xl text-justify text-sm leading-6 text-muted sm:text-base sm:leading-7">{product.description}</p>
           {product.badges?.length || !isReady ? (
             <div className="mt-5 flex flex-wrap gap-2 sm:mt-6">
               {!isReady ? (
