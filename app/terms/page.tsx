@@ -10,6 +10,11 @@ export default function Page() {
             responsibly and only for lawful purposes.
           </p>
           <p>
+            The introductory terminal offer provides one month of access for ₹199 and may be used once per account. Later monthly
+            payments add one month of access for ₹499. Monthly access does not renew automatically. Lifetime access is a separate
+            one-time purchase that permanently removes the access expiry for that product on your account.
+          </p>
+          <p>
             Trading and investing in financial markets involve risk, including the possible loss of capital. Our products are intended
             to support analysis, workflow, execution, learning, or review, but they do not provide financial advice and do not guarantee
             profit, income, accuracy, or trading performance.

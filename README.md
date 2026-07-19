@@ -23,6 +23,30 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Payment Checkout
 
+The options terminal supports three access purchases:
+
+- First month: ₹199 once per account.
+- Later one-month renewals: ₹499. Renewals are customer-initiated and do not auto-debit.
+- Lifetime access: ₹6,999. A monthly customer can upgrade at any time.
+
+Before deploying the matching app code, run
+`docs/supabase_purchase_access_plans.sql` in the Supabase SQL Editor. The
+migration preserves every existing paid purchase as lifetime access, adds
+monthly entitlement windows, prevents a second introductory offer, and installs
+the atomic payment-activation function used by checkout verification and the
+Razorpay webhook.
+
+The terminal itself must authorize the signed-in customer with:
+
+```ts
+await supabase.rpc("has_product_access", {
+  p_product_id: "imperium-option-trading-terminal",
+});
+```
+
+Do not authorize the desktop terminal by checking for any historical `paid`
+purchase, because a paid monthly row can be expired.
+
 Set these values in `.env.local` before accepting real payments:
 
 ```bash

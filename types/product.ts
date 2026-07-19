@@ -35,6 +35,12 @@ export interface ProductGalleryImage {
   height: number;
 }
 
+export interface ProductMonthlyPricing {
+  introductory_price: number;
+  renewal_price: number;
+  duration_months: number;
+}
+
 export interface Product {
   slug: string;
   name: string;
@@ -45,7 +51,9 @@ export interface Product {
   description: string;
   image: { src: string; alt: string; width: number; height: number };
   promise: string;
+  /** The one-time lifetime price. */
   price: number;
+  monthly_pricing?: ProductMonthlyPricing;
   currency: string;
   is_active: boolean;
   audience: string[];

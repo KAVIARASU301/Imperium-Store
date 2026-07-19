@@ -297,10 +297,10 @@ This content is for educational purposes only. It is not investment advice. Trad
 Current payment flow:
 
 1. The browser requests `app/api/razorpay/create-order/route.ts`.
-2. The API authenticates the user, validates products, blocks duplicate paid purchases, creates pending purchases, and returns a Razorpay order.
+2. The API authenticates the user, validates products and access plans, resolves introductory eligibility and server-authoritative prices, blocks duplicate lifetime purchases, creates pending purchases, and returns a Razorpay order.
 3. The browser completes Razorpay checkout.
 4. The browser calls `app/api/razorpay/verify-payment/route.ts`.
-5. The server verifies the Razorpay checkout signature and marks purchases paid.
+5. The server verifies the Razorpay checkout signature and atomically activates either a one-month access window or lifetime access.
 6. `app/api/razorpay/webhook/route.ts` remains the backup confirmation path for captured/failed payments.
 7. Dashboard downloads call `app/api/downloads/[fileId]/route.ts`, which checks auth and paid access before returning the latest GitHub release zip URL.
 
@@ -310,6 +310,10 @@ Rules:
 - Do not allow mixed currencies in one cart unless the backend is deliberately changed.
 - Preserve duplicate purchase protection.
 - Preserve paid access checks before downloads.
+- The options terminal first month is ₹199 once per account, later one-month renewals are ₹499, and lifetime access is ₹6,999.
+- Monthly access is customer-renewed and does not automatically charge.
+- Active monthly customers may upgrade to lifetime at any time. Remaining monthly time is not applied as a credit.
+- Existing paid rows from before access plans are lifetime purchases.
 - `TEST_CHECKOUT_ENABLED=true` is for local testing only and must not be enabled in production.
 
 Required payment env:
@@ -346,12 +350,26 @@ Expected purchase record shape is defined in `types/purchase.ts`:
 | `razorpay_order_id` | Razorpay order ID, or local/free/test order ID. |
 | `razorpay_payment_id` | Razorpay payment ID when available. |
 | `status` | `pending`, `paid`, `failed`, or `refunded`. |
+| `access_type` | `intro_month`, `monthly`, or `lifetime`. Legacy paid rows migrate to `lifetime`. |
+| `access_starts_at` | Activation timestamp set only after payment confirmation. |
+| `access_expires_at` | End of a monthly access window. `null` for lifetime access. |
 | `amount` | Product amount stored in rupees, not paise. |
 | `currency` | Current products use `INR`. |
 | `created_at` | ISO timestamp. |
 | `paid_at` | ISO timestamp only when paid. |
 
 License types exist in `types/license.ts`, but there is no active license activation server yet. Treat licensing as a future feature unless explicitly requested.
+
+Run `docs/supabase_purchase_access_plans.sql` before deploying code that writes
+the access-plan fields. The migration also installs
+`public.activate_purchase_order`, which serializes renewals and is callable only
+through the service role.
+
+The migration also installs authenticated RPC
+`public.has_product_access(product_id)`. The desktop terminal must call this
+entitlement check (or apply the identical lifetime/expiry rule) after login.
+Checking only for an old `paid` purchase would incorrectly keep expired monthly
+customers active.
 
 ## 13. Product Data Rules
 

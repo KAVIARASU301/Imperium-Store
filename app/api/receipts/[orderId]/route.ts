@@ -2,6 +2,7 @@ import { getCurrentUserFromRequest } from "@/lib/auth";
 import { formatPrice, getProductBySlug, getProductsGstInclusiveText } from "@/lib/products";
 import { getPurchasesByOrderId } from "@/lib/purchases";
 import { SUPPORT_EMAIL } from "@/lib/support";
+import { getPurchaseAccessType } from "@/lib/access";
 import { NextResponse } from "next/server";
 
 const defaultSeller = {
@@ -50,9 +51,18 @@ export async function GET(request: Request, context: { params: Promise<{ orderId
 
     const validPurchases = resolvedPurchases.filter((item): item is NonNullable<typeof item> => Boolean(item));
     const items = validPurchases.map(({ product, purchase }) => {
+      const accessType = getPurchaseAccessType(purchase);
+      const accessDescription =
+        accessType === "lifetime"
+          ? "Lifetime access"
+          : `${accessType === "intro_month" ? "Introductory month" : "One-month access"}${
+              purchase.access_starts_at && purchase.access_expires_at
+                ? ` (${formatReceiptDate(purchase.access_starts_at)} to ${formatReceiptDate(purchase.access_expires_at)})`
+                : ""
+            }`;
       return {
         name: product.name,
-        description: product.short_description,
+        description: `${accessDescription}. ${product.short_description}`,
         amount: purchase.amount,
         formattedAmount: formatPrice(purchase.amount, purchase.currency),
       };

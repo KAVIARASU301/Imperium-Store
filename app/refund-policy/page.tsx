@@ -6,12 +6,18 @@ export default function Page() {
         <h1 className="mt-3 text-4xl font-bold text-white">Refund Policy</h1>
         <div className="mt-6 space-y-5 leading-8 text-muted">
           <p>
-            All products sold through Imperium Store are digital delivery products. Once payment is completed and product access is
-            issued to your account, the purchase is final and non-refundable.
+            All products sold through Imperium Store are digital delivery products. This includes introductory monthly access,
+            later one-month renewals, and lifetime access. Once payment is completed and access is issued to your account, the
+            purchase is final and non-refundable.
           </p>
           <p>
             We do not provide refunds for digital products in any case, including accidental purchases, change of mind, lack of use,
             device changes, or account access issues after delivery.
+          </p>
+          <p>
+            Monthly terminal access does not renew automatically. Each payment adds one month of access, and you choose whether to
+            renew. Upgrading to lifetime access is a separate one-time purchase and does not create a credit or partial refund for
+            remaining monthly time.
           </p>
           <p>
             If you lose access to a purchased product, contact support with your order details and registered account email. We will

@@ -1,3 +1,5 @@
+import type { PurchaseAccessType } from "@/types/pricing";
+
 export type PurchaseStatus = "pending" | "paid" | "failed" | "refunded";
 
 export interface Purchase {
@@ -7,6 +9,9 @@ export interface Purchase {
   razorpay_order_id: string;
   razorpay_payment_id: string | null;
   status: PurchaseStatus;
+  access_type: PurchaseAccessType;
+  access_starts_at: string | null;
+  access_expires_at: string | null;
   amount: number;
   currency: string;
   created_at: string;

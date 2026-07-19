@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import type { PurchaseAccessType } from "@/types/pricing";
 import type { Purchase } from "@/types/purchase";
 
 const dataDir = path.join(process.cwd(), ".local-store");
@@ -13,12 +14,21 @@ type LocalPurchaseInput = {
   currency: string;
   status?: Purchase["status"];
   paymentId?: string | null;
+  accessType?: PurchaseAccessType;
+  accessStartsAt?: string | null;
+  accessExpiresAt?: string | null;
 };
 
 async function readPurchases(): Promise<Purchase[]> {
   try {
     const contents = await fs.readFile(purchasesFile, "utf8");
-    return JSON.parse(contents) as Purchase[];
+    const purchases = JSON.parse(contents) as Purchase[];
+    return purchases.map((purchase) => ({
+      ...purchase,
+      access_type: purchase.access_type ?? "lifetime",
+      access_starts_at: purchase.access_starts_at ?? purchase.paid_at ?? null,
+      access_expires_at: purchase.access_expires_at ?? null,
+    }));
   } catch (error) {
     if (error && typeof error === "object" && "code" in error && error.code === "ENOENT") return [];
     throw error;
@@ -40,6 +50,9 @@ export async function createLocalPurchase(input: LocalPurchaseInput) {
     razorpay_order_id: input.orderId,
     razorpay_payment_id: input.paymentId ?? null,
     status: input.status ?? "pending",
+    access_type: input.accessType ?? "lifetime",
+    access_starts_at: input.accessStartsAt ?? null,
+    access_expires_at: input.accessExpiresAt ?? null,
     amount: input.amount,
     currency: input.currency,
     created_at: now,
@@ -55,40 +68,9 @@ export async function getLocalPurchasesForUser(userId: string) {
   return purchases.filter((purchase) => purchase.user_id === userId);
 }
 
-export async function hasLocalPaidAccess(userId: string, productSlug: string) {
-  const purchases = await getLocalPurchasesForUser(userId);
-  return purchases.some((purchase) => purchase.product_id === productSlug && purchase.status === "paid");
-}
-
-export async function getLocalPurchaseByOrderId(userId: string, orderId: string) {
-  const purchases = await getLocalPurchasesForUser(userId);
-  return purchases.find((purchase) => purchase.razorpay_order_id === orderId) ?? null;
-}
-
 export async function getLocalPurchasesByOrderId(userId: string, orderId: string) {
   const purchases = await getLocalPurchasesForUser(userId);
   return purchases.filter((purchase) => purchase.razorpay_order_id === orderId);
-}
-
-export async function updateLocalPurchaseStatus(input: {
-  orderId: string;
-  status: Purchase["status"];
-  paymentId?: string | null;
-  userId?: string;
-}) {
-  const purchases = await readPurchases();
-  const purchase = purchases.find(
-    (item) =>
-      item.razorpay_order_id === input.orderId &&
-      (!input.userId || item.user_id === input.userId),
-  );
-  if (!purchase) return null;
-
-  purchase.status = input.status;
-  if (input.paymentId !== undefined) purchase.razorpay_payment_id = input.paymentId;
-  if (input.status === "paid") purchase.paid_at = purchase.paid_at ?? new Date().toISOString();
-  await writePurchases(purchases);
-  return purchase;
 }
 
 export async function updateLocalPurchasesStatus(input: {
@@ -96,6 +78,7 @@ export async function updateLocalPurchasesStatus(input: {
   status: Purchase["status"];
   paymentId?: string | null;
   userId?: string;
+  accessWindows?: Record<string, { startsAt: string; expiresAt: string | null }>;
 }) {
   const purchases = await readPurchases();
   const matchingPurchases = purchases.filter(
@@ -108,7 +91,14 @@ export async function updateLocalPurchasesStatus(input: {
   for (const purchase of matchingPurchases) {
     purchase.status = input.status;
     if (input.paymentId !== undefined) purchase.razorpay_payment_id = input.paymentId;
-    if (input.status === "paid") purchase.paid_at = purchase.paid_at ?? paidAt;
+    if (input.status === "paid") {
+      purchase.paid_at = purchase.paid_at ?? paidAt;
+      const accessWindow = input.accessWindows?.[purchase.id];
+      if (accessWindow) {
+        purchase.access_starts_at = accessWindow.startsAt;
+        purchase.access_expires_at = accessWindow.expiresAt;
+      }
+    }
   }
 
   await writePurchases(purchases);

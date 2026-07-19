@@ -1,8 +1,24 @@
 "use client";
 
-import { CART_UPDATED_EVENT, clearCart, clearCartItems, readCart, removeFromCart } from "@/lib/cart";
+import {
+  CART_UPDATED_EVENT,
+  clearCart,
+  clearCartItems,
+  readCart,
+  readCartPlans,
+  removeFromCart,
+  setCartPlan,
+} from "@/lib/cart";
 import { createRazorpayCheckout } from "@/lib/razorpay-client";
-import { formatCurrencySymbol, formatPriceAmount, getProductGstInclusiveText, getProductsGstInclusiveText, isProductReady } from "@/lib/products";
+import {
+  formatCurrencySymbol,
+  formatPriceAmount,
+  getDefaultCheckoutPlan,
+  getProductGstInclusiveText,
+  getProductsGstInclusiveText,
+  isProductReady,
+  resolveCheckoutPrice,
+} from "@/lib/products";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
 import type { Product } from "@/types/product";
 import Image from "next/image";
@@ -11,6 +27,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { markProductsPurchased, usePurchasedProducts } from "@/components/usePurchasedProducts";
 import StatePanel from "@/components/StatePanel";
+import type { CheckoutPlanId } from "@/types/pricing";
 
 interface CreateOrderResponse {
   orderId: string | null;
@@ -21,6 +38,11 @@ interface CreateOrderResponse {
   purchasedProductIds?: string[];
   unavailableProductIds?: string[];
   message?: string;
+  items?: Array<{
+    productId: string;
+    planId: CheckoutPlanId;
+    amount: number;
+  }>;
 }
 
 type RazorpaySuccessResponse = {
@@ -59,6 +81,7 @@ const orderSteps = [
 export default function CartPageClient({ products }: { products: Product[] }) {
   const router = useRouter();
   const [cartSlugs, setCartSlugs] = useState<string[]>([]);
+  const [cartPlans, setCartPlans] = useState<Record<string, CheckoutPlanId>>({});
   const [email, setEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [phone, setPhone] = useState("");
@@ -67,11 +90,18 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { purchasedSlugs, purchasedSlugSet } = usePurchasedProducts();
+  const {
+    purchasedSlugs,
+    lifetimeSlugSet,
+    accessBySlug,
+    loaded: accessLoaded,
+    error: accessError,
+  } = usePurchasedProducts();
 
   useEffect(() => {
     function sync() {
       setCartSlugs(readCart());
+      setCartPlans(readCartPlans());
     }
 
     sync();
@@ -107,23 +137,53 @@ export default function CartPageClient({ products }: { products: Product[] }) {
     [cartSlugs, products],
   );
   const payableProducts = useMemo(
-    () => cartProducts.filter((product) => isProductReady(product) && !purchasedSlugSet.has(product.slug)),
-    [cartProducts, purchasedSlugSet],
+    () =>
+      cartProducts.filter(
+        (product) =>
+          isProductReady(product) && !lifetimeSlugSet.has(product.slug),
+      ),
+    [cartProducts, lifetimeSlugSet],
   );
   const unavailableCartProducts = useMemo(
-    () => cartProducts.filter((product) => !isProductReady(product) && !purchasedSlugSet.has(product.slug)),
-    [cartProducts, purchasedSlugSet],
+    () =>
+      cartProducts.filter(
+        (product) =>
+          !isProductReady(product) && !lifetimeSlugSet.has(product.slug),
+      ),
+    [cartProducts, lifetimeSlugSet],
   );
   const purchasedCartProducts = useMemo(
-    () => cartProducts.filter((product) => purchasedSlugSet.has(product.slug)),
-    [cartProducts, purchasedSlugSet],
+    () => cartProducts.filter((product) => lifetimeSlugSet.has(product.slug)),
+    [cartProducts, lifetimeSlugSet],
   );
-  const total = payableProducts.reduce((sum, product) => sum + product.price, 0);
+  const checkoutItems = useMemo(
+    () =>
+      payableProducts.map((product) => {
+        const planId =
+          cartPlans[product.slug] ?? getDefaultCheckoutPlan(product);
+        const pricing = resolveCheckoutPrice(
+          product,
+          planId,
+          accessBySlug[product.slug]?.intro_eligible !== false,
+        );
+        return { product, planId, ...pricing };
+      }),
+    [accessBySlug, cartPlans, payableProducts],
+  );
+  const total = checkoutItems.reduce((sum, item) => sum + item.amount, 0);
   const currency = payableProducts[0]?.currency ?? cartProducts[0]?.currency ?? "INR";
   const gstInclusiveText = getProductsGstInclusiveText(payableProducts);
 
   async function startPayment() {
     setError("");
+    if (!accessLoaded || accessError) {
+      setError(
+        accessError
+          ? "We could not verify your account price. Refresh the page before paying."
+          : "We are still checking your introductory price. Try again in a moment.",
+      );
+      return;
+    }
     setLoading(true);
     try {
       const supabase = getSupabaseBrowserClient();
@@ -134,7 +194,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         return;
       }
 
-      const productIds = payableProducts.map((product) => product.slug);
+      const productIds = checkoutItems.map((item) => item.product.slug);
       if (productIds.length === 0) {
         clearCartItems(purchasedSlugs);
         if (unavailableCartProducts.length > 0) {
@@ -161,7 +221,12 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       const res = await fetch("/api/razorpay/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ productIds }),
+        body: JSON.stringify({
+          items: checkoutItems.map((item) => ({
+            productId: item.product.slug,
+            planId: item.planId,
+          })),
+        }),
       });
       const order: CreateOrderResponse = await res.json();
       if (!res.ok) {
@@ -188,7 +253,10 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         amount: order.amount,
         currency: order.currency,
         name: "Imperium Store",
-        description: productIds.length === 1 ? payableProducts[0]?.name : `${productIds.length} Imperium products`,
+        description:
+          productIds.length === 1
+            ? `${payableProducts[0]?.name} — ${checkoutItems[0]?.planId === "monthly" ? "one-month access" : "lifetime access"}`
+            : `${productIds.length} Imperium products`,
         prefill: {
           email: sessionData.session?.user.email ?? undefined,
           contact: `+91${cleanPhone}`,
@@ -229,6 +297,14 @@ export default function CartPageClient({ products }: { products: Product[] }) {
     }
   }
 
+  function retryAccessCheck() {
+    if (accessError) {
+      window.location.reload();
+      return;
+    }
+    void startPayment();
+  }
+
   return (
     <main className="page-container py-12">
       <section className="section-heading">
@@ -263,7 +339,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
           <section className="surface-panel overflow-hidden">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-cyan-border bg-card-hover px-5 py-4">
               <div>
-                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Selected products</p>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-brand">Selected access</p>
                 <p className="mt-1 text-sm text-muted">{payableProducts.length} item{payableProducts.length === 1 ? "" : "s"} ready for payment</p>
               </div>
               <button type="button" className="border border-cyan-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand" onClick={clearCart}>
@@ -300,8 +376,16 @@ export default function CartPageClient({ products }: { products: Product[] }) {
               </div>
             ) : null}
             {cartProducts.map((product) => {
-              if (purchasedSlugSet.has(product.slug)) return null;
+              if (lifetimeSlugSet.has(product.slug)) return null;
               const ready = isProductReady(product);
+              const checkoutItem = checkoutItems.find(
+                (item) => item.product.slug === product.slug,
+              );
+              const selectedPlan =
+                checkoutItem?.planId ?? getDefaultCheckoutPlan(product);
+              const hasActiveMonthly =
+                accessBySlug[product.slug]?.has_access &&
+                accessBySlug[product.slug]?.access_type !== "lifetime";
               return (
                 <article key={product.slug} className="grid gap-4 border-b border-cyan-border bg-section p-5 last:border-b-0 sm:grid-cols-[72px_1fr_auto] sm:items-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-md border border-cyan-border bg-main p-2 shadow-inner shadow-black/30">
@@ -317,8 +401,44 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                       ) : null}
                     </div>
                     <p className="mt-1 text-sm leading-6 text-muted">
-                      {ready ? "Digital download access after payment confirmation." : "This product is not ready for checkout yet."}
+                      {ready
+                        ? selectedPlan === "monthly"
+                          ? hasActiveMonthly
+                            ? "Add one month after your current access period."
+                            : accessBySlug[product.slug]?.intro_eligible !== false
+                              ? "Complete terminal access for your introductory month."
+                              : "One month of complete terminal access."
+                          : hasActiveMonthly
+                            ? "Upgrade your active monthly access to permanent lifetime access."
+                            : "Permanent access to downloads and updates."
+                        : "This product is not ready for checkout yet."}
                     </p>
+                    {ready && product.monthly_pricing ? (
+                      <div className="mt-3 inline-flex overflow-hidden rounded-md border border-cyan-border bg-main p-1">
+                        <button
+                          type="button"
+                          onClick={() => setCartPlan(product.slug, "monthly")}
+                          className={`rounded-sm px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+                            selectedPlan === "monthly"
+                              ? "bg-brand-deep text-white"
+                              : "text-muted hover:text-white"
+                          }`}
+                        >
+                          Monthly
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCartPlan(product.slug, "lifetime")}
+                          className={`rounded-sm px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.08em] ${
+                            selectedPlan === "lifetime"
+                              ? "bg-brand-deep text-white"
+                              : "text-muted hover:text-white"
+                          }`}
+                        >
+                          Lifetime
+                        </button>
+                      </div>
+                    ) : null}
                     <button
                       type="button"
                       className="mt-3 border border-cyan-border bg-card px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted hover:border-red-400/50 hover:text-red-100"
@@ -332,9 +452,14 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                       <>
                         <p className="font-semibold tabular-nums text-white">
                           <span className="mr-1 text-sm">{formatCurrencySymbol(product.currency)}</span>
-                          {formatPriceAmount(product.price)}
+                          {formatPriceAmount(checkoutItem?.amount ?? product.price)}
                         </p>
-                        <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{getProductGstInclusiveText(product)}</p>
+                        <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                          {selectedPlan === "monthly"
+                            ? "One month access"
+                            : "Lifetime access"}{" "}
+                          · {getProductGstInclusiveText(product)}
+                        </p>
                       </>
                     ) : (
                       <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-warning">Not in checkout</p>
@@ -345,9 +470,9 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             })}
             {purchasedCartProducts.length ? (
               <div className="border-t border-success/30 bg-success/5 p-5">
-                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-success">Already purchased</p>
+                <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-success">Lifetime access already owned</p>
                 <p className="mt-1 text-sm leading-6 text-muted">
-                  {purchasedCartProducts.map((product) => product.name).join(", ")} {purchasedCartProducts.length === 1 ? "has" : "have"} been removed from checkout.
+                  {purchasedCartProducts.map((product) => product.name).join(", ")} {purchasedCartProducts.length === 1 ? "is" : "are"} already permanently unlocked and {purchasedCartProducts.length === 1 ? "has" : "have"} been removed from checkout.
                 </p>
               </div>
             ) : null}
@@ -362,7 +487,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
               <div className="rounded-md border border-cyan-border bg-section p-4 shadow-[0_0_0_1px_rgba(255,255,255,0.06)_inset]">
                 <div className="space-y-3 text-sm text-muted">
                   <div className="flex justify-between gap-4"><span>Customer</span><span className="text-right">{authChecked ? email ?? "Sign in required" : "Checking..."}</span></div>
-                  <div className="flex justify-between gap-4"><span>Items</span><span>{payableProducts.length}</span></div>
+                  <div className="flex justify-between gap-4"><span>Access plans</span><span>{payableProducts.length}</span></div>
                   <div className="flex justify-between gap-4"><span>Subtotal</span><span>{formatCurrencySymbol(currency)} {formatPriceAmount(total)}</span></div>
                   <div className="flex justify-between gap-4"><span>GST</span><span className="text-right">{gstInclusiveText}</span></div>
                 </div>
@@ -396,8 +521,16 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                   ) : (
                     <p className="mt-2 text-xs leading-5 text-muted">Used for the payment — checkout opens directly on payment options.</p>
                   )}
-                  <button type="button" disabled={loading || payableProducts.length === 0} onClick={startPayment} className="mt-4 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
-                    {loading ? "Starting Payment..." : payableProducts.length === 0 && unavailableCartProducts.length > 0 ? "No Ready Products" : "Pay Securely Now"}
+                  <button type="button" disabled={loading || !accessLoaded || payableProducts.length === 0} onClick={startPayment} className="mt-4 inline-flex w-full items-center justify-center gap-2 btn-primary px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white shadow-lg shadow-black/30  disabled:cursor-not-allowed disabled:bg-cyan-border disabled:text-muted">
+                    {loading
+                      ? "Starting Payment..."
+                      : !accessLoaded
+                        ? "Checking Your Price..."
+                        : accessError
+                          ? "Refresh to Verify Price"
+                        : payableProducts.length === 0 && unavailableCartProducts.length > 0
+                          ? "No Ready Products"
+                          : "Pay Securely Now"}
                   </button>
                 </>
               ) : (
@@ -412,17 +545,22 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                   <div className="mt-4 grid gap-2 sm:grid-cols-2">
                     <button
                       type="button"
-                      onClick={startPayment}
-                      disabled={loading || payableProducts.length === 0}
+                      onClick={retryAccessCheck}
+                      disabled={loading || !accessLoaded || payableProducts.length === 0}
                       className="inline-flex min-h-10 items-center justify-center rounded-md border border-error/35 bg-main/70 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-error disabled:cursor-not-allowed disabled:text-muted"
                     >
-                      Try again
+                      {accessError ? "Refresh page" : "Try again"}
                     </button>
                     <Link href="/support" className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand">
                       Contact support
                     </Link>
                   </div>
                 </div>
+              ) : null}
+              {checkoutItems.some((item) => item.planId === "monthly") ? (
+                <p className="mt-4 rounded-md border border-cyan-border bg-main/45 p-3 text-xs leading-5 text-muted">
+                  Monthly access is paid one month at a time. It does not auto-renew or charge you automatically; renew from your account whenever you choose.
+                </p>
               ) : null}
             </div>
           </aside>

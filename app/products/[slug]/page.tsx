@@ -83,7 +83,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
           </div>
           <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:mt-5 sm:text-xl sm:leading-8">{product.promise}</p>
           <div className="mt-5 lg:hidden">
-            <PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} />
+            <PricingBox product={product} />
           </div>
           <p className="mt-4 max-w-3xl text-sm leading-6 text-muted sm:text-base sm:leading-7">{product.description}</p>
           {product.badges?.length || !isReady ? (
@@ -121,7 +121,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <p className="mt-2 text-sm leading-6 text-white">This content is for educational purposes only. It is not investment advice. Trading involves risk. Past performance does not guarantee future results.</p>
           </section>
         </section>
-        <div className="hidden lg:sticky lg:top-24 lg:block lg:self-start"><PricingBox price={product.price} currency={product.currency} slug={product.slug} productName={product.name} productType={product.type} status={product.status} /></div>
+        <div className="hidden lg:sticky lg:top-24 lg:block lg:self-start"><PricingBox product={product} anchorId="plans-desktop" /></div>
       </div>
     </main>
   );

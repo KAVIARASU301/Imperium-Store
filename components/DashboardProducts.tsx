@@ -11,6 +11,8 @@ import TerminalPasswordPanel from "@/components/TerminalPasswordPanel";
 import { isProductReady } from "@/lib/products";
 import type { Product, ProductFile } from "@/types/product";
 import type { Purchase } from "@/types/purchase";
+import type { ProductAccess } from "@/types/pricing";
+import { summarizeProductAccess } from "@/lib/access";
 
 type AccessState = "checking" | "signed-out" | "ready" | "error";
 const TERMINAL_PRODUCT_SLUG = "imperium-option-trading-terminal";
@@ -18,6 +20,7 @@ const TERMINAL_PRODUCT_SLUG = "imperium-option-trading-terminal";
 export default function DashboardProducts({ products }: { products: Product[] }) {
   const [state, setState] = useState<AccessState>("checking");
   const [purchasesBySlug, setPurchasesBySlug] = useState<Record<string, Purchase>>({});
+  const [accessBySlug, setAccessBySlug] = useState<Record<string, ProductAccess>>({});
   const [errorMessage, setErrorMessage] = useState("");
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -41,15 +44,28 @@ export default function DashboardProducts({ products }: { products: Product[] })
           throw new Error(typeof payload.message === "string" ? payload.message : "Unable to load purchases");
         }
         const map: Record<string, Purchase> = {};
-        for (const purchase of (payload.purchases ?? []) as Purchase[]) {
+        const purchases = (payload.purchases ?? []) as Purchase[];
+        for (const purchase of purchases) {
           const existing = map[purchase.product_id];
           if (shouldUsePurchaseForProduct(purchase, existing)) map[purchase.product_id] = purchase;
         }
         setPurchasesBySlug(map);
+        setAccessBySlug(
+          payload.access ??
+            Object.fromEntries(
+              Array.from(
+                new Set(purchases.map((purchase) => purchase.product_id)),
+              ).map((productSlug) => [
+                productSlug,
+                summarizeProductAccess(purchases, productSlug),
+              ]),
+            ),
+        );
         setState("ready");
       } catch (error) {
         if (!active) return;
         setPurchasesBySlug({});
+        setAccessBySlug({});
         setErrorMessage(error instanceof Error ? error.message : "Unable to load purchases");
         setState("error");
       }
@@ -165,10 +181,14 @@ export default function DashboardProducts({ products }: { products: Product[] })
 
   const unlockedCount = products.filter((product) => {
     const ready = isProductReady(product);
-    const purchase = purchasesBySlug[product.slug];
-    return (ready && product.price === 0) || purchase?.status === "paid";
+    return (
+      (ready && product.price === 0) ||
+      Boolean(accessBySlug[product.slug]?.has_access)
+    );
   }).length;
-  const hasTerminalPurchase = purchasesBySlug[TERMINAL_PRODUCT_SLUG]?.status === "paid";
+  const hasTerminalPurchase = Boolean(
+    accessBySlug[TERMINAL_PRODUCT_SLUG]?.has_access,
+  );
 
   return (
     <div className="grid gap-5">
@@ -197,8 +217,11 @@ export default function DashboardProducts({ products }: { products: Product[] })
         ) : null}
         {products.map((product) => {
           const purchase = purchasesBySlug[product.slug];
+          const productAccess = accessBySlug[product.slug];
           const ready = isProductReady(product);
-          const hasAccess = (ready && product.price === 0) || purchase?.status === "paid";
+          const hasAccess =
+            (ready && product.price === 0) ||
+            Boolean(productAccess?.has_access);
           return (
             <article
               key={product.slug}
@@ -214,9 +237,16 @@ export default function DashboardProducts({ products }: { products: Product[] })
                       <span className="border border-cyan-border bg-main/55 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-brand">
                         {product.type === "app" ? "Software" : product.type}
                       </span>
-                      {hasAccess ? (
+                      {hasAccess && productAccess?.access_type === "lifetime" ? (
                         <span className="border border-gold/30 bg-gold/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-gold-bright">
                           Lifetime access
+                        </span>
+                      ) : null}
+                      {hasAccess &&
+                      productAccess?.access_type !== "lifetime" ? (
+                        <span className="border border-success/30 bg-success/10 px-2 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-success">
+                          Monthly · until{" "}
+                          {formatAccessDate(productAccess?.current_period_end)}
                         </span>
                       ) : null}
                       {!ready && !hasAccess ? (
@@ -229,14 +259,25 @@ export default function DashboardProducts({ products }: { products: Product[] })
                     <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">{product.short_description}</p>
                   </div>
                 </div>
-                <StatusBadge hasAccess={hasAccess} status={purchase?.status} ready={ready} />
+                <StatusBadge
+                  hasAccess={hasAccess}
+                  access={productAccess}
+                  status={purchase?.status}
+                  ready={ready}
+                />
               </div>
               {hasAccess ? (
                 <div className="mt-5 border-t border-cyan-border pt-5">
                   <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                     <div>
                       <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-gold-bright">Your downloads</p>
-                      <p className="mt-1 text-sm text-muted">Download the latest version for your operating system.</p>
+                      <p className="mt-1 text-sm text-muted">
+                        Download the latest version for your operating system.
+                        {productAccess?.access_type !== "lifetime" &&
+                        productAccess?.current_period_end
+                          ? ` Access remains available through ${formatAccessDate(productAccess.current_period_end)}.`
+                          : ""}
+                      </p>
                     </div>
                     {purchase?.status === "paid" ? (
                       <Link
@@ -247,6 +288,32 @@ export default function DashboardProducts({ products }: { products: Product[] })
                       </Link>
                     ) : null}
                   </div>
+                  {productAccess?.access_type !== "lifetime" ? (
+                    <div className="mb-4 grid gap-3 rounded-md border border-cyan-border bg-main/45 p-4 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                      <div>
+                        <p className="font-semibold text-white">
+                          Keep using Imperium your way
+                        </p>
+                        <p className="mt-1 text-sm leading-5 text-muted">
+                          Add another month for ₹
+                          {product.monthly_pricing?.renewal_price ?? 499}, or
+                          upgrade once for permanent access.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/products/${product.slug}?plan=monthly#plans`}
+                        className="inline-flex min-h-10 items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white hover:border-brand"
+                      >
+                        Renew monthly
+                      </Link>
+                      <Link
+                        href={`/products/${product.slug}?plan=lifetime#plans`}
+                        className="inline-flex min-h-10 items-center justify-center btn-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white"
+                      >
+                        Upgrade to lifetime
+                      </Link>
+                    </div>
+                  ) : null}
                   {product.files?.length ? (
                     <div className="grid gap-3">
                       {product.files.map((file) => (
@@ -300,11 +367,29 @@ export default function DashboardProducts({ products }: { products: Product[] })
                 <div className="mt-5 rounded-md border border-cyan-border bg-main/45 p-4">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="font-semibold text-white">{getLockedTitle(purchase?.status, ready)}</p>
-                      <p className="mt-1 text-sm leading-6 text-muted">{getLockedMessage(purchase?.status, ready)}</p>
+                      <p className="font-semibold text-white">
+                        {getLockedTitle(
+                          purchase?.status,
+                          ready,
+                          productAccess,
+                        )}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted">
+                        {getLockedMessage(
+                          purchase?.status,
+                          ready,
+                          productAccess,
+                        )}
+                      </p>
                     </div>
                     <Link href={`/products/${product.slug}`} className="inline-flex min-h-11 w-full items-center justify-center rounded-md border border-cyan-border bg-card px-4 py-2 text-sm font-semibold uppercase tracking-[0.08em] text-white hover:border-brand hover:bg-card-hover sm:w-52">
-                      {ready && purchase?.status === "pending" ? "Complete payment" : "View product"}
+                      {ready && purchase?.status === "pending"
+                        ? "Complete payment"
+                        : productAccess &&
+                            productAccess.access_type === null &&
+                            !productAccess.intro_eligible
+                          ? "Renew access"
+                          : "View plans"}
                     </Link>
                   </div>
                 </div>
@@ -319,17 +404,29 @@ export default function DashboardProducts({ products }: { products: Product[] })
   );
 }
 
-function getLockedTitle(status?: string, ready = true) {
+function getLockedTitle(
+  status?: string,
+  ready = true,
+  access?: ProductAccess,
+) {
   if (!ready) return "Coming soon";
   if (status === "pending") return "Payment confirmation pending";
   if (status === "failed") return "Payment was not completed";
+  if (access && !access.has_access && !access.intro_eligible)
+    return "Monthly access expired";
   return "Product not purchased";
 }
 
-function getLockedMessage(status?: string, ready = true) {
+function getLockedMessage(
+  status?: string,
+  ready = true,
+  access?: ProductAccess,
+) {
   if (!ready) return "This product is not available for purchase yet. It will unlock here when it launches.";
   if (status === "pending") return "We are waiting for your payment to be confirmed. This usually takes less than a minute — refresh this page to check again.";
   if (status === "failed") return "Your last payment did not go through. You can start checkout again whenever you are ready.";
+  if (access && !access.has_access && !access.intro_eligible)
+    return "Renew for another month or switch to lifetime access. Your account and purchase history stay in place.";
   return "Purchase this product to unlock its downloads and receipt here.";
 }
 
@@ -362,11 +459,21 @@ function getPlatformNote(file: ProductFile) {
   return "Download package for this platform.";
 }
 
-function StatusBadge({ hasAccess, status, ready }: { hasAccess: boolean; status?: string; ready: boolean }) {
+function StatusBadge({
+  hasAccess,
+  access,
+  status,
+  ready,
+}: {
+  hasAccess: boolean;
+  access?: ProductAccess;
+  status?: string;
+  ready: boolean;
+}) {
   if (hasAccess) {
     return (
       <span className="inline-flex min-h-9 items-center justify-center rounded-md border border-success/35 bg-success/10 px-3 py-2 font-mono text-xs font-semibold uppercase tracking-widest text-success">
-        Unlocked
+        {access?.access_type === "lifetime" ? "Owned" : "Active"}
       </span>
     );
   }
@@ -396,4 +503,14 @@ function StatusBadge({ hasAccess, status, ready }: { hasAccess: boolean; status?
       Locked
     </span>
   );
+}
+
+function formatAccessDate(value: string | null | undefined) {
+  if (!value) return "current term";
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date(value));
 }

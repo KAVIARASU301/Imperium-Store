@@ -1,5 +1,5 @@
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { hasRecordedPaidPurchase } from "@/lib/purchases";
+import { hasPaidAccess } from "@/lib/purchases";
 import { getSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
@@ -74,7 +74,7 @@ async function getVerifiedTerminalUser(request: Request) {
     return { response: getServiceUnavailableResponse() };
   }
 
-  if (!(await hasRecordedPaidPurchase(user.id, TERMINAL_PRODUCT_SLUG))) {
+  if (!(await hasPaidAccess(user.id, TERMINAL_PRODUCT_SLUG))) {
     return {
       response: NextResponse.json(
         { message: "Paid terminal access required" },

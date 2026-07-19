@@ -5,6 +5,7 @@ import { getSupabaseBrowserClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
 import { usePurchasedProducts } from "@/components/usePurchasedProducts";
+import type { CheckoutPlanId } from "@/types/pricing";
 
 const emptyCartSnapshot: string[] = [];
 let cartSnapshotKey = "";
@@ -15,30 +16,33 @@ export default function AddToCartButton({
   className,
   checkout = false,
   isReady = true,
+  planId = "lifetime",
   children,
 }: {
   slug: string;
   className: string;
   checkout?: boolean;
   isReady?: boolean;
+  planId?: CheckoutPlanId;
   children?: React.ReactNode;
 }) {
   const router = useRouter();
   const [checkingAuth, setCheckingAuth] = useState(false);
   const cart = useSyncExternalStore(subscribeToCart, getCartSnapshot, getEmptyCartSnapshot);
-  const { purchasedSlugSet } = usePurchasedProducts();
+  const { accessBySlug } = usePurchasedProducts();
   const inCart = cart.includes(slug);
-  const isPurchased = purchasedSlugSet.has(slug);
-  const disabled = isPurchased || checkingAuth || !isReady;
+  const hasLifetimeAccess = accessBySlug[slug]?.access_type === "lifetime";
+  const planAlreadyOwned = hasLifetimeAccess;
+  const disabled = planAlreadyOwned || checkingAuth || !isReady;
   const baseDisabledClassName = className.replace(/\bbtn-primary\b/g, "");
-  const buttonClassName = isPurchased
+  const buttonClassName = planAlreadyOwned
     ? `${className.replace(/\bbtn-primary\b/g, "")} cursor-not-allowed border border-success/40 bg-success/10 text-success shadow-none hover:border-success/40 hover:bg-success/10`
     : !isReady
       ? `${baseDisabledClassName} cursor-not-allowed border border-warning/40 bg-warning/10 text-warning shadow-none hover:border-warning/40 hover:bg-warning/10`
     : `${className} disabled:cursor-wait disabled:opacity-70`;
 
   async function handleAddToCart() {
-    if (!isReady || isPurchased || checkingAuth) return;
+    if (!isReady || planAlreadyOwned || checkingAuth) return;
 
     setCheckingAuth(true);
     const supabase = getSupabaseBrowserClient();
@@ -50,7 +54,7 @@ export default function AddToCartButton({
       return;
     }
 
-    addToCart(slug);
+    addToCart(slug, planId);
     setCheckingAuth(false);
     if (checkout) router.push("/cart");
   }
@@ -63,7 +67,18 @@ export default function AddToCartButton({
       aria-disabled={disabled}
       onClick={handleAddToCart}
     >
-      {checkingAuth ? "Checking..." : isPurchased ? "Purchased" : !isReady ? "Coming Soon" : children ?? (checkout ? "Review and Pay" : inCart ? "Added to Cart" : "Add to Cart")}
+      {checkingAuth
+        ? "Checking..."
+        : planAlreadyOwned
+          ? "Lifetime owned"
+          : !isReady
+            ? "Coming Soon"
+            : children ??
+              (checkout
+                ? "Review and Pay"
+                : inCart
+                  ? "Added to Cart"
+                  : "Add to Cart")}
     </button>
   );
 }

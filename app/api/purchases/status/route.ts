@@ -20,6 +20,18 @@ export async function GET(request: Request) {
     if (status === "pending") {
       const payment = await getLatestPaymentForOrder(orderId);
       if (payment?.status === "captured") {
+        const expectedAmount = Math.round(
+          purchases.reduce((sum, purchase) => sum + purchase.amount, 0) * 100,
+        );
+        if (
+          Number(payment.amount) !== expectedAmount ||
+          payment.currency !== purchases[0]?.currency
+        ) {
+          return NextResponse.json(
+            { message: "Payment amount does not match the order" },
+            { status: 409 },
+          );
+        }
         const updatedPurchases = await updatePurchasesStatus({ orderId, status: "paid", paymentId: payment.id, userId: user.id });
         return NextResponse.json({ status: updatedPurchases[0]?.status ?? "paid", productId: productIds[0], productIds });
       }

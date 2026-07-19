@@ -1,4 +1,5 @@
 import type { Product, ProductFile, ProductStatus } from "@/types/product";
+import type { CheckoutPlanId, PurchaseAccessType } from "@/types/pricing";
 
 export const productFiles: ProductFile[] = [
   {
@@ -66,7 +67,7 @@ export const products: Product[] = [
         "Imperium is a desktop terminal built for active Indian options traders. Enter and exit multiple strikes in one click, run option-selling strategies with stoploss and target control at the portfolio, strategy, and position level, and chart with tick data — no separate charting subscription. Connect through Zerodha, Upstox, Angel One, Dhan, Fyers, Groww, or Alice Blue, mirror orders to sub-accounts with the built-in trade copier, and practice everything in paper trading before using live capital.",
     promise:
         "One-click multi-strike execution, strategy-level risk control, and pro charting — built for Indian options traders.",
-    badges: ["7 Indian brokers", "Multi-strike execution", "Trade copier", "Free charting", "Paper trading", "NSE + BSE F&O"],
+    badges: ["₹199 first month", "7 Indian brokers", "Multi-strike execution", "Trade copier", "Free charting", "Paper trading", "NSE + BSE F&O"],
     highlights: [
       {
         icon: "/icons/options.svg",
@@ -182,6 +183,11 @@ export const products: Product[] = [
       },
     ],
     price: 6999,
+    monthly_pricing: {
+      introductory_price: 199,
+      renewal_price: 499,
+      duration_months: 1,
+    },
     currency: "INR",
     is_active: true,
     audience: [
@@ -215,6 +221,21 @@ export const products: Product[] = [
       "Practice safely in paper trading, then go live in the same workspace",
     ],
     faq: [
+      {
+        question: "How does the ₹199 first month work?",
+        answer:
+          "A new customer can unlock the complete terminal for one month for ₹199. It is not a reduced-feature demo. After that month, you can add another month for ₹499 or upgrade to lifetime access at any time.",
+      },
+      {
+        question: "Will the monthly plan charge me automatically?",
+        answer:
+          "No. Monthly access is paid one month at a time through Razorpay. Renew from your account only when you choose, so there is no automatic debit.",
+      },
+      {
+        question: "Can I upgrade from monthly to lifetime?",
+        answer:
+          "Yes. Choose lifetime access from the product page or your purchase dashboard at any time. Lifetime access starts as soon as that payment is confirmed.",
+      },
       {
         question: "Which brokers does the terminal work with?",
         answer:
@@ -499,6 +520,33 @@ export function getProductBySlug(slug: string) {
   return product ? withProductStatus(product) : undefined;
 }
 export function getProductFileById(fileId: string) { return productFiles.find((file) => file.id === fileId && file.is_active); }
+export function getDefaultCheckoutPlan(product: Pick<Product, "monthly_pricing">): CheckoutPlanId {
+  return product.monthly_pricing ? "monthly" : "lifetime";
+}
+
+export function isCheckoutPlanAvailable(
+  product: Pick<Product, "monthly_pricing">,
+  planId: CheckoutPlanId,
+) {
+  return planId === "lifetime" || Boolean(product.monthly_pricing);
+}
+
+export function resolveCheckoutPrice(
+  product: Pick<Product, "price" | "monthly_pricing">,
+  planId: CheckoutPlanId,
+  introEligible: boolean,
+): { amount: number; accessType: PurchaseAccessType } {
+  if (planId === "lifetime") {
+    return { amount: product.price, accessType: "lifetime" };
+  }
+  if (!product.monthly_pricing) {
+    throw new Error("Monthly access is not available for this product");
+  }
+  return introEligible
+    ? { amount: product.monthly_pricing.introductory_price, accessType: "intro_month" }
+    : { amount: product.monthly_pricing.renewal_price, accessType: "monthly" };
+}
+
 export function formatCurrencySymbol(currency = "INR") {
   if (currency === "INR") return "₹";
 

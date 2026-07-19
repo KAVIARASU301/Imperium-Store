@@ -12,8 +12,9 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
   const productTypeLabel = getProductTypeLabel(product.type);
   const previewImage = product.gallery?.[0] ?? product.image;
   const gstInclusiveText = getProductGstInclusiveText(product);
-  const { purchasedSlugSet } = usePurchasedProducts();
-  const isPurchased = purchasedSlugSet.has(product.slug);
+  const { accessBySlug } = usePurchasedProducts();
+  const access = accessBySlug[product.slug];
+  const hasAccess = Boolean(access?.has_access);
   const ready = isProductReady(product);
   const featurePoints = product.highlights?.slice(0, 3) ?? [];
   const primaryBadgeClass =
@@ -79,17 +80,33 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
           <div className="mt-5 border-t border-cyan-border pt-4">
             <div className="flex items-end justify-between gap-4">
               <div>
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">{ready ? "One-time purchase" : "Coming soon"}</p>
-                {isPurchased ? <p className="mt-1 text-xs font-semibold text-success">Already in your account</p> : null}
+                <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">
+                  {ready
+                    ? product.monthly_pricing
+                      ? "Monthly or lifetime"
+                      : "One-time purchase"
+                    : "Coming soon"}
+                </p>
+                {hasAccess ? (
+                  <p className="mt-1 text-xs font-semibold text-success">
+                    {access?.access_type === "lifetime"
+                      ? "Lifetime access owned"
+                      : "Monthly access active"}
+                  </p>
+                ) : null}
               </div>
               <p className="text-right text-white">
                 <span className="mr-1 align-baseline text-xs font-semibold">
                   {formatCurrencySymbol(product.currency)}
                 </span>
                 <span className="font-sans text-xl font-extrabold tracking-normal tabular-nums">
-                  {formatPriceAmount(product.price)}
+                  {formatPriceAmount(
+                    product.monthly_pricing?.introductory_price ?? product.price,
+                  )}
                 </span>
-                <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{gstInclusiveText}</span>
+                <span className="block font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                  {product.monthly_pricing ? "first month" : gstInclusiveText}
+                </span>
               </p>
             </div>
 
@@ -100,14 +117,23 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
               >
                 Details
               </Link>
-              <AddToCartButton
-                slug={product.slug}
-                checkout
-                isReady={ready}
-                className="btn-primary flex min-h-10 items-center justify-center rounded-md px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.08em]"
-              >
-                {product.price === 0 ? "Get Access" : "Buy Now"}
-              </AddToCartButton>
+              {product.monthly_pricing ? (
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="btn-primary flex min-h-10 items-center justify-center rounded-md px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.08em]"
+                >
+                  View plans
+                </Link>
+              ) : (
+                <AddToCartButton
+                  slug={product.slug}
+                  checkout
+                  isReady={ready}
+                  className="btn-primary flex min-h-10 items-center justify-center rounded-md px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.08em]"
+                >
+                  {product.price === 0 ? "Get Access" : "Buy Now"}
+                </AddToCartButton>
+              )}
             </div>
           </div>
         </div>
@@ -174,22 +200,36 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
           </div>
         </div>
         <div className="flex flex-col gap-3 border-t border-cyan-border bg-main/36 p-4 sm:flex-row sm:items-stretch sm:justify-between sm:p-5 md:border-l md:border-t-0 md:bg-main/28 md:flex-col md:justify-center">
-            {isPurchased ? (
+            {hasAccess ? (
               <span className="flex min-h-9 w-full items-center justify-center rounded-md border border-success/40 bg-success/10 px-3 py-2 text-center font-mono text-[10px] font-semibold uppercase tracking-wide text-success">
-                In your account
+                {access?.access_type === "lifetime"
+                  ? "Lifetime owned"
+                  : "Monthly access active"}
               </span>
             ) : null}
             <div className="text-center md:text-left">
-              <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">{ready ? "One-time purchase" : "Coming soon"}</p>
+              <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">
+                {ready
+                  ? product.monthly_pricing
+                    ? "Start with one month"
+                    : "One-time purchase"
+                  : "Coming soon"}
+              </p>
               <p className="mt-1 text-white">
                 <span className="mr-1 align-baseline text-sm font-semibold">
                   {formatCurrencySymbol(product.currency)}
                 </span>
                 <span className="font-sans text-2xl font-extrabold tracking-normal tabular-nums">
-                  {formatPriceAmount(product.price)}
+                  {formatPriceAmount(
+                    product.monthly_pricing?.introductory_price ?? product.price,
+                  )}
                 </span>
               </p>
-              <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">{gstInclusiveText}</p>
+              <p className="mt-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">
+                {product.monthly_pricing
+                  ? `First month · then ₹${formatPriceAmount(product.monthly_pricing.renewal_price)}/month`
+                  : gstInclusiveText}
+              </p>
             </div>
             <Link
                 href={`/products/${product.slug}`}
@@ -197,14 +237,23 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             >
               Details
             </Link>
-            <AddToCartButton
-                slug={product.slug}
-                checkout
-                isReady={ready}
+            {product.monthly_pricing ? (
+              <Link
+                href={`/products/${product.slug}`}
                 className="btn-primary flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white"
-            >
-              {product.price === 0 ? "Get Access" : "Buy Now"}
-            </AddToCartButton>
+              >
+                Compare plans
+              </Link>
+            ) : (
+              <AddToCartButton
+                  slug={product.slug}
+                  checkout
+                  isReady={ready}
+                  className="btn-primary flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-md px-4 py-2 text-center text-xs font-semibold uppercase tracking-[0.08em] text-white"
+              >
+                {product.price === 0 ? "Get Access" : "Buy Now"}
+              </AddToCartButton>
+            )}
         </div>
       </div>
     </article>

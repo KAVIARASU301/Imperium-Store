@@ -27,7 +27,9 @@ export default function Hero() {
         {formatCurrencySymbol(terminal.currency)}
       </span>
       <span className="font-sans font-bold tracking-normal tabular-nums">
-        {formatPriceAmount(terminal.price)}
+        {formatPriceAmount(
+          terminal.monthly_pricing?.introductory_price ?? terminal.price,
+        )}
       </span>
     </>
   ) : null;
@@ -42,7 +44,9 @@ export default function Hero() {
                     <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_70%_at_center,rgba(47,111,166,0.14),transparent_70%)]" />
                     <div className="flex flex-col items-center px-4 py-12 text-center sm:px-8 sm:py-14 lg:py-16">
                       <div className="inline-flex rounded-md border border-brand/45 bg-main/85 px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-brand sm:px-4 sm:py-2 sm:text-xs">
-                        {ready ? "Available now / Instant download" : "Coming soon"}
+                        {ready
+                          ? "First month ₹199 / Lifetime available"
+                          : "Coming soon"}
                       </div>
                       <h1 className="mt-5 max-w-[14ch] text-4xl font-black uppercase leading-[0.95] tracking-normal text-white sm:mt-6 sm:text-6xl lg:text-7xl">
                         Trade faster. Practice safer.
@@ -95,9 +99,23 @@ export default function Hero() {
                       <p className="mt-2 font-sans text-sm font-bold normal-case tracking-normal text-white">{terminal.name}</p>
                     </div>
                     <div className="bg-main p-3 sm:p-4">
-                      <p>{ready ? "One-time purchase" : "Status"}</p>
+                      <p>{ready ? "Start with one month" : "Status"}</p>
                       <p className="mt-2 text-lg text-gold-bright">{ready ? terminalPrice : "Coming soon"}</p>
-                      {ready && gstInclusiveText ? <p className="mt-1 text-[10px] text-muted">{gstInclusiveText}</p> : null}
+                      {ready && gstInclusiveText ? (
+                        <>
+                          <p className="mt-1 text-[10px] text-muted">
+                            First month · then ₹
+                            {formatPriceAmount(
+                              terminal.monthly_pricing?.renewal_price ?? 0,
+                            )}
+                            /month
+                          </p>
+                          <p className="mt-1 text-[10px] text-muted">
+                            Or ₹{formatPriceAmount(terminal.price)} lifetime ·{" "}
+                            {gstInclusiveText}
+                          </p>
+                        </>
+                      ) : null}
                     </div>
                     <div className="bg-main p-3 sm:p-4">
                       <p>Broker support</p>

@@ -72,13 +72,32 @@ export default async function HomePage() {
                 description: homeDescription,
                 image: `${siteUrl}${terminalPreviewImage}`,
                 url: `${siteUrl}${terminalProductPath}`,
-                offers: {
-                    "@type": "Offer",
-                    price: "6999",
-                    priceCurrency: "INR",
-                    availability: "https://schema.org/InStock",
-                    url: `${siteUrl}${terminalProductPath}`,
-                },
+                offers: [
+                    {
+                        "@type": "Offer",
+                        name: "First month access",
+                        price: "199",
+                        priceCurrency: "INR",
+                        availability: "https://schema.org/InStock",
+                        url: `${siteUrl}${terminalProductPath}`,
+                    },
+                    {
+                        "@type": "Offer",
+                        name: "Lifetime access",
+                        price: "6999",
+                        priceCurrency: "INR",
+                        availability: "https://schema.org/InStock",
+                        url: `${siteUrl}${terminalProductPath}`,
+                    },
+                    {
+                        "@type": "Offer",
+                        name: "One-month renewal",
+                        price: "499",
+                        priceCurrency: "INR",
+                        availability: "https://schema.org/InStock",
+                        url: `${siteUrl}${terminalProductPath}`,
+                    },
+                ],
                 publisher: {
                     "@id": `${siteUrl}/#organization`,
                 },
@@ -132,7 +151,7 @@ export default async function HomePage() {
                 <div className="surface-panel flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6 md:p-8">
                     <div>
                         <h2 className="text-xl font-bold text-white sm:text-2xl">Ready when you are.</h2>
-                        <p className="mt-1.5 text-sm leading-6 text-muted">One-time purchase. Instant download from your dashboard.</p>
+                        <p className="mt-1.5 text-sm leading-6 text-muted">Try the complete terminal for ₹199 for one month, then renew monthly or upgrade to lifetime anytime.</p>
                     </div>
                     <Link href={terminalProductPath} className="btn-primary inline-flex min-h-11 items-center justify-center rounded-md px-5 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-white">
                         Get the Terminal
