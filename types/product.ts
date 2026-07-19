@@ -44,6 +44,9 @@ export interface ProductMonthlyPricing {
 export interface Product {
   slug: string;
   name: string;
+  alternate_names?: string[];
+  seo_title?: string;
+  seo_description?: string;
   type: ProductType;
   status?: ProductStatus;
   icon: { src: string; alt: string; width: number; height: number };

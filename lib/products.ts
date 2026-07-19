@@ -48,6 +48,10 @@ export const products: Product[] = [
   {
     slug: "imperium-option-trading-terminal",
     name: "Imperium Option Trading Terminal",
+    alternate_names: ["Imperium Trader", "Imperium Trading Terminal"],
+    seo_title: "Imperium Trader – Options Terminal | Imperium Store",
+    seo_description:
+      "Imperium Trader is the Imperium options trading terminal for Indian traders: one-click multi-strike execution, 7 brokers, pro charts, and paper trading.",
     type: "app",
     icon: {
       src: "/product-resources/imperium-option-trading-terminal/icons/imperium_icon_64x64.png",
@@ -56,7 +60,7 @@ export const products: Product[] = [
       height: 64,
     },
     short_description:
-        "One-click multi-strike execution, strategy-level risk control, and free pro-grade charts. Works with 7 Indian brokers. Built for fast NSE and BSE options trading.",
+        "Imperium Trader is an options trading terminal with one-click multi-strike execution, strategy-level risk control, and free pro-grade charts. Works with 7 Indian brokers.",
     image: {
       src: "/product-resources/imperium-option-trading-terminal/images/imperium_broadcast.webp",
       alt: "Imperium Option Trading Terminal desktop workspace with option chain, watchlists, P&L, and order panels",
@@ -64,7 +68,7 @@ export const products: Product[] = [
       height: 1088,
     },
     description:
-        "Imperium is a desktop terminal built for active Indian options traders. Enter and exit multiple strikes in one click, run option-selling strategies with stoploss and target control at the portfolio, strategy, and position level, and chart with tick data — no separate charting subscription. Connect through Zerodha, Upstox, Angel One, Dhan, Fyers, Groww, or Alice Blue, mirror orders to sub-accounts with the built-in trade copier, and practice everything in paper trading before using live capital.",
+        "Imperium Trader — officially the Imperium Option Trading Terminal — is a desktop terminal built for active Indian options traders. Enter and exit multiple strikes in one click, run option-selling strategies with stoploss and target control at the portfolio, strategy, and position level, and chart with tick data — no separate charting subscription. Connect through Zerodha, Upstox, Angel One, Dhan, Fyers, Groww, or Alice Blue, mirror orders to sub-accounts with the built-in trade copier, and practice everything in paper trading before using live capital.",
     promise:
         "One-click multi-strike execution, strategy-level risk control, and pro charting — built for Indian options traders.",
     badges: ["₹199 first month", "7 Indian brokers", "Multi-strike execution", "Trade copier", "Free charting", "Paper trading", "NSE + BSE F&O"],
@@ -182,7 +186,7 @@ export const products: Product[] = [
         height: 642,
       },
     ],
-    price: 6999,
+    price: 14999,
     monthly_pricing: {
       introductory_price: 199,
       renewal_price: 499,
@@ -221,6 +225,11 @@ export const products: Product[] = [
       "Practice safely in paper trading, then go live in the same workspace",
     ],
     faq: [
+      {
+        question: "Is Imperium Trader the same as the Imperium Option Trading Terminal?",
+        answer:
+          "Yes. Imperium Trader is the short product name for the Imperium Option Trading Terminal sold through this official store. It is the desktop options terminal for Indian traders described on this page.",
+      },
       {
         question: "How does the ₹199 first month work?",
         answer:

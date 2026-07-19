@@ -310,7 +310,7 @@ Rules:
 - Do not allow mixed currencies in one cart unless the backend is deliberately changed.
 - Preserve duplicate purchase protection.
 - Preserve paid access checks before downloads.
-- The options terminal first month is ₹199 once per account, later one-month renewals are ₹499, and lifetime access is ₹6,999.
+- The options terminal first month is ₹199 once per account, later one-month renewals are ₹499, and lifetime access is ₹14,999.
 - Monthly access is customer-renewed and does not automatically charge.
 - Active monthly customers may upgrade to lifetime at any time. Remaining monthly time is not applied as a credit.
 - Existing paid rows from before access plans are lifetime purchases.

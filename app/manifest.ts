@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Imperium Store",
     short_name: "Imperium",
     description:
-      "Imperium Option Trading Terminal and professional trading software for Indian market traders.",
+      "Official store for Imperium Trader, the Imperium Option Trading Terminal for Indian market traders.",
     start_url: "/",
     scope: "/",
     display: "standalone",

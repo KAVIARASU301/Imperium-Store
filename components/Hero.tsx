@@ -45,7 +45,7 @@ export default function Hero() {
                     <div className="flex flex-col items-center px-4 py-12 text-center sm:px-8 sm:py-14 lg:py-16">
                       <div className="inline-flex rounded-md border border-brand/45 bg-main/85 px-3 py-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-brand sm:px-4 sm:py-2 sm:text-xs">
                         {ready
-                          ? "First month ₹199 / Lifetime available"
+                          ? "Imperium Trader / Official options terminal"
                           : "Coming soon"}
                       </div>
                       <h1 className="mt-5 max-w-[14ch] text-4xl font-black uppercase leading-[0.95] tracking-normal text-white sm:mt-6 sm:text-6xl lg:text-7xl">

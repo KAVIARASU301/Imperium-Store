@@ -7,9 +7,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
-const homeTitle = "Imperium Option Trading Terminal | Imperium Store";
+const homeTitle = "Imperium Trader – Options Terminal | Imperium Store";
 const homeDescription =
-    "Imperium Option Trading Terminal: one-click multi-strike execution, strategy-level risk control, trade copier for sub-accounts, and free TradingView-style charts. Works with 7 Indian brokers across NSE and BSE F&O.";
+    "Imperium Trader is the Imperium options trading terminal for Indian traders: one-click multi-strike execution, 7 brokers, pro charts, and paper trading.";
 const terminalPreviewImage = "/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg";
 const terminalProductPath = "/products/imperium-option-trading-terminal";
 
@@ -57,9 +57,20 @@ export default async function HomePage() {
         "@context": "https://schema.org",
         "@graph": [
             {
+                "@type": "WebSite",
+                "@id": `${siteUrl}/#website`,
+                name: "Imperium Store",
+                alternateName: ["Imperium Trader Store"],
+                url: `${siteUrl}/`,
+                publisher: {
+                    "@id": `${siteUrl}/#organization`,
+                },
+            },
+            {
                 "@type": "Organization",
                 "@id": `${siteUrl}/#organization`,
                 name: "Imperium Store",
+                alternateName: "Imperium Trading Software",
                 url: siteUrl,
                 logo: `${siteUrl}/icons/imperium_store_icons/imperium_icon_64x64.png`,
             },
@@ -67,6 +78,7 @@ export default async function HomePage() {
                 "@type": "SoftwareApplication",
                 "@id": `${siteUrl}${terminalProductPath}#software`,
                 name: "Imperium Option Trading Terminal",
+                alternateName: ["Imperium Trader", "Imperium Trading Terminal"],
                 applicationCategory: "FinanceApplication",
                 operatingSystem: "Windows, Linux",
                 description: homeDescription,
@@ -84,7 +96,7 @@ export default async function HomePage() {
                     {
                         "@type": "Offer",
                         name: "Lifetime access",
-                        price: "6999",
+                        price: "14999",
                         priceCurrency: "INR",
                         availability: "https://schema.org/InStock",
                         url: `${siteUrl}${terminalProductPath}`,
@@ -100,6 +112,9 @@ export default async function HomePage() {
                 ],
                 publisher: {
                     "@id": `${siteUrl}/#organization`,
+                },
+                isPartOf: {
+                    "@id": `${siteUrl}/#website`,
                 },
             },
         ],
@@ -133,8 +148,11 @@ export default async function HomePage() {
 
             <section className="page-container page-section">
                 <div className="section-heading mb-4 sm:mb-6">
-                    <p className="section-kicker">Why Imperium</p>
-                    <h2 className="section-title">Built for serious options traders</h2>
+                    <p className="section-kicker">Imperium Trader</p>
+                    <h2 className="section-title">Imperium Trader: the options terminal for Indian traders</h2>
+                    <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+                        Imperium Trader is the short name for the Imperium Option Trading Terminal — desktop trading software for NSE and BSE options execution, risk control, charting, paper trading, and multi-account workflows.
+                    </p>
                 </div>
                 <dl className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-4">
                     {principles.map((item) => (

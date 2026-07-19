@@ -16,13 +16,13 @@ const labelFont = Space_Grotesk({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   applicationName: "Imperium Store",
-  title: "Imperium Option Trading Terminal | Imperium Store",
+  title: "Imperium Trader – Options Terminal | Imperium Store",
   description:
-      "Imperium Option Trading Terminal: one-click multi-strike execution, strategy-level risk control, trade copier, and free TradingView-style charts. Works with 7 Indian brokers across NSE and BSE F&O.",
+      "Imperium Trader is the Imperium options trading terminal for Indian traders: one-click multi-strike execution, 7 brokers, pro charts, and paper trading.",
   openGraph: {
-    title: "Imperium Option Trading Terminal | Imperium Store",
+    title: "Imperium Trader – Options Terminal | Imperium Store",
     description:
-        "One-click multi-strike execution, strategy-level risk control, trade copier, and free professional charting. Works with 7 Indian brokers across NSE and BSE F&O.",
+        "The official store for Imperium Trader, the Imperium Option Trading Terminal for Indian options traders.",
     url: "/",
     siteName: "Imperium Store",
     type: "website",
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Imperium Option Trading Terminal | Imperium Store",
+    title: "Imperium Trader – Options Terminal | Imperium Store",
     description:
-        "One-click multi-strike execution, strategy risk control, trade copier, and free TradingView-style charts. Works with 7 Indian brokers.",
+        "Official Imperium Trader store: one-click multi-strike execution, strategy risk control, 7 brokers, pro charts, and paper trading.",
     images: ["/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg"],
   },
   icons: {
@@ -103,7 +103,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="mx-auto flex max-w-[1200px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="font-semibold text-white">Imperium Store</p>
-            <p className="mt-1 text-xs leading-5">Official store for Imperium trading software. Educational tools only.</p>
+            <p className="mt-1 text-xs leading-5">Official store for Imperium Trader and Imperium trading software. Educational tools only.</p>
           </div>
           <nav aria-label="Footer" className="flex max-w-md flex-wrap gap-x-4 gap-y-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] md:justify-end">
             <Link href="/products" className="hover:text-white">Products</Link>

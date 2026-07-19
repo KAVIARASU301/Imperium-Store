@@ -1,7 +1,7 @@
 import PricingBox from "@/components/PricingBox";
 import ProductImage from "@/components/ProductImage";
 import { getActiveProducts, getProductBySlug, isProductReady } from "@/lib/products";
-import { truncateDescription } from "@/lib/seo";
+import { getSiteUrl, truncateDescription } from "@/lib/seo";
 import type { ProductGalleryImage, ProductHighlight } from "@/types/product";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -23,13 +23,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  const title = `${product.name} | Imperium Store`;
-  const description = truncateDescription(product.short_description);
+  const title = product.seo_title ?? `${product.name} | Imperium Store`;
+  const description = truncateDescription(
+    product.seo_description ?? product.short_description,
+  );
   const path = `/products/${product.slug}`;
 
   return {
     title,
     description,
+    category: product.type === "app" ? "Trading Software" : product.type,
     alternates: { canonical: path },
     openGraph: {
       title,
@@ -61,8 +64,98 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   const product = getProductBySlug(slug);
   if (!product) return notFound();
   const isReady = isProductReady(product);
+  const siteUrl = getSiteUrl();
+  const path = `/products/${product.slug}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${siteUrl}${path}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Imperium Store",
+            item: `${siteUrl}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Trading Software",
+            item: `${siteUrl}/products`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: product.alternate_names?.[0] ?? product.name,
+            item: `${siteUrl}${path}`,
+          },
+        ],
+      },
+      ...(product.type === "app"
+        ? [
+            {
+              "@type": "SoftwareApplication",
+              "@id": `${siteUrl}${path}#software`,
+              name: product.name,
+              alternateName: product.alternate_names,
+              applicationCategory: "FinanceApplication",
+              operatingSystem: "Windows, Linux",
+              description:
+                product.seo_description ?? product.short_description,
+              image: `${siteUrl}${product.image.src}`,
+              url: `${siteUrl}${path}`,
+              mainEntityOfPage: `${siteUrl}${path}`,
+              offers: product.monthly_pricing
+                ? [
+                    {
+                      "@type": "Offer",
+                      name: "First month access",
+                      price: product.monthly_pricing.introductory_price,
+                      priceCurrency: product.currency,
+                      availability: "https://schema.org/InStock",
+                      url: `${siteUrl}${path}`,
+                    },
+                    {
+                      "@type": "Offer",
+                      name: "One-month renewal",
+                      price: product.monthly_pricing.renewal_price,
+                      priceCurrency: product.currency,
+                      availability: "https://schema.org/InStock",
+                      url: `${siteUrl}${path}`,
+                    },
+                    {
+                      "@type": "Offer",
+                      name: "Lifetime access",
+                      price: product.price,
+                      priceCurrency: product.currency,
+                      availability: "https://schema.org/InStock",
+                      url: `${siteUrl}${path}`,
+                    },
+                  ]
+                : {
+                    "@type": "Offer",
+                    name: "Lifetime access",
+                    price: product.price,
+                    priceCurrency: product.currency,
+                    availability: "https://schema.org/InStock",
+                    url: `${siteUrl}${path}`,
+                  },
+              publisher: {
+                "@id": `${siteUrl}/#organization`,
+              },
+            },
+          ]
+        : []),
+    ],
+  };
   return (
     <main className="page-container py-8 sm:py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
       <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_360px]">
         <section>
           <p className="inline-flex rounded-md border border-cyan-border bg-section px-3 py-1.5 font-mono text-sm font-semibold uppercase tracking-widest text-brand">{product.type === "app" ? "Software" : product.type}</p>
@@ -81,6 +174,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
               {product.name}
             </h1>
           </div>
+          {product.alternate_names?.[0] ? (
+            <p className="mt-3 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-brand">
+              {product.alternate_names[0]} · Official Imperium options terminal
+            </p>
+          ) : null}
           <p className="mt-4 max-w-2xl text-base font-semibold leading-7 text-white sm:mt-5 sm:text-xl sm:leading-8">{product.promise}</p>
           <div className="mt-5 lg:hidden">
             <PricingBox product={product} />

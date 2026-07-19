@@ -27,7 +27,7 @@ The options terminal supports three access purchases:
 
 - First month: ₹199 once per account.
 - Later one-month renewals: ₹499. Renewals are customer-initiated and do not auto-debit.
-- Lifetime access: ₹6,999. A monthly customer can upgrade at any time.
+- Lifetime access: ₹14,999. A monthly customer can upgrade at any time.
 
 Before deploying the matching app code, run
 `docs/supabase_purchase_access_plans.sql` in the Supabase SQL Editor. The
