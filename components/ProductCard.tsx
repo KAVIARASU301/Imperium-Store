@@ -40,16 +40,16 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
           />
           <div className="absolute inset-x-2 bottom-2 h-20 rounded-b-sm bg-gradient-to-t from-main/92 to-transparent" />
           <div className="absolute left-4 top-4 flex flex-wrap gap-1.5">
-            <span className="border border-cyan-border bg-main/80 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide text-brand backdrop-blur">
+            <span className="border border-cyan-border bg-main/90 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide text-brand">
               {productTypeLabel}
             </span>
             {primaryBadge ? (
-              <span className={`border px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide backdrop-blur ${primaryBadgeClass}`}>
+              <span className={`border px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide ${primaryBadgeClass}`}>
                 {primaryBadge === "India + U.S. stocks" ? "India + U.S." : primaryBadge}
               </span>
             ) : null}
             {!ready ? (
-              <span className="border border-warning/40 bg-warning/10 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide text-warning backdrop-blur">
+              <span className="border border-warning/40 bg-warning/15 px-2 py-1 font-mono text-[9px] font-semibold uppercase tracking-wide text-warning">
                 Coming Soon
               </span>
             ) : null}
@@ -155,7 +155,7 @@ export default function ProductCard({ product, variant = "horizontal" }: { produ
             suppressHydrationWarning
           />
           <div className="absolute inset-x-2 bottom-2 h-16 rounded-b-sm bg-gradient-to-t from-main/88 to-transparent" />
-          <div className="absolute bottom-4 left-4 flex h-12 w-12 items-center justify-center rounded-md border border-cyan-border bg-main/82 p-2 backdrop-blur">
+          <div className="absolute bottom-4 left-4 flex h-12 w-12 items-center justify-center rounded-md border border-cyan-border bg-main/92 p-2">
             <Image
               src={product.icon.src}
               alt={product.icon.alt}

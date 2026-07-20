@@ -63,7 +63,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       {/* Base color lives on <html>; a body background would paint over the
           fixed body::before gradient layer (negative z-index). */}
       <body className="min-h-full text-white">
-      <header className="sticky top-0 z-40 border-b border-cyan-border bg-section/95 md:bg-section/85 md:backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-cyan-border bg-section/95">
         <nav className="mx-auto flex max-w-[1400px] items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3.5">
           <Link
               href="/"
