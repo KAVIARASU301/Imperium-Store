@@ -23,20 +23,13 @@ export const metadata: Metadata = {
         url: "/",
         siteName: "Imperium Store",
         type: "website",
-        images: [
-            {
-                url: terminalPreviewImage,
-                width: 1200,
-                height: 653,
-                alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
-            },
-        ],
+        // og:image comes from the generated hero card in app/opengraph-image.tsx.
     },
     twitter: {
         card: "summary_large_image",
         title: homeTitle,
         description: homeDescription,
-        images: [terminalPreviewImage],
+        // twitter:image comes from the generated hero card in app/twitter-image.tsx.
     },
 };
 

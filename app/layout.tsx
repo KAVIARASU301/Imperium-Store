@@ -26,21 +26,14 @@ export const metadata: Metadata = {
     url: "/",
     siteName: "Imperium Store",
     type: "website",
-    images: [
-      {
-        url: "/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg",
-        width: 1200,
-        height: 653,
-        alt: "Imperium Option Trading Terminal desktop workspace with option chain, positions, P&L, charts, and order panels",
-      },
-    ],
+    // og:image comes from the generated hero card in app/opengraph-image.tsx.
   },
   twitter: {
     card: "summary_large_image",
     title: "Imperium Trader – Options Terminal | Imperium Store",
     description:
         "Official Imperium Trader store: one-click multi-strike execution, strategy risk control, 7 brokers, pro charts, and paper trading.",
-    images: ["/product-resources/imperium-option-trading-terminal/images/imperium_horizon_og.jpg"],
+    // twitter:image comes from the generated hero card in app/twitter-image.tsx.
   },
   icons: {
     icon: [
