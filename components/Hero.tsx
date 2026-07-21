@@ -17,6 +17,15 @@ const osIcons = [
   { src: "/icons/linux-mint.svg", label: "Linux (Linux Mint)" },
 ];
 
+const heroFeatures = [
+  "Trade copier across sub-accounts",
+  "Free static IP for broker APIs",
+  "Strategy builder for option strategies",
+  "Quick one-click option buying & selling",
+  "Group positions by strategy",
+  "Strategy-level P&L for option sellers",
+];
+
 export default function Hero() {
   const terminal = getProductBySlug("imperium-option-trading-terminal");
   const ready = terminal ? isProductReady(terminal) : false;
@@ -61,6 +70,19 @@ export default function Hero() {
                         <Link href="/products" className="btn-ghost rounded-md px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.08em] sm:px-5 sm:py-3 sm:text-sm">
                           All Products
                         </Link>
+                      </div>
+
+                      <div className="mt-7 flex flex-col items-center gap-3 sm:mt-9">
+                        <ul className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                          {heroFeatures.map((feature) => (
+                            <li
+                              key={feature}
+                              className="rounded-md border border-cyan-border bg-card px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-white sm:text-xs"
+                            >
+                              {feature}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
 
                       <div className="mt-9 flex flex-col items-center gap-3 sm:mt-11">
