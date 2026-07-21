@@ -446,7 +446,7 @@ export const products: Product[] = [
         height: 1241,
       },
     ],
-    price: 4999,
+    price: 7999,
     currency: "INR",
     is_active: true,
     audience: [
