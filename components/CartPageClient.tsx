@@ -20,11 +20,18 @@ import {
   resolveCheckoutPrice,
 } from "@/lib/products";
 import { getSupabaseBrowserClient } from "@/lib/supabase";
+import {
+  COUNTRY_CODES,
+  DEFAULT_COUNTRY_ISO,
+  getCountryByIso,
+  getCountryFlag,
+  parsePhoneValue,
+} from "@/lib/country-codes";
 import type { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { markProductsPurchased, usePurchasedProducts } from "@/components/usePurchasedProducts";
 import StatePanel from "@/components/StatePanel";
 import type { CheckoutPlanId } from "@/types/pricing";
@@ -53,15 +60,13 @@ type RazorpaySuccessResponse = {
 
 const PHONE_STORAGE_PREFIX = "imperium.checkout.phone:";
 
-function normalizePhone(value: string) {
-  const digits = value.replace(/\D/g, "");
-  if (digits.length === 12 && digits.startsWith("91")) return digits.slice(2);
-  if (digits.length === 11 && digits.startsWith("0")) return digits.slice(1);
-  return digits;
+function normalizeDigits(value: string) {
+  return value.replace(/\D/g, "");
 }
 
-function isValidIndianMobile(value: string) {
-  return /^[6-9]\d{9}$/.test(value);
+function isValidMobile(dial: string, digits: string) {
+  if (dial === "91") return /^[6-9]\d{9}$/.test(digits);
+  return digits.length >= 6 && digits.length <= 14;
 }
 
 function getMetadataString(user: unknown, key: string): string {
@@ -84,6 +89,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
   const [cartPlans, setCartPlans] = useState<Record<string, CheckoutPlanId>>({});
   const [email, setEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  const [countryIso, setCountryIso] = useState(DEFAULT_COUNTRY_ISO);
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [savedPhone, setSavedPhone] = useState("");
@@ -120,11 +126,13 @@ export default function CartPageClient({ products }: { products: Product[] }) {
       setEmail(data.session?.user.email ?? null);
       if (data.session) {
         const id = data.session.user.id;
-        const metadataPhone = normalizePhone(getMetadataString(data.session.user, "contact_phone"));
-        const storedPhone = normalizePhone(window.localStorage.getItem(PHONE_STORAGE_PREFIX + id) ?? "");
+        const metadataPhone = getMetadataString(data.session.user, "contact_phone");
+        const storedPhone = window.localStorage.getItem(PHONE_STORAGE_PREFIX + id) ?? "";
+        const parsed = parsePhoneValue(storedPhone || metadataPhone);
         setUserId(id);
         setSavedPhone(metadataPhone);
-        setPhone(storedPhone || metadataPhone);
+        setCountryIso(parsed.iso);
+        setPhone(parsed.number);
       }
       setAuthChecked(true);
     }
@@ -205,17 +213,23 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         router.push("/dashboard");
         return;
       }
-      const cleanPhone = normalizePhone(phone);
-      if (!isValidIndianMobile(cleanPhone)) {
-        setPhoneError("Enter your 10-digit mobile number to continue to payment.");
+      const dial = getCountryByIso(countryIso).dial;
+      const cleanPhone = normalizeDigits(phone);
+      if (!isValidMobile(dial, cleanPhone)) {
+        setPhoneError(
+          dial === "91"
+            ? "Enter your 10-digit mobile number to continue to payment."
+            : "Enter a valid mobile number to continue to payment.",
+        );
         setLoading(false);
         return;
       }
       setPhoneError("");
-      window.localStorage.setItem(PHONE_STORAGE_PREFIX + (userId ?? sessionData.session?.user.id ?? ""), cleanPhone);
-      if (cleanPhone !== savedPhone) {
-        setSavedPhone(cleanPhone);
-        void supabase.auth.updateUser({ data: { contact_phone: cleanPhone } });
+      const fullPhone = `+${dial}${cleanPhone}`;
+      window.localStorage.setItem(PHONE_STORAGE_PREFIX + (userId ?? sessionData.session?.user.id ?? ""), fullPhone);
+      if (fullPhone !== savedPhone) {
+        setSavedPhone(fullPhone);
+        void supabase.auth.updateUser({ data: { contact_phone: fullPhone } });
       }
 
       const res = await fetch("/api/razorpay/create-order", {
@@ -259,7 +273,7 @@ export default function CartPageClient({ products }: { products: Product[] }) {
             : `${productIds.length} Imperium products`,
         prefill: {
           email: sessionData.session?.user.email ?? undefined,
-          contact: `+91${cleanPhone}`,
+          contact: fullPhone,
           name: getMetadataString(sessionData.session?.user, "full_name") || getMetadataString(sessionData.session?.user, "name") || undefined,
         },
         theme: { color: "#2F6FA6" },
@@ -501,17 +515,26 @@ export default function CartPageClient({ products }: { products: Product[] }) {
                   <label className="mt-5 block text-sm font-medium text-white">
                     Mobile number
                     <div className={`mt-2 flex items-center rounded-md border bg-main focus-within:border-brand ${phoneError ? "border-error/50" : "border-cyan-border"}`}>
-                      <span className="pl-4 text-sm font-semibold text-muted">+91</span>
+                      <CountryCodeSelect
+                        value={countryIso}
+                        onChange={(nextIso) => {
+                          setCountryIso(nextIso);
+                          if (nextIso === DEFAULT_COUNTRY_ISO) setPhone((current) => current.slice(0, 10));
+                          setPhoneError("");
+                        }}
+                      />
+                      <span className="h-6 w-px bg-cyan-border" aria-hidden="true" />
                       <input
                         value={phone}
                         onChange={(event) => {
-                          setPhone(normalizePhone(event.target.value).slice(0, 10));
+                          const maxDigits = countryIso === DEFAULT_COUNTRY_ISO ? 10 : 14;
+                          setPhone(normalizeDigits(event.target.value).slice(0, maxDigits));
                           setPhoneError("");
                         }}
                         type="tel"
                         inputMode="numeric"
                         autoComplete="tel-national"
-                        placeholder="10-digit mobile"
+                        placeholder={countryIso === DEFAULT_COUNTRY_ISO ? "10-digit mobile" : "Mobile number"}
                         className="min-w-0 flex-1 bg-transparent px-3 py-3 text-white outline-none"
                       />
                     </div>
@@ -569,6 +592,65 @@ export default function CartPageClient({ products }: { products: Product[] }) {
         </div>
       )}
     </main>
+  );
+}
+
+function CountryCodeSelect({ value, onChange }: { value: string; onChange: (iso: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const selected = getCountryByIso(value);
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+
+  return (
+    <div ref={containerRef} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Country code"
+        className="flex shrink-0 items-center gap-1 rounded-l-md bg-transparent py-3 pl-4 pr-2 text-sm font-semibold text-muted outline-none hover:text-white"
+      >
+        <span>{getCountryFlag(selected.iso)}</span>
+        <span>+{selected.dial}</span>
+      </button>
+      {open ? (
+        <ul
+          role="listbox"
+          aria-label="Country code"
+          className="absolute left-0 top-full z-20 mt-1 max-h-64 w-60 overflow-y-auto rounded-md border border-cyan-border bg-main shadow-lg shadow-black/40"
+        >
+          {COUNTRY_CODES.map((country) => (
+            <li key={country.iso}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={country.iso === value}
+                onClick={() => {
+                  onChange(country.iso);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-card-hover ${
+                  country.iso === value ? "bg-card-hover text-white" : "text-muted"
+                }`}
+              >
+                <span>{getCountryFlag(country.iso)}</span>
+                <span className="font-semibold">+{country.dial}</span>
+                <span className="truncate">{country.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
   );
 }
 
